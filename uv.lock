@@ -2221,6 +2221,11 @@ dependencies = [
     { name = "vectorbt" },
 ]
 
+[package.dev-dependencies]
+dev = [
+    { name = "pytest" },
+]
+
 [package.metadata]
 requires-dist = [
     { name = "jupyter", specifier = ">=1.1.1" },
@@ -2236,6 +2241,9 @@ requires-dist = [
     { name = "statsmodels", specifier = ">=0.15.0" },
     { name = "vectorbt", specifier = ">=1.1.1" },
 ]
+
+[package.metadata.requires-dev]
+dev = [{ name = "pytest", specifier = ">=9.1.1" }]
 
 [[package]]
 name = "referencing"

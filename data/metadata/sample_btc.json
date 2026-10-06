@@ -1,0 +1,10 @@
+{
+  "source": "binance",
+  "download_date": "2026-10-01",
+  "symbols": ["BTCUSDT"],
+  "start": "2020-01-01",
+  "end": "2026-01-01",
+  "timezone": "UTC",
+  "adjusted": true,
+  "interval": "1d"
+}

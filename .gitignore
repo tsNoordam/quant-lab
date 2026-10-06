@@ -1,10 +1,43 @@
-# Python-generated files
+# Python
 __pycache__/
-*.py[oc]
-build/
-dist/
-wheels/
-*.egg-info
+*.py[cod]
+*.so
 
 # Virtual environments
-.venv
+.venv/
+venv/
+env/
+
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# Jupyter
+.ipynb_checkpoints/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Data
+data/raw/*
+data/processed/*
+
+# Backtest outputs
+backtests/results/*
+backtests/reports/*
+
+# Temporary files
+tmp/
+.cache/
+
+# Secrets
+*.pem
+*.key
+credentials.json
+secrets.json
