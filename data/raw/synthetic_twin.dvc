@@ -1,0 +1,6 @@
+outs:
+- md5: 7d0fb442998fde5dba710c442f937396.dir
+  size: 296310
+  nfiles: 2
+  hash: md5
+  path: synthetic_twin

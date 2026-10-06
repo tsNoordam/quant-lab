@@ -1,0 +1,31 @@
+# DVC pipeline DAG. Reproduce everything that is out of date with:
+#
+#     uv run dvc repro
+#
+# Raw data enters with `dvc add data/raw/<dataset>` (never produced by a stage,
+# because vendor downloads are not reproducible). Every stage below is a pure
+# function of its deps + params, so `dvc repro` on any commit rebuilds exactly
+# the processed data that commit saw.
+
+stages:
+  preprocess:
+    foreach:
+      - synthetic_twin
+    do:
+      cmd: python -m quant_lab.data.preprocess --dataset ${item}
+      deps:
+        - data/raw/${item}
+        - src/quant_lab/data/loaders.py
+        - src/quant_lab/data/validation.py
+        - src/quant_lab/data/synchronization.py
+        - src/quant_lab/data/preprocess.py
+      params:
+        - conf/data/${item}.yaml:
+            - legs
+            - alignment
+            - validation
+      outs:
+        - data/processed/${item}/panel.parquet
+      metrics:
+        - data/processed/${item}/validation.json:
+            cache: false

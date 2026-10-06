@@ -1,0 +1,46 @@
+schema: '2.0'
+stages:
+  preprocess@synthetic_twin:
+    cmd: python -m quant_lab.data.preprocess --dataset synthetic_twin
+    deps:
+    - path: data/raw/synthetic_twin
+      hash: md5
+      md5: 7d0fb442998fde5dba710c442f937396.dir
+      size: 296310
+      nfiles: 2
+    - path: src/quant_lab/data/loaders.py
+      hash: md5
+      md5: 5ba045696d635dd44b0224999700fc75
+      size: 813
+    - path: src/quant_lab/data/preprocess.py
+      hash: md5
+      md5: 51be19cc65eda38c6e4031ba3952b0be
+      size: 3219
+    - path: src/quant_lab/data/synchronization.py
+      hash: md5
+      md5: 7c3f201e9ba00fc66f0f81ae29784dac
+      size: 2050
+    - path: src/quant_lab/data/validation.py
+      hash: md5
+      md5: 3c30ad893d6671accbd9448993eab421
+      size: 4616
+    params:
+      conf/data/synthetic_twin.yaml:
+        alignment:
+          missing_policy: drop
+          ffill_limit: 0
+        legs:
+          a: TWIN_A
+          b: TWIN_B
+        validation:
+          max_missing_frac: 0.02
+          max_abs_log_return: 0.25
+    outs:
+    - path: data/processed/synthetic_twin/panel.parquet
+      hash: md5
+      md5: a913f3b6cb6e06f8fdb48f5fc8553ea0
+      size: 264726
+    - path: data/processed/synthetic_twin/validation.json
+      hash: md5
+      md5: 208d2dd850a60b957de5b3d3c8136281
+      size: 322

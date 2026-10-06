@@ -1,0 +1,17 @@
+{
+  "dataset": "synthetic_twin",
+  "legs": {
+    "a": "TWIN_A",
+    "b": "TWIN_B"
+  },
+  "start": "2000-01-03",
+  "end": "2009-08-28",
+  "rows": 2490,
+  "dates_either_leg": 2520,
+  "rows_dropped": 30,
+  "missing_frac_a": 0.005952,
+  "missing_frac_b": 0.005952,
+  "stale_rows_a": 0,
+  "stale_rows_b": 0,
+  "warnings": []
+}

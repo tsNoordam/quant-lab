@@ -56,6 +56,31 @@ quant-research/
 MLflow (`mlflow.db`, `mlruns/`) and Hydra (`outputs/`, `multirun/`) write
 local, git-ignored state.
 
+## Data (DVC)
+
+One-time per machine (the remote path is machine-local, kept in the
+git-ignored `.dvc/config.local`):
+
+```bash
+mkdir -p ~/dvc-store
+uv run dvc remote add --local -d localstore ~/dvc-store
+uv run dvc pull                      # fetch the data this commit points to
+```
+
+Daily workflow:
+
+```bash
+# new raw dataset (immutable): write files + data/metadata/<name>.json, then
+uv run dvc add data/raw/<name>
+# rebuild whatever is out of date and inspect data-quality metrics
+uv run dvc repro
+uv run dvc metrics show              # or: dvc metrics diff main
+uv run dvc push && git push          # data blobs to the store, pointers to GitHub
+```
+
+The synthetic twin pair (`conf/data/synthetic_twin.yaml`) is regenerable from
+code: `uv run python -m quant_lab.data.synthetic --dataset synthetic_twin`.
+
 ## Dependencies
 
 | Group | Packages | Why |

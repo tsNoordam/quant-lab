@@ -1,0 +1,27 @@
+{
+  "dataset": "synthetic_twin",
+  "source": "synthetic",
+  "generator": "quant_lab.data.synthetic",
+  "config": "conf/data/synthetic_twin.yaml",
+  "seed": 20261006,
+  "symbols": [
+    "TWIN_A",
+    "TWIN_B"
+  ],
+  "start": "2000-01-03",
+  "end": "2009-08-28",
+  "calendar": "business_daily",
+  "timezone": "naive exchange-local dates",
+  "currency": "USD",
+  "adjusted": "no corporate actions; adj_close == close",
+  "parity_ratio": 1.5,
+  "columns": [
+    "date",
+    "open",
+    "high",
+    "low",
+    "close",
+    "adj_close",
+    "volume"
+  ]
+}
