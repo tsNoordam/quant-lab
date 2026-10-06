@@ -13,11 +13,17 @@ Read:
 - research/methodology/
 - research/assumptions/
 
-Create:
+Write the specifications (Markdown, every rule tagged) to:
 
-strategies/replication/
-strategies/baseline/
-strategies/extensions/
+research/specs/replication/
+research/specs/baseline/
+research/specs/extensions/
+
+Implement them as code in:
+
+src/quant_lab/strategies/
+
+with parameters in conf/strategy/ (never hardcoded).
 
 Strategy replication must remain faithful to the paper.
 

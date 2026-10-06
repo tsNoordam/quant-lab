@@ -20,6 +20,10 @@ Test:
 - market regimes
 - trade concentration
 
-Save results under:
+Run sweeps through Hydra multirun on the train/validation split only.
+Never pass +unlock_oos=true.
 
-backtests/robustness/
+Every run is logged to MLflow. Write the written summary
+(sensitivity tables, stable regions, conclusion) to:
+
+research/reports/

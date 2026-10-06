@@ -22,6 +22,40 @@ uv run pytest                 # must pass
 uv run ruff check . && uv run ruff format --check .
 ```
 
+## Layout
+
+```
+quant-research/
+├── .claude/            agents, skills, settings.json, hooks/guard_bash.py
+├── conf/               Hydra config groups: data, features, strategy, costs, split, backtest
+├── data/
+│   ├── raw/            immutable vendor data            (DVC: dvc add)
+│   ├── processed/      dvc.yaml stage outputs           (DVC: stage outs)
+│   └── metadata/       provenance JSON per dataset      (Git)
+├── papers/             raw/ PDFs (DVC), extracted/ text
+├── research/           extraction, equations, methodology, assumptions, evidence,
+│                       specs/{replication,baseline,extensions}, reports
+├── notebooks/          exploration only
+├── src/quant_lab/
+│   ├── data/           loaders, validation, cleaning, synchronization, preprocess (DVC stages)
+│   ├── features/       signals and rolling metrics
+│   ├── models/         econometrics (statsmodels: OLS, HAC/Newey-West)
+│   ├── strategies/     replication / baseline implementations
+│   ├── backtest/       run (Hydra+MLflow entry), costs, splits, reference engine
+│   └── tracking/       MLflow helpers (git commit, DVC hash, dirty-tree tags)
+├── tests/
+│   ├── unit/           costs, execution, entries/exits, sizing, tooling
+│   ├── data/           deterministic data validation
+│   ├── structural/     look-ahead / leakage perturbation tests
+│   └── integration/    VectorBT vs reference engine reconciliation
+├── CLAUDE.md           lab rules for Claude Code
+├── dvc.yaml            pipeline DAG (Step 3)
+└── pyproject.toml / uv.lock
+```
+
+MLflow (`mlflow.db`, `mlruns/`) and Hydra (`outputs/`, `multirun/`) write
+local, git-ignored state.
+
 ## Dependencies
 
 | Group | Packages | Why |

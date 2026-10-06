@@ -2,6 +2,11 @@
 __pycache__/
 *.py[cod]
 *.so
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+.ruff_cache/
 
 # Virtual environments
 .venv/
@@ -24,13 +29,21 @@ env/
 .DS_Store
 Thumbs.db
 
-# Data
-data/raw/*
-data/processed/*
+# Data: do NOT ignore data/raw or data/processed here. DVC writes its own
+# .gitignore next to each tracked output; a blanket pattern would also hide
+# the *.dvc pointer files that must be committed.
 
-# Backtest outputs
-backtests/results/*
-backtests/reports/*
+# MLflow (sqlite backend + local artifact stores)
+mlflow.db
+mlruns/
+mlartifacts/
+
+# Hydra run directories
+outputs/
+multirun/
+
+# Claude Code: personal overrides stay local
+.claude/settings.local.json
 
 # Temporary files
 tmp/

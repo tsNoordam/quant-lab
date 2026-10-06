@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "deny": [
+      "Read(./.env)",
+      "Read(./.env.*)",
+      "Edit(./data/raw/**)",
+      "Write(./data/raw/**)",
+      "Edit(./papers/raw/**)",
+      "Write(./papers/raw/**)",
+      "Edit(./dvc.lock)",
+      "Write(./dvc.lock)",
+      "Edit(./uv.lock)",
+      "Write(./uv.lock)",
+      "Bash(git push --force:*)",
+      "Bash(git push -f:*)",
+      "Bash(dvc gc:*)"
+    ],
+    "ask": [
+      "Edit(./.claude/settings.json)",
+      "Write(./.claude/settings.json)",
+      "Edit(./.claude/hooks/**)",
+      "Write(./.claude/hooks/**)"
+    ]
+  },
+  "env": {
+    "MLFLOW_DISABLE_AGENT_HINT": "1"
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/guard_bash.py\""
+          }
+        ]
+      }
+    ]
+  }
+}
