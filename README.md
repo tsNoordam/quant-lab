@@ -22,6 +22,11 @@ uv run pytest                 # must pass
 uv run ruff check . && uv run ruff format --check .
 ```
 
+Moved or renamed the project folder? Recreate the environment with
+`rm -rf .venv && uv sync`. Console scripts in `.venv/bin/` (dvc, pytest,
+ruff, ...) hard-code the old interpreter path and otherwise fail with
+"Failed to spawn: ... No such file or directory".
+
 ## Layout
 
 ```
