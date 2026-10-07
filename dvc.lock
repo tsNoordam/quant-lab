@@ -459,9 +459,9 @@ stages:
     deps:
     - path: data/raw/datastream_dlc
       hash: md5
-      md5: dae0da4020c8770df19f83203aeb60ef.dir
-      size: 70670360
-      nfiles: 14
+      md5: 98b9d30a9f26801499270d9c519a5ab6.dir
+      size: 35334548
+      nfiles: 12
     - path: src/quant_lab/data/datastream.py
       hash: md5
       md5: 1be425bb0e2932b5de4bccc163f44390
@@ -507,9 +507,9 @@ stages:
     deps:
     - path: data/raw/datastream_dlc
       hash: md5
-      md5: dae0da4020c8770df19f83203aeb60ef.dir
-      size: 70670360
-      nfiles: 14
+      md5: 98b9d30a9f26801499270d9c519a5ab6.dir
+      size: 35334548
+      nfiles: 12
     - path: src/quant_lab/data/datastream.py
       hash: md5
       md5: 1be425bb0e2932b5de4bccc163f44390
@@ -556,9 +556,9 @@ stages:
     deps:
     - path: data/raw/datastream_dlc
       hash: md5
-      md5: dae0da4020c8770df19f83203aeb60ef.dir
-      size: 70670360
-      nfiles: 14
+      md5: 98b9d30a9f26801499270d9c519a5ab6.dir
+      size: 35334548
+      nfiles: 12
     - path: src/quant_lab/data/datastream.py
       hash: md5
       md5: 1be425bb0e2932b5de4bccc163f44390
@@ -605,9 +605,9 @@ stages:
     deps:
     - path: data/raw/datastream_dlc
       hash: md5
-      md5: dae0da4020c8770df19f83203aeb60ef.dir
-      size: 70670360
-      nfiles: 14
+      md5: 98b9d30a9f26801499270d9c519a5ab6.dir
+      size: 35334548
+      nfiles: 12
     - path: src/quant_lab/data/datastream.py
       hash: md5
       md5: 1be425bb0e2932b5de4bccc163f44390
@@ -653,9 +653,9 @@ stages:
     deps:
     - path: data/raw/datastream_dlc
       hash: md5
-      md5: dae0da4020c8770df19f83203aeb60ef.dir
-      size: 70670360
-      nfiles: 14
+      md5: 98b9d30a9f26801499270d9c519a5ab6.dir
+      size: 35334548
+      nfiles: 12
     - path: src/quant_lab/data/datastream.py
       hash: md5
       md5: 1be425bb0e2932b5de4bccc163f44390
@@ -701,9 +701,9 @@ stages:
     deps:
     - path: data/raw/datastream_dlc
       hash: md5
-      md5: dae0da4020c8770df19f83203aeb60ef.dir
-      size: 70670360
-      nfiles: 14
+      md5: 98b9d30a9f26801499270d9c519a5ab6.dir
+      size: 35334548
+      nfiles: 12
     - path: src/quant_lab/data/datastream.py
       hash: md5
       md5: 1be425bb0e2932b5de4bccc163f44390
@@ -749,9 +749,9 @@ stages:
     deps:
     - path: data/raw/datastream_dlc
       hash: md5
-      md5: dae0da4020c8770df19f83203aeb60ef.dir
-      size: 70670360
-      nfiles: 14
+      md5: 98b9d30a9f26801499270d9c519a5ab6.dir
+      size: 35334548
+      nfiles: 12
     - path: src/quant_lab/data/datastream.py
       hash: md5
       md5: 1be425bb0e2932b5de4bccc163f44390
@@ -798,9 +798,9 @@ stages:
     deps:
     - path: data/raw/datastream_dlc
       hash: md5
-      md5: dae0da4020c8770df19f83203aeb60ef.dir
-      size: 70670360
-      nfiles: 14
+      md5: 98b9d30a9f26801499270d9c519a5ab6.dir
+      size: 35334548
+      nfiles: 12
     - path: src/quant_lab/data/datastream.py
       hash: md5
       md5: 1be425bb0e2932b5de4bccc163f44390
@@ -847,9 +847,9 @@ stages:
     deps:
     - path: data/raw/datastream_dlc
       hash: md5
-      md5: dae0da4020c8770df19f83203aeb60ef.dir
-      size: 70670360
-      nfiles: 14
+      md5: 98b9d30a9f26801499270d9c519a5ab6.dir
+      size: 35334548
+      nfiles: 12
     - path: src/quant_lab/data/datastream.py
       hash: md5
       md5: 1be425bb0e2932b5de4bccc163f44390
@@ -895,9 +895,9 @@ stages:
     deps:
     - path: data/raw/datastream_dlc
       hash: md5
-      md5: dae0da4020c8770df19f83203aeb60ef.dir
-      size: 70670360
-      nfiles: 14
+      md5: 98b9d30a9f26801499270d9c519a5ab6.dir
+      size: 35334548
+      nfiles: 12
     - path: src/quant_lab/data/datastream.py
       hash: md5
       md5: 1be425bb0e2932b5de4bccc163f44390
@@ -945,9 +945,9 @@ stages:
     deps:
     - path: data/raw/datastream_dlc
       hash: md5
-      md5: dae0da4020c8770df19f83203aeb60ef.dir
-      size: 70670360
-      nfiles: 14
+      md5: 98b9d30a9f26801499270d9c519a5ab6.dir
+      size: 35334548
+      nfiles: 12
     - path: src/quant_lab/data/datastream.py
       hash: md5
       md5: 1be425bb0e2932b5de4bccc163f44390
@@ -995,9 +995,9 @@ stages:
     deps:
     - path: data/raw/datastream_dlc
       hash: md5
-      md5: dae0da4020c8770df19f83203aeb60ef.dir
-      size: 70670360
-      nfiles: 14
+      md5: 98b9d30a9f26801499270d9c519a5ab6.dir
+      size: 35334548
+      nfiles: 12
     - path: src/quant_lab/data/datastream.py
       hash: md5
       md5: 1be425bb0e2932b5de4bccc163f44390
