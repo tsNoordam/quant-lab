@@ -138,8 +138,21 @@ uv run python -m quant_lab.backtest.walkforward data=rd_shell
 uv run python -m quant_lab.backtest.walkforward data=rd_shell walkforward.selection=best
 ```
 
-Settings in `conf/walkforward/default.yaml` (fold lengths, embargo, grid,
-selection rule). MLflow artifacts: `folds.csv`, `grid_scores.csv`, equity plot.
+Settings in `conf/walkforward/default.yaml` (fold lengths, embargo, selection
+rule); the parameter grid is `strategy.grid` in `conf/strategy/<name>.yaml`.
+MLflow artifacts: `folds.csv`, `grid_scores.csv`, equity plot.
+
+Strategies (`strategy=<name>`; specs in `research/specs/`):
+
+| Name | What | Spec |
+|---|---|---|
+| `parity_zscore` (default) | baseline: trailing z-score of the relative price | `baseline/parity_zscore.md` |
+| `silta_parity` | the SILTA arbitrageur: deviation from parity, 180 bps entry, exit at parity | `extensions/silta_parity.md` |
+
+```bash
+uv run python -m quant_lab.backtest.run data=rd_shell strategy=silta_parity
+uv run python -m quant_lab.backtest.walkforward data=rd_shell strategy=silta_parity
+```
 
 ## SILTA regressions (paper replication)
 

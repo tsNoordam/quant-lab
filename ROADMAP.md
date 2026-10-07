@@ -19,7 +19,8 @@ the next step started (see "Working in steps" in CLAUDE.md).
 | 5a | First audit: rd_shell walk-forward. Verdict FAIL (A1 dividends); A4 logging fixed | ffcf775 |
 | 5b | Fixes A1 (total-return dividends), A2 (locked quotes), A5 (FX cost); re-audit verdict WARNING. Walk-forward Sharpe -0.34, total -11.5% | befb58f |
 | 6 | Paper extraction: `research/{extraction,equations,methodology,assumptions,evidence}/maymin_silta.*`; parity checked against the equalization agreements | d063320 |
-| 7 | SILTA regressions (`quant_lab.models.silta`), Newey-West as in R sandwich, causal variant, chi check. H1 not supported on 1987-99 data (RD/Shell b=+0.02, t 0.4; Reed Elsevier b=+0.08, t 1.9, sign unstable); `research/reports/silta_replication.md` | (this step) |
+| 7 | SILTA regressions (`quant_lab.models.silta`), Newey-West as in R sandwich, causal variant, chi check. H1 not supported on 1987-99 data (RD/Shell b=+0.02, t 0.4; Reed Elsevier b=+0.08, t 1.9, sign unstable); `research/reports/silta_replication.md` | 5079cb1 |
+| 8 | Strategy registry; `silta_parity` (the SILTA arbitrageur: deviation from parity, 180 bps entry, exit at parity) with replication/extension specs and `run-backtest` skill. RD/Shell: train Sharpe -0.12, validation +0.14, walk-forward -0.02 (-3.5%) vs baseline -0.34 (-11.5%); cost-dominated, no edge after costs. `research/reports/silta_parity_rd_shell.md` | b555c5e + (this step) |
 
 ## Remaining, in order
 
@@ -40,14 +41,16 @@ Shell shares differ in size ~6.9x); H2 calibration (eq. 1) deferred, since only
 ~1-13% of development days lie inside the 180 bps bound. Block bootstrap and a
 differenced specification of the step 7 regression are left for step 9.
 
-8. **SILTA-informed strategy.** `/build-strategy`: a strategy spec that uses the
-   paper's relation, every rule tagged, with step 7's null result as the stated
-   prior (the relation is not established on our data); implemented in
-   `quant_lab.strategies`; walk-forward on `rd_shell` train+validation only.
-   Adds the `run-backtest` skill.
-9. **Robustness and multiple testing.** `/robustness`: parameter neighbourhoods,
-   cost and capital sensitivity (stamp duty, impact k, init_cash), sub-periods,
-   the `reed_elsevier` validation pair, number of trials from MLflow and a
+Decided in step 8: the paper has no trading rule, so there is no replication
+strategy (`research/specs/replication/maymin_silta.md`); relative volume (H1)
+is not used as a signal (contemporaneous, and absent in our data); the
+walk-forward grid now lives in each strategy's config (`strategy.grid`).
+
+9. **Robustness and multiple testing.** `/robustness` on `parity_zscore` and
+   `silta_parity`: parameter neighbourhoods, cost and capital sensitivity
+   (stamp duty, impact k, fallback spread, leverage), sub-periods (pre/post the
+   1997 UK tax-credit change), the `reed_elsevier` validation pair at frozen
+   values, the corner-selection issue (A3), number of trials from MLflow and a
    deflated Sharpe ratio.
 10. **Freeze.** `/audit-backtest` and red-team on the final candidate; a
     pre-registration note (what OOS result would count as success or failure,
