@@ -14,13 +14,18 @@ currency: GBP
 execution: next_close
 
 # [EXTERNAL-RESEARCH] workbook's theoretical ratio (1 Ltd share = 1 PLC share).
+# Rio Tinto's DLC description (riotinto.com, "RT DLC structure details"): a share
+# in either company carries the same dividend and voting rights, i.e. 1:1.
+# The 1995 sharing agreement PDF has no text layer; checked at the freeze (step 10).
 parity_ratio: 1.0
 
 # Total-return P&L; see conf/data/rd_shell.yaml.
 dividends:
   withholding:
-    # [IMPLEMENTATION-ASSUMPTION] UNVERIFIED: fully franked Australian dividends
-    # carry no withholding tax for non-residents. Settle before the freeze (step 10).
+    # [EXTERNAL-RESEARCH] Rio Tinto Ltd dividends 1997-2001 were 100% franked
+    # (investsmart.com.au dividend history); the franked part of a dividend is
+    # exempt from Australian dividend withholding tax for non-residents. Checked
+    # at the freeze (step 10); unfranked parts, if any, are not modelled.
     a: 0.0    # Rio Tinto Ltd (AU)
     b: 0.0    # Rio Tinto PLC (UK)
   min_yield: 0.005
