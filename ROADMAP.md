@@ -16,14 +16,15 @@ the next step started (see "Working in steps" in CLAUDE.md).
 | 4b | Liquidity-scaled costs, borrow, participation cap, VectorBT reconciliation | 0f891be |
 | 4c | Locked sample design, walk-forward, Unilever dropped | bfe79e7 |
 | 5 | `backtest-auditor` agent + audit workflow | ea1827b |
-| 5a | First audit: rd_shell walk-forward. Verdict FAIL (A1 dividends); A4 logging fixed | (this step) |
+| 5a | First audit: rd_shell walk-forward. Verdict FAIL (A1 dividends); A4 logging fixed | ffcf775 |
+| 5b | Fixes A1 (total-return dividends), A2 (locked quotes), A5 (FX cost); re-audit verdict WARNING. Walk-forward Sharpe -0.34, total -11.5% | (this step) |
 
 ## Remaining, in order
 
-5b. **Fix audit findings A1, A2, A5** (`research/reports/audits/2026-10-07-rd_shell-walkforward.md`):
-    dividend-consistent P&L, locked/crossed quotes as missing (+ validation
-    check), FX conversion cost. Remove each strict xfail marker in its fix
-    commit, re-run the walk-forward on train+validation, re-audit.
+Open from the audits (decisions, not fixes): B6 treatment of RD/Elsevier
+1996-98 wide quotes (needs a source); A3 corner-biased selection; the
+signal's raw vs dividend-adjusted relative price (step 6); Rio Tinto Ltd
+withholding (before step 10).
 
 6. **Paper extraction.** `/extract-paper` on Maymin (paper-reader), reviewed by
    quant-researcher: exact definitions (relative price/volume, standardization

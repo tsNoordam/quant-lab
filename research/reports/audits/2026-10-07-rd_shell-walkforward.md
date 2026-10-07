@@ -8,7 +8,7 @@
 | MLflow runs | `81dcbbf2e02f4ecd9232a9f7eb45a920` (bfe79e7, clean): audited. `131d36012fec49c0aa17605f8c1e306e` (ba535b0, after the A4 fix): same metrics, adds cost/trial metrics. Dirty only because of untracked `node_modules/` and `package*.json` outside the project code. |
 | Gate | Before: pytest 184 passed; ruff check and ruff format clean. After: 187 passed, 3 xfailed (strict); ruff clean. |
 | Auditor | `backtest-auditor` agent (read-only) |
-| **Verdict** | **FAIL.** A1 (P&L ignores dividends) is CONFIRMED and not yet fixed. |
+| **Verdict** | **FAIL** at ea1827b: A1 (P&L ignores dividends) CONFIRMED. A1, A2 and A5 were fixed in step 5b; the follow-up is `2026-10-07-rd_shell-walkforward-reaudit.md` (verdict WARNING). |
 
 Reported result (unchanged by this audit): walk-forward Sharpe -0.03, total
 return -1.8%, max drawdown -4.4%, 9 folds, 23 entries, 92 orders, gross
@@ -53,11 +53,11 @@ the defect is fixed, which forces the marker to be removed in the fix commit.
 
 | Finding | Status | Test | Fix commit |
 |---|---|---|---|
-| A1 dividends omitted from P&L | **CONFIRMED** (+1.50% phantom P&L on a 3% dividend at leg weight 0.5) | `tests/integration/test_dividends.py::test_short_leg_pays_the_ex_dividend` (strict xfail) | open |
-| A2 locked quotes priced as zero spread | **CONFIRMED** | `tests/unit/test_costs.py::test_locked_quotes_are_not_a_zero_spread` (strict xfail) | open |
+| A1 dividends omitted from P&L | **CONFIRMED** (+1.50% phantom P&L on a 3% dividend at leg weight 0.5) | `tests/integration/test_dividends.py::test_short_leg_pays_the_ex_dividend` (xfail removed; fixture corrected, see the fix commit) | `50333bf` |
+| A2 locked quotes priced as zero spread | **CONFIRMED** | `tests/unit/test_costs.py::test_locked_quotes_are_not_a_zero_spread` (xfail removed) | `c4443f7` |
 | A3 neighbourhood selection favours corners | **CONFIRMED** (WARNING stands, documented here) | `tests/unit/test_walkforward.py::test_neighbourhood_mean_favours_grid_corners_under_noise` (characterization) | none: changing the selection rule is a research decision, not an audit fix |
 | A4 incomplete walk-forward logging | **CONFIRMED** → fixed | `tests/integration/test_backtest_run.py::test_walk_forward_run_logs_costs_trades_and_trials` | `ba535b0` |
-| A5 no FX conversion cost | **CONFIRMED** (the model has no FX term) | `tests/integration/test_fx_costs.py::test_cost_model_prices_fx_conversion_for_foreign_currency_legs` (strict xfail) | open |
+| A5 no FX conversion cost | **CONFIRMED** (the model has no FX term) | `tests/integration/test_fx_costs.py::test_cost_model_prices_fx_conversion_for_foreign_currency_legs` (xfail removed) | `d42fdd5` |
 | A6 statistical weight | WARNING stands, documented | none (descriptive) | none |
 | A7 look-ahead / fold mechanics | PASS | existing `tests/structural/` | none |
 | A8 `backtest.period` cosmetic | **REJECTED** as a defect, regression guard added | `tests/structural/test_walkforward_causality.py::test_backtest_period_and_oos_unlock_do_not_affect_walk_forward` | none |
