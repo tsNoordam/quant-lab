@@ -16,9 +16,9 @@ from quant_lab.data.synthetic import write_raw
 
 ROOT = Path(__file__).resolve().parents[2]
 SMALL_GRID = [
-    "walkforward.grid.window=[40,80]",
-    "walkforward.grid.entry_z=[1.5,2.5]",
-    "walkforward.grid.exit_z=[0.0]",
+    "strategy.grid.window=[40,80]",
+    "strategy.grid.entry_z=[1.5,2.5]",
+    "strategy.grid.exit_z=[0.0]",
     "walkforward.train_years=3",
 ]
 PRICES = ["open_a", "high_a", "low_a", "close_a", "adj_close_a"]

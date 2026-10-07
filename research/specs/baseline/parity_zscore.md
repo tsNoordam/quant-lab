@@ -2,9 +2,9 @@
 
 Status: pipeline baseline. It exercises data -> signal -> execution -> costs ->
 MLflow end to end. It is **not** a replication of Maymin (SILTA): the paper
-explains why twin mispricings persist and proposes no trading rule. A
-SILTA-informed strategy follows after `/extract-paper` has produced
-`research/extraction/`.
+explains why twin mispricings persist and proposes no trading rule
+(`research/specs/replication/maymin_silta.md`). The SILTA-informed strategy is
+`research/specs/extensions/silta_parity.md`.
 
 Code: `src/quant_lab/strategies/parity_zscore.py`. Parameters: `conf/strategy/parity_zscore.yaml`.
 
@@ -14,7 +14,7 @@ Code: `src/quant_lab/strategies/parity_zscore.py`. Parameters: `conf/strategy/pa
 |---|---|---|
 | 1 | Relative price `r_t = ln(P_a,t / P_b,t)` on daily closes. | [PAPER-DERIVED] (definition, p. 5) |
 | 2 | Standardise `r_t` with a trailing `window`-day mean and standard deviation, using closes up to and including `t`. | [IMPLEMENTATION-ASSUMPTION]. The paper standardises (demean, descale, detrend) over the full sample, which is look-ahead in a trading context. |
-| 3 | No detrending. | [IMPLEMENTATION-ASSUMPTION]. A trailing mean absorbs slow drift; explicit detrending is deferred until the paper's procedure is extracted. |
+| 3 | No detrending. | [IMPLEMENTATION-ASSUMPTION]. A trailing mean absorbs slow drift. The paper's detrending (A1) is a full-sample, explanatory step. |
 | 4 | Short A / long B when `z_t > entry_z`; long A / short B when `z_t < -entry_z`; close when `|z_t| < exit_z`; flip directly when the opposite threshold is crossed. | [PROPOSED-EXTENSION]. The paper contains no entry/exit rule. |
 | 5 | No position while `z_t` is undefined (warm-up). | [IMPLEMENTATION-ASSUMPTION] |
 | 6 | Decision on close `t`, order filled on bar `t+1`: its open (`next_open`) or, for close-only data, its close (`next_close`). | [IMPLEMENTATION-ASSUMPTION] |
@@ -26,7 +26,8 @@ Code: `src/quant_lab/strategies/parity_zscore.py`. Parameters: `conf/strategy/pa
 
 ## Known gaps
 
-- Relative volume, the variable SILTA is about, is not used.
+- Relative volume, the variable SILTA is about, is not used (why: "Relative
+  volume" in `research/specs/extensions/silta_parity.md`).
 - The paper also describes a cap on total position as a multiple of daily
   volume; with single-day entries the 15% participation cap is always the
   binding one, so it is not modelled separately.
@@ -34,9 +35,8 @@ Code: `src/quant_lab/strategies/parity_zscore.py`. Parameters: `conf/strategy/pa
   roughly offset for a dollar-neutral book).
 - Trade size for the impact model uses `backtest.init_cash` as the equity scale,
   not the running equity.
-- Dividends: P&L is total-return (rule 11), but the signal still uses raw
-  closes, so each leg's ex-date drop moves the relative price. Kept because raw
-  prices are the paper's relative-price definition; revisit in step 6 when the
-  extraction confirms Maymin's exact definition. Changing it is a strategy change.
+- Dividends: P&L is total-return (rule 11), but the signal uses raw closes, so
+  each leg's ex-date drop moves the relative price. Settled in step 6: raw
+  prices are the paper's relative-price definition (A7), so this stays.
 - The pre-1997 UK tax credit on dividends (the tax-clientele effect behind
   these mispricings) is not modelled.

@@ -26,7 +26,7 @@ from quant_lab.backtest import costs, dividends
 from quant_lab.backtest.costs import LEGS
 from quant_lab.backtest.report import plot_equity
 from quant_lab.data.preprocess import PANEL_FILE
-from quant_lab.strategies.parity_zscore import target_positions
+from quant_lab.strategies import decide
 from quant_lab.tracking import mlflow_utils
 
 PERIODS = ("train", "validation", "oos")
@@ -286,7 +286,7 @@ def run_backtest(cfg: DictConfig, root: Path, overrides: list[str] | None = None
     panel = pd.read_parquet(root / panel_rel).loc[: period.end]  # nothing after the period
 
     s = cfg.strategy
-    decisions, z = target_positions(panel, window=s.window, entry_z=s.entry_z, exit_z=s.exit_z)
+    decisions, signal = decide(panel, cfg)
     sim = backtest_pair(panel, decisions, period, cfg)
     equity = sim.equity
     metrics = compute_metrics(equity, sim.held, sim.pf, cfg.backtest.annualization)
@@ -310,7 +310,7 @@ def run_backtest(cfg: DictConfig, root: Path, overrides: list[str] | None = None
             )
             plot_equity(equity, title, tmp / "equity_curve.png")
             (tmp / "config.yaml").write_text(OmegaConf.to_yaml(cfg, resolve=True))
-            pd.DataFrame({"equity": equity, "spread_position": held, "zscore": z}).dropna(
+            pd.DataFrame({"equity": equity, "spread_position": held, signal.name: signal}).dropna(
                 subset=["equity"]
             ).to_csv(tmp / "daily.csv", index_label="date")
             pf.orders.records_readable.to_csv(tmp / "orders.csv", index=False)

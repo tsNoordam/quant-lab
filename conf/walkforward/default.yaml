@@ -18,9 +18,6 @@ embargo_days: 5         # trading days skipped between a training and a test win
 metric: sharpe
 selection: neighbourhood_mean   # neighbourhood_mean | best
 
-# Parameter grid (strategy.<name>). Values must be listed in increasing order.
-# [IMPLEMENTATION-ASSUMPTION] ranges around the baseline (60 / 2.0 / 0.5).
-grid:
-  window: [40, 60, 80, 120]
-  entry_z: [1.5, 2.0, 2.5]
-  exit_z: [0.0, 0.5]
+# The parameter grid belongs to the strategy (strategy.grid in
+# conf/strategy/<name>.yaml), so a walk-forward always searches the selected
+# strategy's own parameters.

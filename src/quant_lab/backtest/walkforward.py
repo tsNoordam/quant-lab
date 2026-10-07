@@ -5,7 +5,7 @@
 The evaluated range is the dataset's train + validation periods; the OOS period
 is never used. For each fold:
 
-1. every parameter combination in ``walkforward.grid`` is backtested on the
+1. every parameter combination in ``strategy.grid`` is backtested on the
    training window, using data up to the training window's end only;
 2. the selection rule (``best`` or ``neighbourhood_mean``) picks one combination
    from the training scores alone;
@@ -39,7 +39,7 @@ from quant_lab.backtest.run import (
     run_tags,
 )
 from quant_lab.data.preprocess import PANEL_FILE
-from quant_lab.strategies.parity_zscore import target_positions
+from quant_lab.strategies import decide
 from quant_lab.tracking import mlflow_utils
 
 MIN_TEST_DAYS = 20
@@ -97,7 +97,7 @@ def parameter_grid(grid: DictConfig) -> tuple[list[str], list[tuple]]:
     for name in names:
         values = list(grid[name])
         if values != sorted(values):
-            raise ValueError(f"walkforward.grid.{name} must be in increasing order")
+            raise ValueError(f"strategy.grid.{name} must be in increasing order")
     return names, list(itertools.product(*(grid[n] for n in names)))
 
 
@@ -121,9 +121,11 @@ def neighbourhood_scores(names: list[str], grid: DictConfig, raw: dict[tuple, fl
 def evaluate(panel: pd.DataFrame, period: Period, cfg: DictConfig, params: dict):
     """Backtest one parameter set on one window, seeing data up to its end only."""
     visible = panel.loc[: period.end]
-    s = OmegaConf.merge(cfg.strategy, params)
-    decisions, _ = target_positions(visible, window=s.window, entry_z=s.entry_z, exit_z=s.exit_z)
+    unknown = set(params) - set(cfg.strategy)
+    if unknown:
+        raise BacktestGuardError(f"grid parameters {sorted(unknown)} are not in strategy config")
     run_cfg = OmegaConf.merge(cfg, {"strategy": params})
+    decisions, _ = decide(visible, run_cfg)
     sim = backtest_pair(visible, decisions, period, run_cfg)
     metrics = compute_metrics(sim.equity, sim.held, sim.pf, cfg.backtest.annualization)
     return sim, metrics
@@ -156,7 +158,7 @@ def walk_forward(cfg: DictConfig, panel: pd.DataFrame) -> dict:
     )
     if not folds:
         raise BacktestGuardError("no walk-forward folds fit in the development range")
-    names, combos = parameter_grid(wf.grid)
+    names, combos = parameter_grid(cfg.strategy.grid)
 
     fold_rows, grid_rows, returns = [], [], []
     for fold in folds:
@@ -170,7 +172,7 @@ def walk_forward(cfg: DictConfig, panel: pd.DataFrame) -> dict:
         if wf.selection == "best":
             score = raw
         elif wf.selection == "neighbourhood_mean":
-            score = neighbourhood_scores(names, wf.grid, raw)
+            score = neighbourhood_scores(names, cfg.strategy.grid, raw)
         else:
             raise ValueError(f"unknown walkforward.selection {wf.selection!r}")
         finite = {c: v for c, v in score.items() if np.isfinite(v)}
@@ -266,7 +268,7 @@ def run_walk_forward(cfg: DictConfig, root: Path, overrides: list[str] | None = 
         mlflow.set_tags(tags)
         # Single-run settings the walk-forward does not use: the traded parameters
         # are chosen per fold (folds.csv) and the range comes from the split file.
-        unused = {"backtest.period"} | {f"strategy.{name}" for name in cfg.walkforward.grid}
+        unused = {"backtest.period"} | {f"strategy.{name}" for name in cfg.strategy.grid}
         mlflow.log_params({k: v for k, v in run_params(cfg).items() if k not in unused})
         mlflow.log_metrics(summary)
         with tempfile.TemporaryDirectory() as tmp:

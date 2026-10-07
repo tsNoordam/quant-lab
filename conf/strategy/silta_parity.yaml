@@ -1,0 +1,26 @@
+# The SILTA arbitrageur: trade the deviation from theoretical parity.
+# Spec and rule classification: research/specs/extensions/silta_parity.md
+#
+#   uv run python -m quant_lab.backtest.run strategy=silta_parity data=rd_shell
+#
+# Parity itself is data.parity_ratio (conf/data/<pair>.yaml).
+
+name: silta_parity
+
+# [PAPER-DERIVED] Enter when |D| exceeds round-turn transaction costs. Maymin uses
+# HSBC's 180 bps bound for every pair (pp. 12-13, 27).
+entry_bound: 0.018
+
+# [PAPER-DERIVED] The arbitrageur is paid when the discrepancy disappears: close
+# once D reaches (or crosses) parity. 0 = parity itself.
+exit_bound: 0.0
+
+# [IMPLEMENTATION-ASSUMPTION] |target weight| per leg, as in the baseline
+# (gross 2 x leg_weight). The paper's 5x leverage example (p. 13) is not used.
+leg_weight: 0.5
+
+# Walk-forward neighbourhood. [IMPLEMENTATION-ASSUMPTION] 1x, 2x, 3x the paper's
+# cost bound; exit at parity or at half the bound. Increasing order.
+grid:
+  entry_bound: [0.018, 0.036, 0.054]
+  exit_bound: [0.0, 0.009]

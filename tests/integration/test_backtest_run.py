@@ -14,7 +14,7 @@ from hydra import compose, initialize_config_dir
 from quant_lab.backtest import run as bt
 from quant_lab.data.preprocess import load_dataset_config, preprocess
 from quant_lab.data.synthetic import simulate_truth, write_raw
-from quant_lab.strategies.parity_zscore import spread_positions
+from quant_lab.strategies.parity_zscore import spread_positions, target_positions
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -96,7 +96,7 @@ def test_data_after_the_period_cannot_affect_the_run(project, tmp_path):
     def equity(p):
         p = p.loc[: period.end]
         s = cfg.strategy
-        decisions, _ = bt.target_positions(p, window=s.window, entry_z=s.entry_z, exit_z=s.exit_z)
+        decisions, _ = target_positions(p, window=s.window, entry_z=s.entry_z, exit_z=s.exit_z)
         return bt.backtest_pair(p, decisions, period, cfg).equity
 
     pd.testing.assert_series_equal(equity(panel), equity(shocked))
@@ -156,9 +156,9 @@ def test_walk_forward_run_is_logged(project):
 
     cfg = config(
         project,
-        "walkforward.grid.window=[40,80]",
-        "walkforward.grid.entry_z=[2.0]",
-        "walkforward.grid.exit_z=[0.5]",
+        "strategy.grid.window=[40,80]",
+        "strategy.grid.entry_z=[2.0]",
+        "strategy.grid.exit_z=[0.5]",
     )
     result = run_walk_forward(cfg, project)
     run = mlflow.get_run(result["run_id"])
@@ -178,9 +178,9 @@ def test_walk_forward_run_logs_costs_trades_and_trials(project):
 
     cfg = config(
         project,
-        "walkforward.grid.window=[40,80]",
-        "walkforward.grid.entry_z=[2.0]",
-        "walkforward.grid.exit_z=[0.5]",
+        "strategy.grid.window=[40,80]",
+        "strategy.grid.entry_z=[2.0]",
+        "strategy.grid.exit_z=[0.5]",
     )
     run = mlflow.get_run(run_walk_forward(cfg, project)["run_id"])
     expected = {

@@ -11,6 +11,7 @@ Spread position: +1 = long leg A / short leg B, -1 = short A / long B, 0 = flat.
 
 import numpy as np
 import pandas as pd
+from omegaconf import DictConfig
 
 from quant_lab.features.rolling import calculate_rolling_zscore
 
@@ -47,3 +48,7 @@ def target_positions(panel: pd.DataFrame, *, window: int, entry_z: float, exit_z
     rel = relative_price(panel)
     z = calculate_rolling_zscore(rel, window=window).rename("zscore")
     return spread_positions(z, entry_z=entry_z, exit_z=exit_z), z
+
+
+def decide(panel: pd.DataFrame, s: DictConfig, data: DictConfig):
+    return target_positions(panel, window=s.window, entry_z=s.entry_z, exit_z=s.exit_z)
