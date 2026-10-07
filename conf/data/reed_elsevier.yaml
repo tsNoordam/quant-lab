@@ -10,8 +10,8 @@ currency: GBP
 # Close-only data: decisions on close t are filled at close t+1.
 execution: next_close
 
-# [EXTERNAL-RESEARCH] workbook's theoretical ratio in GBP per share; cross-check
-# against REEDELSEVIERPLC20F eq agr.pdf.
+# [EXTERNAL-RESEARCH] workbook's theoretical ratio in GBP per share. Verified in
+# step 6: the equalization agreement's "Equalisation Ratio" is 1.538:1.
 parity_ratio: 1.538
 
 # Total-return P&L; see conf/data/rd_shell.yaml. [IMPLEMENTATION-ASSUMPTION]

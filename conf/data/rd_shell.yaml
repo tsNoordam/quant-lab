@@ -16,8 +16,10 @@ execution: next_close
 # Theoretical P_a/P_b in GBP per share, as used by the workbook's own
 # "LOG DEVIATIONS FROM PARITY" column (verified to machine precision in
 # tests/integration/test_datastream_real.py).
-# [EXTERNAL-RESEARCH] value from the dataset authors; to be cross-checked
-# against the equalization agreement (ROYALDUTCH-SHELL eq agr.pdf).
+# [EXTERNAL-RESEARCH] value from the dataset authors. Checked in step 6 against
+# the 60/40 dividend split in the equalization agreement: 1.5 x N_Shell / N_RD
+# gives 6.87-6.96 over 1997-2002 (share counts drift with buybacks), so the
+# constant is right to ~1%. See research/equations/maymin_silta.md.
 parity_ratio: 6.863006819188524
 
 # Total-return P&L (quant_lab.backtest.dividends): longs receive the dividend net

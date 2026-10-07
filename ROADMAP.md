@@ -17,21 +17,23 @@ the next step started (see "Working in steps" in CLAUDE.md).
 | 4c | Locked sample design, walk-forward, Unilever dropped | bfe79e7 |
 | 5 | `backtest-auditor` agent + audit workflow | ea1827b |
 | 5a | First audit: rd_shell walk-forward. Verdict FAIL (A1 dividends); A4 logging fixed | ffcf775 |
-| 5b | Fixes A1 (total-return dividends), A2 (locked quotes), A5 (FX cost); re-audit verdict WARNING. Walk-forward Sharpe -0.34, total -11.5% | (this step) |
+| 5b | Fixes A1 (total-return dividends), A2 (locked quotes), A5 (FX cost); re-audit verdict WARNING. Walk-forward Sharpe -0.34, total -11.5% | befb58f |
+| 6 | Paper extraction: `research/{extraction,equations,methodology,assumptions,evidence}/maymin_silta.*`; parity checked against the equalization agreements | (this step) |
 
 ## Remaining, in order
 
 Open from the audits (decisions, not fixes): B6 treatment of RD/Elsevier
-1996-98 wide quotes (needs a source); A3 corner-biased selection; the
-signal's raw vs dividend-adjusted relative price (step 6); Rio Tinto Ltd
-withholding (before step 10).
+1996-98 wide quotes (needs a source); A3 corner-biased selection; Rio Tinto
+Ltd withholding (before step 10).
 
-6. **Paper extraction.** `/extract-paper` on Maymin (paper-reader), reviewed by
-   quant-researcher: exact definitions (relative price/volume, standardization
-   = demean/descale/detrend), regression specifications, reported coefficients
-   and t-stats per pair, the SILTA model and its calibration. Also settle the
-   parity ratios against the equalization agreements in the archives.
-   Output: `research/extraction|equations|methodology|assumptions|evidence/`.
+Settled in step 6: the paper's relative price uses raw prices (A7 in
+`research/assumptions/maymin_silta.md`), so the signal stays on raw closes.
+Found in step 6: the paper's twin sample is 2002-04-25..2007-04-24, which our
+data does not cover, so step 7 tests H1 on an earlier, disjoint period instead
+of replicating Table VI numbers. Also: `shares_outstanding` (NOSH) is not
+split-adjusted while volume is, so the turnover check overstates pre-split
+turnover (less sensitive, never a false failure); fix before relying on it.
+
 7. **SILTA econometric replication.** `quant_lab.models`: the paper's
    relative-price-on-relative-volume regressions with Newey-West errors for
    `rd_shell` and `reed_elsevier`, compared with the paper's numbers; full-

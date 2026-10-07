@@ -1,0 +1,49 @@
+claim_id,pair,period,specification,statistic,value,se_or_t,source,tag
+T2a,HSBC New-Old,1992-1999,y on x shares; raw,alpha,0.033,t=+12.0,Table II p34,PAPER-DERIVED
+T2a,HSBC New-Old,1992-1999,y on x shares; raw,beta,-0.017,t=-7.6,Table II p34,PAPER-DERIVED
+T2a,HSBC New-Old,1992-1999,y on x shares; raw,rho,-0.51,,Table II p34,PAPER-DERIVED
+T2a,HSBC New-Old,1992-1999,y on x shares; raw,R2,0.26,,Table II p34,PAPER-DERIVED
+T2b,HSBC New-Old,1992-1999,y on notional volume; raw,beta,-0.017,t=-7.2,Table II p34,PAPER-DERIVED
+T2b,HSBC New-Old,1992-1999,y on notional volume; raw,rho,-0.48,,Table II p34,PAPER-DERIVED
+T2c,HSBC New-Old,1992-1999,demeaned+descaled,beta=rho,-0.23,t=-3.8,Table II p34,PAPER-DERIVED
+T2d,HSBC New-Old,1992-1999,demeaned+descaled+detrended,beta=rho,-0.22,t=-4.2,Table II p34,PAPER-DERIVED
+T2d,HSBC New-Old,1992-1999,demeaned+descaled+detrended,R2,0.05,,Table II p34,PAPER-DERIVED
+T5a,3Com/Palm,2000,y on x shares; raw,beta,-0.18,t=-6.4,Table V p37,PAPER-DERIVED
+T5a,3Com/Palm,2000,y on x shares; raw,rho,-0.63,,Table V p37,PAPER-DERIVED
+T5d,3Com/Palm,2000,demeaned+descaled+detrended,beta=rho,-0.43,t=-2.8,Table V p37,PAPER-DERIVED
+T6,HSBC New-Old,1992-1999,Z[y] on Z[x],beta=rho,-0.22,se=0.05; t=-4.2,Table VI p38,PAPER-DERIVED
+T6,3Com/Palm,2000,Z[y] on Z[x],beta=rho,-0.43,se=0.15; t=-2.9,Table VI p38,PAPER-DERIVED
+T6,RD-Shell,2002-04-25..2007-04-24,Z[y] on Z[x],beta=rho,-0.25,se=0.07; t=-3.4,Table VI p38,PAPER-DERIVED
+T6,Unilever,2002-04-25..2007-04-24,Z[y] on Z[x],beta=rho,-0.23,se=0.06; t=-3.8,Table VI p38,PAPER-DERIVED
+T6,Reed-Elsevier,2002-04-25..2007-04-24,Z[y] on Z[x],beta=rho,-0.09,se=0.04; t=-2.2,Table VI p38,PAPER-DERIVED
+T6,Creative/Ubid,per Lamont-Thaler,Z[y] on Z[x],beta=rho,0.13,se=0.19; t=+0.7,Table VI p38,PAPER-DERIVED
+T6,HNC/Retek,per Lamont-Thaler,Z[y] on Z[x],beta=rho,0.10,se=0.09; t=+1.1,Table VI p38,PAPER-DERIVED
+T6,DaisyTek/PFSWeb,per Lamont-Thaler,Z[y] on Z[x],beta=rho,0.12,se=0.07; t=+1.8,Table VI p38,PAPER-DERIVED
+T6,Metamor/Xpedior,per Lamont-Thaler,Z[y] on Z[x],beta=rho,-0.21,se=0.13; t=-1.6,Table VI p38,PAPER-DERIVED
+T6,Methode/Stratos,per Lamont-Thaler,Z[y] on Z[x],beta=rho,-0.03,se=0.10; t=-0.3,Table VI p38,PAPER-DERIVED
+T7,HSBC New-Old,1992-1999,log volume ratio within 180bps bound,mu;sigma,1.01;0.81,,Table VII p39,PAPER-DERIVED
+T7,3Com/Palm,2000,log volume ratio (whole history),mu;sigma,0.78;0.70,,Table VII p39,PAPER-DERIVED
+T7,RD-Shell,2002-2007,log volume ratio within bound,mu;sigma,0.27;0.38,,Table VII p39,PAPER-DERIVED
+T7,Unilever,2002-2007,log volume ratio within bound,mu;sigma,0.40;0.44,,Table VII p39,PAPER-DERIVED
+T7,Reed-Elsevier,2002-2007,log volume ratio within bound,mu;sigma,0.57;0.35,,Table VII p39,PAPER-DERIVED
+T7,HSBC New-Old,1992-1999,implied daily convergence p (N=100),p,0.0070,,Table VII p39,PAPER-DERIVED
+T7,3Com/Palm,2000,implied daily convergence p (N=100),p,0.0340,,Table VII p39,PAPER-DERIVED
+T7,RD-Shell,2002-2007,implied daily convergence p (N=100),p,0.0120,,Table VII p39,PAPER-DERIVED
+T7,Unilever,2002-2007,implied daily convergence p (N=100),p,0.0060,,Table VII p39,PAPER-DERIVED
+T7,Reed-Elsevier,2002-2007,implied daily convergence p (N=100),p,0.0000,,Table VII p39,PAPER-DERIVED
+T7,HSBC New-Old,1992-1999,smaller avg daily traded value,value,GBP 24m,,Table VII p39,PAPER-DERIVED
+T7,RD-Shell,2002-2007,smaller avg daily traded value,value,EUR 300m,,Table VII p39,PAPER-DERIVED
+T7,Unilever,2002-2007,smaller avg daily traded value,value,EUR 130m,,Table VII p39,PAPER-DERIVED
+T7,Reed-Elsevier,2002-2007,smaller avg daily traded value,value,EUR 34m,,Table VII p39,PAPER-DERIVED
+T8,HSBC;RD-Shell;Unilever,n/a,implied max position N at p=0.0100,N,73;120;65,,Table VIII p40,PAPER-DERIVED
+T8,HSBC;RD-Shell;Unilever,n/a,implied max position N at p=0.0075,N,99;158;89,,Table VIII p40,PAPER-DERIVED
+T8,HSBC;RD-Shell;Unilever,n/a,implied max position N at p=0.0050,N,130;209;118,,Table VIII p40,PAPER-DERIVED
+T8,HSBC;RD-Shell;Unilever,n/a,implied max position N at p=0.0060,N,118;187;105,,Table VIII p40,PAPER-DERIVED
+T8,HSBC;RD-Shell;Unilever,n/a,implied max position N at p=0.0095,N,77;127;69,,Table VIII p40,PAPER-DERIVED
+T3,HSBC New-Old,1992-1999,round-turn costs (price convergence within 1y),bps,180,,Table III p35,PAPER-DERIVED
+T4,HSBC New-Old,1992-1999,mispricing periods above cost bound until parity,business days,73;223;250;55;262;13;747,,Table IV p36,PAPER-DERIVED
+X1,HSBC New-Old,1992-1999,model-implied arbitrage activity,share of daily volume,0.20 average,,p24,PAPER-DERIVED
+X2,HSBC New-Old,1992-1999,mean abs premium New over Old,percent,2.89,,p7,PAPER-DERIVED
+X3,HSBC New-Old,1992-1999,daily return correlation of classes,rho,0.97,,p6,PAPER-DERIVED
+X4,HSBC New-Old,1992-1999,noiseless model slope range,b,-1.45..-1.39,,p21,PAPER-DERIVED
+X5,HSBC New-Old,1992-1999,implied p from fitted cubic at b=-0.22,p,N=5: 0.06; N=100: 0.007; N=500: 0,,p22,PAPER-DERIVED
