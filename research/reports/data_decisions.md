@@ -3,6 +3,22 @@
 Decisions that shape what the lab can conclude, with the evidence behind them.
 Newest first. Each entry is fixed once a result depends on it.
 
+## 2026-10-07: RD/Shell parity from pre-2000 share counts (freeze audit A1)
+
+The workbook's constant parity 6.863 cannot be derived from information before
+2000: split-adjusted, 1.5 x N_Shell / N_RD is 6.956 in every year 1987-1999,
+and values near 6.863 occur only in 2000-02 (the OOS period). The step 6 check
+that compared them used 2000-02 share counts (a data touch, no returns); it is
+recorded here as such.
+
+Decision, on causality grounds: `parity_ratio = 6.9558` (median over
+1997-07-01..1999-12-31, after the 1997 splits). The workbook value stays as
+`workbook_parity_ratio`, used only to verify the ingest against the workbook's
+own deviation column. The development effect was seen before this decision
+(auditor's read-only check: silta_parity train -12.4% -> about -5%, validation
+unchanged); the choice is fixed by the causality argument, not by that number.
+`parity_zscore` is unaffected (a constant parity drops out of the z-score).
+
 ## 2026-10-07: Sample design for real pairs (Step 4c), committed before any real-data backtest
 
 No backtest had been run on Datastream data when this design was committed.

@@ -13,14 +13,20 @@ currency: GBP
 # Close-only data: decisions on close t are filled at close t+1.
 execution: next_close
 
-# Theoretical P_a/P_b in GBP per share, as used by the workbook's own
-# "LOG DEVIATIONS FROM PARITY" column (verified to machine precision in
-# tests/integration/test_datastream_real.py).
-# [EXTERNAL-RESEARCH] value from the dataset authors. Checked in step 6 against
-# the 60/40 dividend split in the equalization agreement: 1.5 x N_Shell / N_RD
-# gives 6.87-6.96 over 1997-2002 (share counts drift with buybacks), so the
-# constant is right to ~1%. See research/equations/maymin_silta.md.
-parity_ratio: 6.863006819188524
+# Theoretical P_a/P_b in GBP per share.
+# [MATHEMATICALLY-DERIVED] 60/40 dividend split of the equalization agreement x
+# share counts: 1.5 x N_Shell / N_RD = 6.9558, the median over 1997-07-01 ..
+# 1999-12-31 (after the 1997 splits). Split-adjusted, the same value holds in
+# every development year (tests/data/test_parity_point_in_time.py), so it is
+# known at each development date and before the OOS period.
+# Changed at the freeze audit 2026-10-07 (A1): the workbook constant below
+# matches only 2000-02 share counts, i.e. it carried OOS information.
+parity_ratio: 6.9558
+
+# The dataset authors' constant, used by the workbook's "LOG DEVIATIONS FROM
+# PARITY" column. Kept only to verify the ingest against that column
+# (tests/integration/test_datastream_real.py). [EXTERNAL-RESEARCH]
+workbook_parity_ratio: 6.863006819188524
 
 # Total-return P&L (quant_lab.backtest.dividends): longs receive the dividend net
 # of withholding, shorts pay it in full. [IMPLEMENTATION-ASSUMPTION] for a

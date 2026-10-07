@@ -22,7 +22,7 @@ gone, which the paper models as a rare event.
 
 | # | Rule | Classification |
 |---|---|---|
-| 1 | D_t = ln(P_a,t / P_b,t) - ln(parity) on raw daily closes in the common currency. | [PAPER-DERIVED] (E1, R1; raw prices per A7). Parity value per pair: [EXTERNAL-RESEARCH] (`data.parity_ratio`, verified against the equalization agreements in step 6). |
+| 1 | D_t = ln(P_a,t / P_b,t) - ln(parity) on raw daily closes in the common currency. | [PAPER-DERIVED] (E1, R1; raw prices per A7). Parity value per pair (`data.parity_ratio`): RD/Shell [MATHEMATICALLY-DERIVED] 1.5 x N_Shell/N_RD from pre-2000 share counts = 6.9558 (changed from the workbook's 6.863 at the freeze audit, A1: that value carried OOS information); Reed/Elsevier 1.538 from the agreement text; Rio Tinto 1.0 (see the freeze pre-registration). |
 | 2 | D_t uses only close t. No rolling window, no standardization. | [PAPER-DERIVED] (R1: the discrepancy itself is the opportunity). Consequence: no look-ahead and no warm-up. |
 | 3 | Short A / long B when D_t > entry_bound; long A / short B when D_t < -entry_bound (short the expensive leg). | [PAPER-DERIVED] (R1) |
 | 4 | entry_bound = 0.018 (180 bps). | [PAPER-DERIVED] (R2: HSBC's round-turn cost, used by the paper for all pairs). Applying it to RD/Shell in 1987-99 is the paper's own simplification, not a measured cost of this pair. |

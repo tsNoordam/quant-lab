@@ -67,6 +67,11 @@ Calibration link (p. 21) [PAPER-DERIVED]:
   per cent", RD-Shell agreement). Per-share parity = 1.5 x N_Shell / N_RD on a common
   split basis. With the workbook's end-of-sample share counts this gives
   6.87-6.96 (1997-2002), versus the workbook constant 6.863. [MATHEMATICALLY-DERIVED]
+  **Freeze audit 2026-10-07 (A1):** that check used 2000-02 share counts (an OOS
+  data touch, no returns). Split-adjusted, the development-period share counts give
+  6.956 in every year 1987-1999; 6.863 matches only 2000-02. `parity_ratio` is now
+  6.9558 (median 1997-07-01..1999-12-31); 6.863 is kept as `workbook_parity_ratio`
+  for the ingest check only.
 - Reed / Elsevier: "Equalisation Ratio means the ratio of 1.538:1" (gross dividend of
   one Elsevier share to one Reed share). Workbook constant 1.538. [PAPER-DERIVED
   from the agreement]

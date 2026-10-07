@@ -29,7 +29,8 @@ def test_rd_shell_parity_is_knowable_before_the_oos_period():
 
 @pytest.mark.skipif(not PANEL.exists(), reason="rd_shell panel not present (dvc pull)")
 def test_split_adjusted_share_count_parity_is_stable_through_development():
-    """The constant is the point-in-time value at every development date (within 0.1%)."""
+    """The constant is the point-in-time value in every development year (yearly medians
+    within 0.1%; NOSH updates one leg before the other around a split, e.g. Dec 1988)."""
     cfg = OmegaConf.load(ROOT / "conf/data/rd_shell.yaml")
     split = OmegaConf.load(ROOT / "conf/split/rd_shell.yaml")
     p = pd.read_parquet(PANEL).loc[: split.validation.end]
@@ -38,4 +39,5 @@ def test_split_adjusted_share_count_parity_is_stable_through_development():
     adjusted = raw.copy()
     adjusted[raw < 6.5] *= 9 / 8
     adjusted[raw > 8.0] *= 3 / 4
-    assert (np.abs(np.log(adjusted / cfg.parity_ratio)) < 0.001).all()
+    yearly = adjusted.groupby(adjusted.index.year).median()
+    assert (np.abs(np.log(yearly / cfg.parity_ratio)) < 0.001).all(), yearly.round(4).to_dict()

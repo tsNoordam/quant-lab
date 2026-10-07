@@ -46,7 +46,8 @@ def test_ingested_prices_reproduce_the_workbook_parity_deviations(lab, dataset):
         book = xlrd.open_workbook(file_contents=archive.read(cfg.source.workbook))
     # Column 3 of 'Ratio' is "LOG DEVIATIONS FROM PARITY" on prices (all four workbooks).
     theirs = read_sheet(book, "Ratio").data[3].reindex(panel.index)
-    ours = np.log(panel["close_a"] / panel["close_b"] / cfg.parity_ratio)
+    parity = cfg.get("workbook_parity_ratio", cfg.parity_ratio)  # rd_shell: freeze audit A1
+    ours = np.log(panel["close_a"] / panel["close_b"] / parity)
 
     assert theirs.notna().all()
     np.testing.assert_allclose(ours, theirs, atol=1e-12)
