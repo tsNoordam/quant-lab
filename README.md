@@ -1,8 +1,13 @@
 # quant-lab
 
 Reproducible quantitative research lab: academic paper → research notes → strategy →
-backtest → audit → robustness → out-of-sample. Current paper: Maymin,
-*Self-Imposed Limits to Arbitrage* (dual-listed share pairs).
+backtest → audit → robustness → out-of-sample. Papers: Maymin, *Self-Imposed
+Limits to Arbitrage* (steps 1-12, done); de Jong, Rosenthal & van Dijk (2009),
+*The Risk and Return of Arbitrage in Dual-Listed Companies* (steps 13+).
+
+Developer hand-over: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) (architecture,
+diagrams, entry points) and [docs/OPERATIONS.md](docs/OPERATIONS.md) (setup,
+operations, SOPs, AI tooling).
 
 Stack: Python 3.12 · uv · DVC (data) · Hydra (config) · MLflow (experiments) ·
 VectorBT (backtests) · statsmodels (econometrics) · pytest + ruff (verification).
@@ -15,8 +20,8 @@ Keep the repo on the Linux filesystem (`~/projects`), not under `/mnt/c`.
 curl -LsSf https://astral.sh/uv/install.sh | sh   # once per machine
 uv python install 3.12
 
-git clone <repo-url> ~/projects/quant-research
-cd ~/projects/quant-research
+git clone https://github.com/tsNoordam/quant-lab.git ~/projects/quant-lab
+cd ~/projects/quant-lab
 uv sync                       # creates .venv from uv.lock (runtime + dev group)
 uv run pytest                 # must pass
 uv run ruff check . && uv run ruff format --check .
@@ -30,9 +35,11 @@ ruff, ...) hard-code the old interpreter path and otherwise fail with
 ## Layout
 
 ```
-quant-research/
+quant-lab/
 ├── .claude/            agents, skills, settings.json, hooks/guard_bash.py
-├── conf/               Hydra config groups: data, features, strategy, costs, split, backtest
+├── conf/               Hydra config groups (data, split, strategy, costs, backtest, walkforward,
+│                       silta, robustness, oos) + dlc/ (paper-2 twins)
+├── docs/               ARCHITECTURE.md, OPERATIONS.md (developer hand-over)
 ├── data/
 │   ├── raw/            immutable vendor data            (DVC: dvc add)
 │   ├── processed/      dvc.yaml stage outputs           (DVC: stage outs)
@@ -115,7 +122,7 @@ validates and aligns the pair. Pairs: `rd_shell`, `reed_elsevier`, `rio_tinto`
 uv run python -m quant_lab.backtest.run                              # train period
 uv run python -m quant_lab.backtest.run backtest.period=validation
 uv run python -m quant_lab.backtest.run -m strategy.window=40,60,80  # sweep (train only)
-uv run python -m quant_lab.backtest.run costs.fee_bps=20             # cost sensitivity
+uv run python -m quant_lab.backtest.run costs=flat_bps costs.fee_bps=20   # labelled flat-fee sensitivity
 
 uv run mlflow ui --backend-store-uri sqlite:///mlflow.db   # http://127.0.0.1:5000
 ```
