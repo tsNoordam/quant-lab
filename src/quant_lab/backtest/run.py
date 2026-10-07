@@ -62,7 +62,15 @@ def select_period(cfg: DictConfig) -> Period:
             "the out-of-sample period is locked; pass +unlock_oos=true only when you "
             "deliberately evaluate a frozen strategy"
         )
+    if cfg.split.name != cfg.data.name:
+        raise BacktestGuardError(
+            f"split {cfg.split.name!r} does not belong to dataset {cfg.data.name!r}"
+        )
     bounds = cfg.split[name]
+    if bounds is None:
+        raise BacktestGuardError(
+            f"dataset {cfg.data.name!r} has no {name} period (see conf/split/{cfg.split.name}.yaml)"
+        )
     return Period(name, pd.Timestamp(bounds.start), pd.Timestamp(bounds.end))
 
 
@@ -235,6 +243,27 @@ def compute_metrics(equity: pd.Series, held: pd.Series, pf: vbt.Portfolio, ann: 
     }
 
 
+def run_tags(cfg: DictConfig, root: Path, panel_rel: str, git: dict, period: Period) -> dict:
+    """Provenance and setup tags shared by every MLflow run."""
+    return {
+        **git,
+        **mlflow_utils.data_provenance(root, panel_rel),
+        "period": period.name,
+        "period_start": str(period.start.date()),
+        "period_end": str(period.end.date()),
+        "unlock_oos": str(bool(cfg.get("unlock_oos", False))).lower(),
+        "cost_model": cfg.costs.model,
+        "execution": cfg.backtest.execution,
+        "strategy": cfg.strategy.name,
+        "dataset": cfg.data.name,
+    }
+
+
+def run_params(cfg: DictConfig) -> dict[str, str]:
+    resolved = OmegaConf.to_container(cfg, resolve=True)
+    return mlflow_utils.flatten({k: v for k, v in resolved.items() if k != "mlflow"})
+
+
 def run_backtest(cfg: DictConfig, root: Path, overrides: list[str] | None = None) -> dict:
     check_overrides(overrides or [])
     period = select_period(cfg)
@@ -257,25 +286,11 @@ def run_backtest(cfg: DictConfig, root: Path, overrides: list[str] | None = None
     mlflow_utils.set_experiment(
         cfg.mlflow.tracking_uri, cfg.mlflow.experiment, root / cfg.mlflow.artifact_root
     )
-    resolved = OmegaConf.to_container(cfg, resolve=True)
-    tags = {
-        **git,
-        **mlflow_utils.data_provenance(root, panel_rel),
-        "period": period.name,
-        "period_start": str(period.start.date()),
-        "period_end": str(period.end.date()),
-        "unlock_oos": str(bool(cfg.get("unlock_oos", False))).lower(),
-        "cost_model": cfg.costs.model,
-        "execution": cfg.backtest.execution,
-        "strategy": s.name,
-        "dataset": cfg.data.name,
-    }
+    tags = run_tags(cfg, root, panel_rel, git, period)
     mlflow = mlflow_utils.mlflow  # imported there, after its env defaults are set
     with mlflow.start_run(run_name=f"{s.name}-{period.name}") as run:
         mlflow.set_tags(tags)
-        mlflow.log_params(
-            mlflow_utils.flatten({k: v for k, v in resolved.items() if k != "mlflow"})
-        )
+        mlflow.log_params(run_params(cfg))
         mlflow.log_metrics(metrics)
         with tempfile.TemporaryDirectory() as tmp:
             tmp = Path(tmp)

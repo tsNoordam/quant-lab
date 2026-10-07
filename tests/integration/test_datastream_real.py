@@ -18,7 +18,7 @@ from quant_lab.data.preprocess import load_dataset_config, preprocess
 
 ROOT = Path(__file__).resolve().parents[2]
 ARCHIVES = ROOT / "data" / "raw" / "datastream_dlc"
-PAIRS = ["rd_shell", "unilever", "reed_elsevier", "rio_tinto"]
+PAIRS = ["rd_shell", "reed_elsevier", "rio_tinto"]
 
 pytestmark = pytest.mark.skipif(
     not any(ARCHIVES.glob("*.zip")), reason="Datastream archives not present (dvc pull)"
@@ -52,19 +52,22 @@ def test_ingested_prices_reproduce_the_workbook_parity_deviations(lab, dataset):
     np.testing.assert_allclose(ours, theirs, atol=1e-12)
 
 
-def test_unilever_nv_volume_is_still_implausible(lab):
-    """Pins the known defect behind `volume_reliable: false` in conf/data/unilever.yaml.
+def test_unilever_nv_volume_is_implausible():
+    """Evidence for dropping Unilever (research/reports/data_decisions.md).
 
-    If this ever fails, the NV volume source was fixed: revisit that flag.
+    NV volume / shares outstanding is ~300x below PLC's. If this ever fails, the
+    source was fixed and the decision can be revisited.
     """
-    cfg = load_dataset_config("unilever", lab)
-    convert(cfg, lab)
-    nv = pd.read_csv(lab / cfg.raw_dir / f"{cfg.legs.a}.csv", index_col="date")
-    plc = pd.read_csv(lab / cfg.raw_dir / f"{cfg.legs.b}.csv", index_col="date")
-    nv_turnover = (nv["volume"] / nv["shares_outstanding"]).median()
-    plc_turnover = (plc["volume"] / plc["shares_outstanding"]).median()
-    assert nv_turnover < 0.0002 <= plc_turnover
-    assert cfg.volume_reliable is False
+    with zipfile.ZipFile(ARCHIVES / "Unilever.zip") as archive:
+        book = xlrd.open_workbook(file_contents=archive.read("Unilever data.xls"))
+    flows = read_sheet(book, "Regression data")
+    turnover = {}
+    for leg, code in (("NV", "932911"), ("PLC", "900789")):
+        shares = read_sheet(book, f"UNILEVER {leg}").column(f"{code}(NOSH)")
+        volume = flows.column(f"TURNOVER BY VOLUME UNILEVER {leg}")
+        turnover[leg] = (volume / shares).loc["1998":].replace(0, np.nan).median()
+    assert turnover["NV"] < 0.0002 <= turnover["PLC"]
+    assert turnover["PLC"] / turnover["NV"] > 100
 
 
 @pytest.mark.parametrize("dataset", PAIRS)

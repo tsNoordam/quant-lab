@@ -7,6 +7,8 @@ legs:
   a: ELSEVIER
   b: REED
 currency: GBP
+# Close-only data: decisions on close t are filled at close t+1.
+execution: next_close
 
 # [EXTERNAL-RESEARCH] workbook's theoretical ratio in GBP per share; cross-check
 # against REEDELSEVIERPLC20F eq agr.pdf.

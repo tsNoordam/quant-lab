@@ -9,7 +9,8 @@
 
 defaults:
   - data: synthetic_twin
-  - split: synthetic_twin
+  - split: ${data}      # each dataset has its own locked split file
+  - walkforward: default
   - strategy: parity_zscore
   - costs: liquidity     # costs=flat_bps only as a labelled sensitivity case
   - backtest: default

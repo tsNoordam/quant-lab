@@ -10,6 +10,8 @@ legs:
   a: ROYAL_DUTCH
   b: SHELL
 currency: GBP
+# Close-only data: decisions on close t are filled at close t+1.
+execution: next_close
 
 # Theoretical P_a/P_b in GBP per share, as used by the workbook's own
 # "LOG DEVIATIONS FROM PARITY" column (verified to machine precision in

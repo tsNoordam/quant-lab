@@ -1,0 +1,13 @@
+# LOCKED. Validation pair: compare only variants frozen on rd_shell. Decided
+# 2026-10-07 before any backtest on this data; see research/reports/data_decisions.md.
+
+name: reed_elsevier
+train:
+  start: "1993-01-01"
+  end: "1997-12-31"
+validation:
+  start: "1998-01-01"
+  end: "1999-12-31"
+oos:
+  start: "2000-01-01"
+  end: "2002-10-03"

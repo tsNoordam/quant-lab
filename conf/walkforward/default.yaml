@@ -1,0 +1,26 @@
+# Walk-forward evaluation (quant_lab.backtest.walkforward).
+#
+#   uv run python -m quant_lab.backtest.walkforward data=rd_shell
+#
+# Folds cover the dataset's train + validation periods only; the OOS period is
+# never touched. In each fold the parameters are chosen on the training window
+# and then traded, unchanged, on the following test window. The stitched test
+# windows are the walk-forward result.
+
+anchored: true          # true: training window grows from the start; false: rolling
+train_years: 4          # (minimum) training window length
+test_months: 12         # test window length
+embargo_days: 5         # trading days skipped between a training and a test window
+
+# Selection score on the training window. "neighbourhood_mean" scores each grid
+# point by the mean of itself and its direct grid neighbours (one step in one
+# parameter), preferring stable regions over isolated best points (CLAUDE.md).
+metric: sharpe
+selection: neighbourhood_mean   # neighbourhood_mean | best
+
+# Parameter grid (strategy.<name>). Values must be listed in increasing order.
+# [IMPLEMENTATION-ASSUMPTION] ranges around the baseline (60 / 2.0 / 0.5).
+grid:
+  window: [40, 60, 80, 120]
+  entry_z: [1.5, 2.0, 2.5]
+  exit_z: [0.0, 0.5]

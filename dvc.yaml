@@ -9,12 +9,14 @@
 #
 #   data/raw/datastream_dlc (dvc add) --ingest--> data/interim/<pair> --preprocess--> data/processed/<pair>
 #   data/raw/synthetic_twin (dvc add) ---------------------------------preprocess--> data/processed/synthetic_twin
+#
+# Unilever.zip stays in data/raw/datastream_dlc but is not ingested
+# (see research/reports/data_decisions.md).
 
 stages:
   ingest:
     foreach:
       - rd_shell
-      - unilever
       - reed_elsevier
       - rio_tinto
     do:
@@ -39,8 +41,6 @@ stages:
         input: data/raw/synthetic_twin
       rd_shell:
         input: data/interim/rd_shell
-      unilever:
-        input: data/interim/unilever
       reed_elsevier:
         input: data/interim/reed_elsevier
       rio_tinto:

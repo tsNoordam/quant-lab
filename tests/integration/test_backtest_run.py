@@ -151,6 +151,25 @@ def test_costs_reduce_returns(project):
     assert dear["n_entries"] == cheap["n_entries"]
 
 
+def test_walk_forward_run_is_logged(project):
+    from quant_lab.backtest.walkforward import run_walk_forward
+
+    cfg = config(
+        project,
+        "walkforward.grid.window=[40,80]",
+        "walkforward.grid.entry_z=[2.0]",
+        "walkforward.grid.exit_z=[0.5]",
+    )
+    result = run_walk_forward(cfg, project)
+    run = mlflow.get_run(result["run_id"])
+    assert run.data.tags["kind"] == "walkforward"
+    assert run.data.tags["period_end"] == cfg.split.validation.end  # never past validation
+    assert {"wf_sharpe", "wf_n_folds", "wf_positive_folds"} <= set(run.data.metrics)
+    artifacts = {a.path for a in mlflow.MlflowClient().list_artifacts(result["run_id"])}
+    assert {"folds.csv", "grid_scores.csv", "walkforward_equity.png", "config.yaml"} <= artifacts
+    assert result["folds"]["test_end"].max() <= pd.Timestamp(cfg.split.validation.end).date()
+
+
 def test_hydra_cli_end_to_end(project, tmp_path):
     cmd = [
         sys.executable,

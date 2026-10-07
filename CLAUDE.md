@@ -83,8 +83,11 @@ Never use the out-of-sample period for strategy development.
   or pasted into notes, issues or chat.
 - Real pairs are close-only (no open/high/low): backtest them with
   `backtest.execution=next_close`.
-- `volume_reliable: false` in a dataset config (currently `unilever`) means its
-  volume must not be used: no ADV-based costs, no relative-volume analysis.
+- `volume_reliable: false` in a dataset config means its volume must not be
+  used: no ADV-based costs, no relative-volume analysis.
+- Sample design (pair roles, splits, what is locked) is fixed in
+  `research/reports/data_decisions.md`. Develop on `rd_shell` train+validation
+  only; `rio_tinto` and everything from 2000 on are out-of-sample.
 - Any rolling statistic used by a cost or signal model (volatility, ADV,
   spread) must be lagged so that it only uses information available before
   the decision time.

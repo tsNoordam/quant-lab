@@ -105,8 +105,8 @@ git commit -m "Add Datastream DLC archives via DVC" && git push
 
 `ingest` converts each workbook (date repair, #N/A, holiday padding, units to
 GBP, total-return adjusted close) into the per-leg CSV schema; `preprocess`
-validates and aligns the pair. Pairs: `rd_shell`, `unilever`, `reed_elsevier`,
-`rio_tinto`. They are close-only, so backtest them with
+validates and aligns the pair. Pairs: `rd_shell`, `reed_elsevier`, `rio_tinto`
+(Unilever is in the archive but excluded: see `research/reports/data_decisions.md`). They are close-only, so backtest them with
 `backtest.execution=next_close`.
 
 ## Backtests (Hydra + VectorBT + MLflow)
@@ -126,7 +126,20 @@ backtest). Each run logs params, metrics (Sharpe, drawdown, ...), provenance tag
 resolved config, daily positions, orders).
 
 Guards: split boundaries in `conf/split/` cannot be overridden from the CLI, and
-`backtest.period=oos` refuses to run without `+unlock_oos=true`.
+`backtest.period=oos` refuses to run without `+unlock_oos=true`. Each dataset
+uses its own split file (`data=rd_shell` selects `conf/split/rd_shell.yaml`);
+the sample design is in `research/reports/data_decisions.md`.
+
+Walk-forward evaluation (train + validation only; parameters chosen per fold on
+the training window, traded unchanged on the next test window):
+
+```bash
+uv run python -m quant_lab.backtest.walkforward data=rd_shell
+uv run python -m quant_lab.backtest.walkforward data=rd_shell walkforward.selection=best
+```
+
+Settings in `conf/walkforward/default.yaml` (fold lengths, embargo, grid,
+selection rule). MLflow artifacts: `folds.csv`, `grid_scores.csv`, equity plot.
 
 ## Dependencies
 

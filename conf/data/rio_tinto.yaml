@@ -10,6 +10,8 @@ legs:
   a: RIO_LTD
   b: RIO_PLC
 currency: GBP
+# Close-only data: decisions on close t are filled at close t+1.
+execution: next_close
 
 # [EXTERNAL-RESEARCH] workbook's theoretical ratio (1 Ltd share = 1 PLC share).
 parity_ratio: 1.0
