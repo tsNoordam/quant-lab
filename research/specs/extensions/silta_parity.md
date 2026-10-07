@@ -31,7 +31,7 @@ gone, which the paper models as a rare event.
 | 7 | Dollar-neutral, leg_weight 0.5 of equity per leg (gross 1x). The paper's 5x leverage example (p. 13) is not used, so results stay comparable with the baseline. | [IMPLEMENTATION-ASSUMPTION] |
 | 8 | Self-imposed limits: an entry may trade at most 15% of either leg's 20-day ADV; the size is then held. | [PAPER-DERIVED] (R4, daily limit) turned into a sizing rule: [PROPOSED-EXTENSION]. Shared with the baseline (`costs.limits.max_participation`). |
 | 9 | Overall position limit of N days of ADV. | [PAPER-DERIVED] (R4). **Not modelled**: with single-day entries the 15% daily cap is always tighter than N = 100 days. |
-| 10 | Costs, borrow, dividends, FX, period end: identical to the baseline (rules 8-11 of `research/specs/baseline/parity_zscore.md`). | as classified there |
+| 10 | Costs, borrow, dividends, FX, period end, and no position before the cost statistics exist: identical to the baseline (rules 5b and 8-11 of `research/specs/baseline/parity_zscore.md`). | as classified there |
 
 ## Walk-forward neighbourhood
 

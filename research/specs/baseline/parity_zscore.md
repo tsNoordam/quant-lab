@@ -17,6 +17,7 @@ Code: `src/quant_lab/strategies/parity_zscore.py`. Parameters: `conf/strategy/pa
 | 3 | No detrending. | [IMPLEMENTATION-ASSUMPTION]. A trailing mean absorbs slow drift. The paper's detrending (A1) is a full-sample, explanatory step. |
 | 4 | Short A / long B when `z_t > entry_z`; long A / short B when `z_t < -entry_z`; close when `|z_t| < exit_z`; flip directly when the opposite threshold is crossed. | [PROPOSED-EXTENSION]. The paper contains no entry/exit rule. |
 | 5 | No position while `z_t` is undefined (warm-up). | [IMPLEMENTATION-ASSUMPTION] |
+| 5b | No position while either leg's cost or capacity statistics (sigma, ADV, price) are undefined at the decision close; an order without cost statistics is an error, never a free fill. | [IMPLEMENTATION-ASSUMPTION] (freeze audit 2026-10-07, A2) |
 | 6 | Decision on close `t`, order filled on bar `t+1`: its open (`next_open`) or, for close-only data, its close (`next_close`). | [IMPLEMENTATION-ASSUMPTION] |
 | 7 | Dollar-neutral: each leg `leg_weight` of equity, rebalanced only when the spread position changes. | [IMPLEMENTATION-ASSUMPTION] |
 | 8 | Positions are closed on the last bar of the evaluated period. | [IMPLEMENTATION-ASSUMPTION] |

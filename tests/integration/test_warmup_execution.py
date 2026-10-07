@@ -14,6 +14,7 @@ import numpy as np
 import pandas as pd
 import pytest
 from hydra import compose, initialize_config_dir
+from omegaconf import OmegaConf
 
 from quant_lab.backtest import run as bt
 from quant_lab.data.preprocess import load_dataset_config, preprocess
@@ -68,3 +69,40 @@ def test_position_opens_once_liquidity_statistics_exist(setup):
     first = held.ne(0).idxmax()
     # sigma needs vol_lookback_days + 1 closes; the fill is one bar after the decision
     assert panel.index.get_loc(first) >= cfg.costs.impact.vol_lookback_days + 1
+
+
+def test_alternating_signal_from_the_first_row_has_no_free_orders_or_ghosts(ohlcv):
+    """The auditor's in-memory reproduction (freeze audit A2)."""
+    dates = pd.bdate_range("2020-01-01", periods=150)
+    cfg = OmegaConf.create(
+        {
+            "strategy": {"name": "silta_parity", "leg_weight": 0.5},
+            "data": {
+                "name": "t",
+                "dividends": {"min_yield": 0.005, "withholding": {"a": 0, "b": 0}},
+            },
+            "backtest": {"init_cash": 1e6, "execution": "next_close", "annualization": 252},
+            "costs": {
+                "model": "liquidity",
+                "commission_bps": 5.0,
+                "fx_conversion_bps": 0.0,
+                "borrow_bps_annual": 50.0,
+                "buy_tax_bps": 0.0,
+                "spread": {
+                    "lookback_days": 20,
+                    "min_quote_days": 10,
+                    "fallback_half_spread_bps": 10,
+                },
+                "impact": {"coefficient": 1.0, "vol_lookback_days": 60, "adv_lookback_days": 20},
+                "limits": {"max_participation": 0.15},
+            },
+        }
+    )
+    panel = ohlcv(dates, seed=1).add_suffix("_a").join(ohlcv(dates, seed=2).add_suffix("_b"))
+    dec = pd.Series(np.where((np.arange(len(dates)) // 15) % 2 == 0, 1, -1), index=dates)
+    sim = bt.backtest_pair(panel, dec, bt.Period("oos", dates[0], dates[-1]), cfg)
+    w = sim.orders.ffill().fillna(0.0)
+    traded = (w - w.shift(fill_value=0.0)).where(sim.orders.notna()).abs() > 0
+    assert traded.to_numpy().sum() > 0
+    assert sim.order_cost[traded].notna().sum().sum() == traded.sum().sum()
+    assert not ((sim.held != 0) & (w["a"] == 0)).any()

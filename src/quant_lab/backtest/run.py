@@ -196,6 +196,10 @@ def backtest_pair(
             "needs volume (ADV). Use costs=flat_bps as a labelled sensitivity case instead."
         )
     stats = {leg: costs.market_stats(panel, leg, c) for leg in LEGS}
+    # No position until both legs' cost and capacity statistics exist (warm-up at the
+    # start of the data): a position must never be sized 0 or filled without costs.
+    # [IMPLEMENTATION-ASSUMPTION] (freeze audit 2026-10-07, A2)
+    decisions = decisions.where(costs.statistics_ready(stats).reindex(decisions.index), 0)
     cap = costs.participation_cap(stats, capital, c.limits.max_participation)
     held, orders = execution_targets(decisions, period, leg_weight, weight_cap=cap)
     at_fill = {leg: st.shift(1).reindex(orders.index) for leg, st in stats.items()}  # decision-day

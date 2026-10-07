@@ -84,8 +84,21 @@ def order_costs(
         buy_tax = np.where(delta > 0, cfg.buy_tax_bps / 1e4, 0.0)
         fx = cfg.fx_conversion_bps / 1e4 if leg in fx_legs else 0.0
         cost = s["half_spread"] + impact + buy_tax + fx
-        out[leg] = cost.where(delta.abs() > 0)
+        traded = delta.abs() > 0
+        if cost[traded].isna().any():
+            missing = cost[traded].isna()
+            raise ValueError(
+                f"leg {leg}: {int(missing.sum())} orders without cost statistics, first on "
+                f"{missing.idxmax().date()}; an order must never be filled at zero cost"
+            )
+        out[leg] = cost.where(traded)
     return pd.DataFrame(out)
+
+
+def statistics_ready(stats: dict[str, pd.DataFrame]) -> pd.Series:
+    """True on closes where every leg's sigma, ADV and price are defined."""
+    cols = ["sigma", "adv", "price"]
+    return pd.concat([s[cols].notna().all(axis=1) for s in stats.values()], axis=1).all(axis=1)
 
 
 def fx_legs(data_cfg: DictConfig) -> tuple[str, ...]:
