@@ -153,6 +153,27 @@ def test_locked_quotes_are_reported():
     assert checks.get("locked_quotes") == "warning"
 
 
+def test_a_quarter_of_wide_quotes_is_reported_even_if_the_full_sample_median_is_fine():
+    dates = pd.bdate_range("2001-01-01", "2001-12-31")
+    wide = (dates >= "2001-04-01") & (dates < "2001-07-01")
+    half = np.where(wide, 0.01, 0.0005)  # 200 bps vs 10 bps full spread
+    df = pd.DataFrame(
+        {
+            "close": 5.0,
+            "adj_close": 5.0,
+            "volume": 1.0,
+            "bid": 5.0 * (1 - half),
+            "ask": 5.0 * (1 + half),
+        },
+        index=dates,
+    )
+    issues = check_ohlcv(df, "X", max_abs_log_return=0.25)
+    found = {i.check: i for i in issues}
+    assert "wide_quotes" not in found  # full-sample median is narrow
+    assert found["wide_quote_regime"].severity == "warning"
+    assert "1 quarter(s) ending 2001-06-30" in found["wide_quote_regime"].detail
+
+
 def test_close_only_frames_validate_without_bars():
     df, _ = build_leg(series([5.0] * 6), series([1.0] * 6), series([1.0] * 6))
     assert check_ohlcv(df, "X", max_abs_log_return=0.25) == []

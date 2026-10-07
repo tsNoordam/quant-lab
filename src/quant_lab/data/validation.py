@@ -153,6 +153,21 @@ def _check_quotes(df: pd.DataFrame, name: str) -> list[Issue]:
                     f"{name}: median quoted spread {spread_bps:.0f} bps; check the quote source",
                 )
             )
+        # A full-sample median can hide a regime of implausibly wide quotes lasting
+        # a few quarters (e.g. Royal Dutch 1997-98): check each calendar quarter.
+        valid = both[both["ask"] > both["bid"]]
+        rel = (valid["ask"] - valid["bid"]) / ((valid["ask"] + valid["bid"]) / 2) * 1e4
+        quarterly = rel.groupby(pd.Grouper(freq="QE")).median().dropna()
+        wide = quarterly.index[(quarterly > MAX_MEDIAN_SPREAD_BPS).to_numpy()]
+        if len(wide):
+            issues.append(
+                Issue(
+                    "wide_quote_regime",
+                    "warning",
+                    f"{name}: quarterly median quoted spread > {MAX_MEDIAN_SPREAD_BPS:.0f} bps "
+                    f"in {len(wide)} quarter(s) ending {_dates(wide)}",
+                )
+            )
         # Close and quote mid must be in the same unit (catches pence vs pounds).
         offset = float(np.log(df.loc[both.index, "close"] / mid).median())
         if abs(offset) > MAX_QUOTE_UNIT_OFFSET:

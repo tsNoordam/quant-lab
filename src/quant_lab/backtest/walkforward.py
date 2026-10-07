@@ -232,7 +232,7 @@ def walk_forward(cfg: DictConfig, panel: pd.DataFrame) -> dict:
         "dividends",
     )
     for key in sums:
-        if f"test_{key}" in folds_df:  # cost metrics: liquidity cost model only
+        if f"test_{key}" in folds_df:  # dividends always; cost metrics: liquidity model only
             summary[f"wf_{key}"] = float(folds_df[f"test_{key}"].sum())
     if "test_quoted_spread_share" in folds_df:
         n = folds_df["test_n_orders"]
