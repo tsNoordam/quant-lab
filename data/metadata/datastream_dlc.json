@@ -1,0 +1,26 @@
+{
+  "dataset": "datastream_dlc",
+  "description": "Daily Datastream (and some Bloomberg) data on dual-listed company pairs, compiled for academic DLC research; workbooks dated June 2008, plus equalization agreements and press clippings.",
+  "source": "TODO: record where these archives were obtained (URL / person / date)",
+  "license": "Thomson Reuters Datastream data: licensed, do not redistribute. Kept in DVC only, never committed to Git.",
+  "layout": "data/raw/datastream_dlc/<Pair>.zip, original archives, unmodified",
+  "files": {
+    "RoyalDutchShell.zip": {"md5": "14d3a7e732e35c84c80573cf021ffb51", "workbooks": ["RD Shell data.xls", "RD Shell data - update and unification.xls", "RD Shell ADR data.xls"]},
+    "Unilever.zip": {"md5": "cea207a475d9ba9f0444376b82df8782", "workbooks": ["Unilever data.xls", "Unilever ADR data.xls"]},
+    "ReedElsevier.zip": {"md5": "076d7b5411f656eac76a2620509f0ed1", "workbooks": ["Reed Elsevier data incl S.xls", "Reed Elsevier ADR data.xls"]},
+    "RioTinto.zip": {"md5": "1cd544ecf8c39eab65e5522c29a0c37d", "workbooks": ["Rio Tinto data.xls", "Rio Tinto ADR data Datastream.xls", "Rio Tinto ADR data Bloomberg - Datastream.xls"]}
+  },
+  "calendar": "business_daily (Datastream pads exchange holidays with the previous price)",
+  "timezone": "naive exchange-local dates",
+  "known_issues": [
+    "Dates exported as dd/mm/yy: days 1-12 stored by Excel as month/day, days 13-31 as text. Repaired in quant_lab.data.datastream.",
+    "Excel #N/A error cells (code 42) mean missing.",
+    "UK prices in pence except Rio Tinto PLC price (divided by 100 by the workbook author); UK quotes in pence.",
+    "Dutch legs in EUR (ex-NLG); Rio Tinto Ltd in AUD; FX per GBP included per workbook.",
+    "Volume (turnover by volume) in thousands of shares, split-adjusted like prices.",
+    "Workbooks extracted at different times use different split adjustments (e.g. Royal Dutch x2): never mix files of one pair.",
+    "Unilever NV price stale on most days before ~1993; NV quotes unreliable (median spread 165-420 bps).",
+    "Rio Tinto Ltd (Sydney) and PLC (London) closes are non-synchronous."
+  ],
+  "used_by": ["conf/data/rd_shell.yaml", "conf/data/unilever.yaml", "conf/data/reed_elsevier.yaml", "conf/data/rio_tinto.yaml"]
+}

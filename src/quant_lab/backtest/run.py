@@ -82,18 +82,30 @@ def execution_targets(
     return held, orders
 
 
+EXECUTION_PRICE = {"next_open": "open", "next_close": "close"}
+
+
 def simulate(panel: pd.DataFrame, orders: pd.DataFrame, cfg: DictConfig) -> vbt.Portfolio:
+    """Fill orders at the bar after the decision: its open, or its close for close-only data."""
+    execution = cfg.backtest.execution
+    if execution not in EXECUTION_PRICE:
+        raise BacktestGuardError(f"backtest.execution must be one of {list(EXECUTION_PRICE)}")
+    fill = EXECUTION_PRICE[execution]
+    if f"{fill}_a" not in panel:
+        raise BacktestGuardError(
+            f"execution={execution} needs '{fill}' prices, which dataset {cfg.data.name!r} "
+            "does not have; use backtest.execution=next_close"
+        )
     rows = orders.index
-    legs = {"a": "a", "b": "b"}
-    close = pd.DataFrame({k: panel.loc[rows, f"close_{leg}"] for k, leg in legs.items()})
-    open_ = pd.DataFrame({k: panel.loc[rows, f"open_{leg}"] for k, leg in legs.items()})
+    close = pd.DataFrame({leg: panel.loc[rows, f"close_{leg}"] for leg in ("a", "b")})
+    price = pd.DataFrame({leg: panel.loc[rows, f"{fill}_{leg}"] for leg in ("a", "b")})
     if cfg.costs.model != "flat_bps":
         raise NotImplementedError(f"cost model {cfg.costs.model!r} is not implemented yet")
     return vbt.Portfolio.from_orders(
         close=close,
         size=orders,
         size_type="targetpercent",
-        price=open_ if cfg.backtest.execution == "next_open" else close,
+        price=price,
         direction="both",
         fees=cfg.costs.fee_bps / 1e4,
         slippage=cfg.costs.slippage_bps / 1e4,

@@ -10,8 +10,12 @@ from typing import Literal
 import numpy as np
 import pandas as pd
 
+from quant_lab.data.loaders import BAR_COLUMNS, QUOTE_COLUMNS, REQUIRED_COLUMNS
+
 Severity = Literal["error", "warning"]
 PRICE_COLUMNS = ("open", "high", "low", "close", "adj_close")
+MAX_QUOTE_UNIT_OFFSET = 0.05
+MAX_MEDIAN_SPREAD_BPS = 100.0
 
 
 @dataclass(frozen=True)
@@ -54,23 +58,31 @@ def check_ohlcv(df: pd.DataFrame, name: str, *, max_abs_log_return: float) -> li
     if len(intraday):
         issues.append(Issue("intraday_timestamps", "error", f"{name}: {_dates(intraday)}"))
 
-    for col in (*PRICE_COLUMNS, "volume"):
+    has_bars = all(c in df.columns for c in BAR_COLUMNS)
+    complete = [*REQUIRED_COLUMNS, *(BAR_COLUMNS if has_bars else ())]
+    prices = [c for c in PRICE_COLUMNS if c in df.columns]
+    quotes = [c for c in QUOTE_COLUMNS if c in df.columns]
+
+    for col in complete:  # quotes may legitimately be missing on some days
         nan_dates = idx[df[col].isna().to_numpy()]
         if len(nan_dates):
             issues.append(Issue("missing_values", "error", f"{name}.{col}: {_dates(nan_dates)}"))
-    for col in PRICE_COLUMNS:
+    for col in (*prices, *quotes):
         bad = idx[(df[col] <= 0).to_numpy()]
         if len(bad):
             issues.append(Issue("non_positive_price", "error", f"{name}.{col}: {_dates(bad)}"))
 
-    high_floor = df[["open", "close", "low"]].max(axis=1)
-    bad_high = idx[(df["high"] < high_floor).to_numpy()]
-    if len(bad_high):
-        issues.append(Issue("high_inconsistent", "error", f"{name}: {_dates(bad_high)}"))
-    low_cap = df[["open", "close", "high"]].min(axis=1)
-    bad_low = idx[(df["low"] > low_cap).to_numpy()]
-    if len(bad_low):
-        issues.append(Issue("low_inconsistent", "error", f"{name}: {_dates(bad_low)}"))
+    if has_bars:
+        high_floor = df[["open", "close", "low"]].max(axis=1)
+        bad_high = idx[(df["high"] < high_floor).to_numpy()]
+        if len(bad_high):
+            issues.append(Issue("high_inconsistent", "error", f"{name}: {_dates(bad_high)}"))
+        low_cap = df[["open", "close", "high"]].min(axis=1)
+        bad_low = idx[(df["low"] > low_cap).to_numpy()]
+        if len(bad_low):
+            issues.append(Issue("low_inconsistent", "error", f"{name}: {_dates(bad_low)}"))
+    if len(quotes) == 2:
+        issues += _check_quotes(df, name)
     neg_volume = idx[(df["volume"] < 0).to_numpy()]
     if len(neg_volume):
         issues.append(Issue("negative_volume", "error", f"{name}: {_dates(neg_volume)}"))
@@ -85,6 +97,37 @@ def check_ohlcv(df: pd.DataFrame, name: str, *, max_abs_log_return: float) -> li
                     "extreme_return",
                     "warning",
                     f"{name}: |log return| > {max_abs_log_return} on {_dates(jumps)}",
+                )
+            )
+    return issues
+
+
+def _check_quotes(df: pd.DataFrame, name: str) -> list[Issue]:
+    issues = []
+    both = df[["bid", "ask"]].dropna()
+    crossed = both.index[(both["bid"] > both["ask"]).to_numpy()]
+    if len(crossed):
+        issues.append(Issue("crossed_quotes", "warning", f"{name}: bid > ask on {_dates(crossed)}"))
+    if len(both):
+        mid = (both["bid"] + both["ask"]) / 2
+        spread_bps = float(((both["ask"] - both["bid"]) / mid).median() * 1e4)
+        if spread_bps > MAX_MEDIAN_SPREAD_BPS:
+            issues.append(
+                Issue(
+                    "wide_quotes",
+                    "warning",
+                    f"{name}: median quoted spread {spread_bps:.0f} bps; check the quote source",
+                )
+            )
+        # Close and quote mid must be in the same unit (catches pence vs pounds).
+        offset = float(np.log(df.loc[both.index, "close"] / mid).median())
+        if abs(offset) > MAX_QUOTE_UNIT_OFFSET:
+            issues.append(
+                Issue(
+                    "quote_units",
+                    "error",
+                    f"{name}: median log(close/mid) = {offset:+.3f}; close and quotes "
+                    "are probably in different units",
                 )
             )
     return issues

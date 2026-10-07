@@ -1,0 +1,62 @@
+# Royal Dutch Petroleum (Amsterdam, EUR) / Shell Transport & Trading (London, GBp).
+# Twin pair studied in Maymin (SILTA). 60:40 cash-flow split.
+#
+# Source: Datastream workbook in data/raw/datastream_dlc/ (see
+# data/metadata/datastream_dlc.json). Converted by quant_lab.data.datastream.
+
+name: rd_shell
+calendar: business_daily
+legs:
+  a: ROYAL_DUTCH
+  b: SHELL
+currency: GBP
+
+# Theoretical P_a/P_b in GBP per share, as used by the workbook's own
+# "LOG DEVIATIONS FROM PARITY" column (verified to machine precision in
+# tests/integration/test_datastream_real.py).
+# [EXTERNAL-RESEARCH] value from the dataset authors; to be cross-checked
+# against the equalization agreement (ROYALDUTCH-SHELL eq agr.pdf).
+parity_ratio: 6.863006819188524
+
+raw_dir: data/interim/rd_shell
+processed_dir: data/processed/rd_shell
+
+source:
+  archive: data/raw/datastream_dlc/RoyalDutchShell.zip
+  workbook: RD Shell data.xls
+  volume_sheet: Regression data
+  volume_multiplier: 1000   # Datastream turnover by volume is in thousands of shares
+  # [IMPLEMENTATION-ASSUMPTION] window = where both legs have daily volume.
+  window:
+    start: "1987-01-01"
+    end: "2002-10-03"
+  legs:
+    a:
+      sheet: Royal Dutch
+      price: 902178(P)
+      total_return_index: 902178(RI)
+      fx_per_unit: "# NLG(€) per £"   # EUR (ex-NLG) per GBP
+      price_scale: 1.0
+      quote_scale: 1.0
+      volume: TURNOVER BY VOLUME ROYAL DUTCH
+      bid: BID PRICE ROYAL DUTCH
+      ask: ASK PRICE ROYAL DUTCH
+    b:
+      sheet: Shell
+      price: 900998(P)
+      total_return_index: 900998(RI)
+      price_scale: 0.01           # pence -> GBP
+      quote_scale: 0.01
+      volume: TURNOVER BY VOLUME SHELL
+      bid: BID PRICE SHELL
+      ask: ASK PRICE SHELL
+
+alignment:
+  # [IMPLEMENTATION-ASSUMPTION] trade the pair only when both markets are open.
+  missing_policy: drop
+  ffill_limit: 0
+
+validation:
+  # Amsterdam and London holidays differ, so each leg misses some union dates.
+  max_missing_frac: 0.05
+  max_abs_log_return: 0.25

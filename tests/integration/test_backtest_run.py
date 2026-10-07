@@ -111,6 +111,22 @@ def test_known_signal_is_profitable_through_the_engine(project):
     assert _oracle_sharpe(project, -1) < -0.5
 
 
+def test_close_only_data_requires_next_close_execution(project):
+    cfg = config(project)
+    period = bt.select_period(cfg)
+    panel = pd.read_parquet(project / cfg.data.processed_dir / "panel.parquet")
+    close_only = panel.drop(columns=[f"{c}_{leg}" for c in ("open", "high", "low") for leg in "ab"])
+    decisions = pd.Series(0, index=close_only.index)
+    _, orders = bt.execution_targets(decisions, period, 0.5)
+
+    with pytest.raises(bt.BacktestGuardError, match="next_close"):
+        bt.simulate(close_only, orders, cfg)
+    pf = bt.simulate(close_only, orders, config(project, "backtest.execution=next_close"))
+    assert pf.value().iloc[-1] == cfg.backtest.init_cash
+    with pytest.raises(bt.BacktestGuardError, match="must be one of"):
+        bt.simulate(panel, orders, config(project, "backtest.execution=same_close"))
+
+
 def test_costs_reduce_returns(project):
     cheap = bt.run_backtest(config(project, "costs.fee_bps=0", "costs.slippage_bps=0"), project)
     dear = bt.run_backtest(config(project, "costs.fee_bps=20", "costs.slippage_bps=20"), project)

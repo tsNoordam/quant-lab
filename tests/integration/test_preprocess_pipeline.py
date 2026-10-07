@@ -79,10 +79,21 @@ def test_corrupt_raw_data_stops_the_stage(project):
     assert not (root / cfg.processed_dir / PANEL_FILE).exists()
 
 
-def test_dvc_stage_params_exist_in_the_dataset_config():
-    stage = yaml.safe_load((ROOT / "dvc.yaml").read_text())["stages"]["preprocess"]
+@pytest.mark.parametrize("stage_name", ["ingest", "preprocess"])
+def test_dvc_stage_params_exist_in_the_dataset_config(stage_name):
+    stage = yaml.safe_load((ROOT / "dvc.yaml").read_text())["stages"][stage_name]
     for dataset in stage["foreach"]:
         cfg = OmegaConf.to_container(load_dataset_config(dataset, ROOT))
         for entry in stage["do"]["params"]:
             (keys,) = entry.values()
             assert set(keys) <= set(cfg), f"{dataset}: dvc.yaml params missing from config"
+
+
+def test_preprocess_inputs_match_dataset_raw_dirs():
+    stages = yaml.safe_load((ROOT / "dvc.yaml").read_text())["stages"]
+    for dataset, item in stages["preprocess"]["foreach"].items():
+        assert item["input"] == load_dataset_config(dataset, ROOT).raw_dir, dataset
+    for dataset in stages["ingest"]["foreach"]:
+        assert dataset in stages["preprocess"]["foreach"], (
+            f"{dataset} is ingested but never preprocessed"
+        )

@@ -86,6 +86,29 @@ uv run dvc push && git push          # data blobs to the store, pointers to GitH
 The synthetic twin pair (`conf/data/synthetic_twin.yaml`) is regenerable from
 code: `uv run python -m quant_lab.data.synthetic --dataset synthetic_twin`.
 
+### Datastream dual-listed pairs (licensed, DVC only)
+
+The original archives live unmodified in `data/raw/datastream_dlc/`
+(`RoyalDutchShell.zip`, `Unilever.zip`, `ReedElsevier.zip`, `RioTinto.zip`;
+md5s in `data/metadata/datastream_dlc.json`). Adding them the first time:
+
+```bash
+mkdir -p data/raw/datastream_dlc
+cp /mnt/c/Users/<you>/Downloads/RoyalDutchShell.zip data/raw/datastream_dlc/   # etc., exact names above
+md5sum data/raw/datastream_dlc/*.zip     # compare with data/metadata/datastream_dlc.json
+uv run dvc add data/raw/datastream_dlc   # writes data/raw/datastream_dlc.dvc (+ .gitignore entry)
+uv run dvc repro                         # ingest -> data/interim/<pair>, preprocess -> data/processed/<pair>
+uv run dvc push                          # blobs to ~/dvc-store
+git add data/raw/datastream_dlc.dvc data/raw/.gitignore dvc.lock data/interim/*.ingest.json data/processed/*/validation.json
+git commit -m "Add Datastream DLC archives via DVC" && git push
+```
+
+`ingest` converts each workbook (date repair, #N/A, holiday padding, units to
+GBP, total-return adjusted close) into the per-leg CSV schema; `preprocess`
+validates and aligns the pair. Pairs: `rd_shell`, `unilever`, `reed_elsevier`,
+`rio_tinto`. They are close-only, so backtest them with
+`backtest.execution=next_close`.
+
 ## Backtests (Hydra + VectorBT + MLflow)
 
 ```bash

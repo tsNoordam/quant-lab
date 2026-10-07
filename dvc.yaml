@@ -6,26 +6,60 @@
 # because vendor downloads are not reproducible). Every stage below is a pure
 # function of its deps + params, so `dvc repro` on any commit rebuilds exactly
 # the processed data that commit saw.
+#
+#   data/raw/datastream_dlc (dvc add) --ingest--> data/interim/<pair> --preprocess--> data/processed/<pair>
+#   data/raw/synthetic_twin (dvc add) ---------------------------------preprocess--> data/processed/synthetic_twin
 
 stages:
+  ingest:
+    foreach:
+      - rd_shell
+      - unilever
+      - reed_elsevier
+      - rio_tinto
+    do:
+      cmd: python -m quant_lab.data.datastream --dataset ${item}
+      deps:
+        - data/raw/datastream_dlc
+        - src/quant_lab/data/datastream.py
+      params:
+        - conf/data/${item}.yaml:
+            - legs
+            - raw_dir
+            - source
+      outs:
+        - data/interim/${item}
+      metrics:
+        - data/interim/${item}.ingest.json:
+            cache: false
+
   preprocess:
     foreach:
-      - synthetic_twin
+      synthetic_twin:
+        input: data/raw/synthetic_twin
+      rd_shell:
+        input: data/interim/rd_shell
+      unilever:
+        input: data/interim/unilever
+      reed_elsevier:
+        input: data/interim/reed_elsevier
+      rio_tinto:
+        input: data/interim/rio_tinto
     do:
-      cmd: python -m quant_lab.data.preprocess --dataset ${item}
+      cmd: python -m quant_lab.data.preprocess --dataset ${key}
       deps:
-        - data/raw/${item}
+        - ${item.input}
         - src/quant_lab/data/loaders.py
         - src/quant_lab/data/validation.py
         - src/quant_lab/data/synchronization.py
         - src/quant_lab/data/preprocess.py
       params:
-        - conf/data/${item}.yaml:
+        - conf/data/${key}.yaml:
             - legs
             - alignment
             - validation
       outs:
-        - data/processed/${item}/panel.parquet
+        - data/processed/${key}/panel.parquet
       metrics:
-        - data/processed/${item}/validation.json:
+        - data/processed/${key}/validation.json:
             cache: false

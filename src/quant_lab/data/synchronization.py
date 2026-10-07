@@ -9,7 +9,7 @@ from typing import Literal
 
 import pandas as pd
 
-from quant_lab.data.loaders import OHLCV_COLUMNS
+from quant_lab.data.loaders import BAR_COLUMNS
 
 MissingPolicy = Literal["drop", "ffill"]
 
@@ -26,11 +26,16 @@ def align_pair(
     drop:  keep only dates on which both legs traded.
     ffill: keep dates on which either leg traded; carry a missing leg's last close
            forward for at most ``ffill_limit`` days as a no-trade bar
-           (open = high = low = close, volume = 0, stale = True). Dates still
-           missing after that are dropped.
+           (open = high = low = close, volume = 0, no quote, stale = True).
+           Dates still missing after that are dropped.
+
+    Both legs must carry the same columns (see quant_lab.data.loaders).
     """
-    a = a.loc[:, list(OHLCV_COLUMNS)].add_suffix("_a")
-    b = b.loc[:, list(OHLCV_COLUMNS)].add_suffix("_b")
+    if list(a.columns) != list(b.columns):
+        raise ValueError(f"legs have different columns: {list(a.columns)} vs {list(b.columns)}")
+    bars = [c for c in BAR_COLUMNS if c in a.columns]
+    a = a.add_suffix("_a")
+    b = b.add_suffix("_b")
 
     if missing_policy == "drop":
         panel = a.join(b, how="inner")
@@ -48,7 +53,7 @@ def align_pair(
         stale = panel[f"close_{leg}"].isna()
         close = panel[f"close_{leg}"].ffill(limit=ffill_limit)
         panel[f"adj_close_{leg}"] = panel[f"adj_close_{leg}"].ffill(limit=ffill_limit)
-        for col in ("open", "high", "low"):
+        for col in bars:
             panel[f"{col}_{leg}"] = panel[f"{col}_{leg}"].fillna(close)
         panel[f"close_{leg}"] = close
         panel[f"volume_{leg}"] = panel[f"volume_{leg}"].fillna(0)

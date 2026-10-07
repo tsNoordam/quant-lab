@@ -42,8 +42,9 @@ Git + DVC + MLflow record what happened.
 |---|---|---|
 | `papers/raw/` | Source PDFs (immutable) | DVC |
 | `research/` | Extraction notes, equations, methodology, assumptions, evidence, strategy specs (`specs/`), written reports (`reports/`) | Git |
-| `data/raw/` | Immutable vendor data | DVC (`dvc add`) |
-| `data/processed/` | Outputs of `dvc.yaml` stages, never edited by hand | DVC (stage outs) |
+| `data/raw/` | Immutable vendor data (`datastream_dlc/` original zips, `synthetic_twin/`) | DVC (`dvc add`) |
+| `data/interim/` | Vendor formats converted to the per-leg raw CSV schema (`ingest` stage) | DVC (stage outs) |
+| `data/processed/` | Validated, aligned pair panels (`preprocess` stage), never edited by hand | DVC (stage outs) |
 | `data/metadata/` | Source/provenance JSON per dataset | Git |
 | `conf/` | Hydra config groups: data, features, strategy, costs, split, backtest | Git |
 | `src/quant_lab/` | `data`, `features`, `models` (statsmodels), `strategies`, `backtest`, `tracking` | Git |
@@ -77,7 +78,11 @@ Never use the out-of-sample period for strategy development.
 - `data/raw/` is immutable. Fix data problems in a processing stage, never in
   the raw file.
 - Every dataset in `data/raw/` has a metadata JSON in `data/metadata/`.
-- `data/processed/` is produced only by `uv run dvc repro`.
+- `data/interim/` and `data/processed/` are produced only by `uv run dvc repro`.
+- Datastream data is licensed: it stays in DVC and is never committed to Git
+  or pasted into notes, issues or chat.
+- Real pairs are close-only (no open/high/low): backtest them with
+  `backtest.execution=next_close`.
 - Any rolling statistic used by a cost or signal model (volatility, ADV,
   spread) must be lagged so that it only uses information available before
   the decision time.

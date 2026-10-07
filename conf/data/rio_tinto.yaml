@@ -1,0 +1,55 @@
+# Rio Tinto Ltd (Sydney, AUD) / Rio Tinto PLC (London, GBP). Not in Maymin's sample:
+# candidate out-of-sample pair. Source: data/raw/datastream_dlc/RioTinto.zip.
+#
+# NON-SYNCHRONOUS: Sydney closes before London opens, so the same-date closes are
+# ~10 hours apart. Any relative-price signal or execution model must account for this.
+
+name: rio_tinto
+calendar: business_daily
+legs:
+  a: RIO_LTD
+  b: RIO_PLC
+currency: GBP
+
+# [EXTERNAL-RESEARCH] workbook's theoretical ratio (1 Ltd share = 1 PLC share).
+parity_ratio: 1.0
+
+raw_dir: data/interim/rio_tinto
+processed_dir: data/processed/rio_tinto
+
+source:
+  archive: data/raw/datastream_dlc/RioTinto.zip
+  workbook: Rio Tinto data.xls
+  volume_sheet: Regression data
+  volume_multiplier: 1000
+  window:  # [IMPLEMENTATION-ASSUMPTION] skip the first days after the DLC merger (Dec 1995)
+    start: "1996-01-01"
+    end: "2002-10-03"
+  legs:
+    a:
+      sheet: Rio Tinto Ltd
+      price: 905473(P)
+      total_return_index: 905473(RI)
+      fx_per_unit: "# AUS$ per £"
+      price_scale: 1.0
+      quote_scale: 1.0
+      volume: TURNOVER BY VOLUME RIO TINTO Ltd
+      bid: BID PRICE RIO TINTO Ltd
+      ask: ASK PRICE RIO TINTO Ltd
+    b:
+      sheet: Rio Tinto PLC
+      price: 901714(P)
+      total_return_index: 901714(RI)
+      price_scale: 1.0     # the workbook author already divided this price by 100
+      quote_scale: 0.01    # ...but not the quotes, which are still in pence
+      volume: TURNOVER BY VOLUME RIO TINTO PLC
+      bid: BID PRICE RIO TINTO PLC
+      ask: ASK PRICE RIO TINTO PLC
+
+alignment:
+  missing_policy: drop
+  ffill_limit: 0
+
+validation:
+  max_missing_frac: 0.05
+  max_abs_log_return: 0.25

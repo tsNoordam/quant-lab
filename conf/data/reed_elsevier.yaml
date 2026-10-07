@@ -1,0 +1,53 @@
+# Elsevier NV (Amsterdam, EUR) / Reed International PLC (London, GBp).
+# Twin pair in Maymin (SILTA). Source: data/raw/datastream_dlc/ReedElsevier.zip.
+
+name: reed_elsevier
+calendar: business_daily
+legs:
+  a: ELSEVIER
+  b: REED
+currency: GBP
+
+# [EXTERNAL-RESEARCH] workbook's theoretical ratio in GBP per share; cross-check
+# against REEDELSEVIERPLC20F eq agr.pdf.
+parity_ratio: 1.538
+
+raw_dir: data/interim/reed_elsevier
+processed_dir: data/processed/reed_elsevier
+
+source:
+  archive: data/raw/datastream_dlc/ReedElsevier.zip
+  workbook: Reed Elsevier data incl S.xls
+  volume_sheet: Regression data
+  volume_multiplier: 1000
+  window:  # [IMPLEMENTATION-ASSUMPTION] full workbook range; volume complete throughout
+    start: "1993-01-01"
+    end: "2002-10-03"
+  legs:
+    a:
+      sheet: Elsevier
+      price: 981526(P)
+      total_return_index: 981526(RI)
+      fx_per_unit: "# NLG(€) per £"
+      price_scale: 1.0
+      quote_scale: 1.0
+      volume: TURNOVER BY VOLUME ELSEVIER
+      bid: BID PRICE ELSEVIER
+      ask: ASK PRICE ELSEVIER
+    b:
+      sheet: Reed International
+      price: 901080(P)
+      total_return_index: 901080(RI)
+      price_scale: 0.01
+      quote_scale: 0.01
+      volume: TURNOVER BY VOLUME REED INT.
+      bid: BID PRICE REED INT.
+      ask: ASK PRICE REED INT.
+
+alignment:
+  missing_policy: drop
+  ffill_limit: 0
+
+validation:
+  max_missing_frac: 0.05
+  max_abs_log_return: 0.25
