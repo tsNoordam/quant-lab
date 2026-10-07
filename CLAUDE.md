@@ -3,8 +3,9 @@
 ## Mission
 
 This repository converts academic quantitative finance research papers into
-reproducible, testable trading strategies. Current paper: Maymin,
-*Self-Imposed Limits to Arbitrage* (dual-listed share pairs).
+reproducible, testable trading strategies. Papers: Maymin, *Self-Imposed
+Limits to Arbitrage* (steps 1-12, done); current: de Jong, Rosenthal & van Dijk
+(2009), *The Risk and Return of Arbitrage in Dual-Listed Companies* (steps 13+).
 
 The goal is NOT to maximize historical returns.
 

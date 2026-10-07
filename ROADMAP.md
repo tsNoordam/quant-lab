@@ -60,3 +60,36 @@ All numbered steps are done. Open items for any follow-up study (not started):
 B6 sourced RD/Elsevier spreads 1996-98; impact sized on running equity (A7);
 H2 calibration (needs the paper's 2002-07 sample); the 2000-02 OOS period is
 spent for these strategies.
+
+# Paper 2: de Jong, Rosenthal & van Dijk (2009), DLC arbitrage
+
+Same data source (the authors built the Datastream DLC workbooks). The paper is
+in-sample over 1980-2002 and specifies trading rules with per-twin results, so
+a numerical replication is possible. Branch: work on `claude/sharp-bohr-snz350`
+(restarted from main), merged by the user into `Dijk-paper`.
+
+| Step | What | Commit |
+|---|---|---|
+| 13 | Paper extraction: `research/{extraction,equations,methodology,assumptions}/dejong_dlc.md`, evidence CSV (539 rows: Tables II-VI, sensitivity, unifications); ambiguities D1-D12; review | (this step) |
+
+Planned, in order:
+
+14. **Data for all 12 DLCs.** Ingest configs for the 8 new workbooks (sheets,
+    units, theoretical ratio from the workbook), validation, per-twin sample
+    windows of Table II (unified twins end 20 trading days before the
+    announcement). Reproduce Table II from our panels. Sample-design decision
+    recorded in `data_decisions.md`, including whether the replication may
+    touch 2000-02 (`+unlock_oos`; the user's call).
+15. **Comovement (Table III).** Regression E2 with Newey-West errors from the
+    workbooks' `Regression data`; compare with the paper per twin.
+16. **Paper-convention arbitrage engine (Tables IV-V).** Threshold strategy
+    with Reg T margin account, maintenance calls, fixed interest, flat costs
+    and the T-bill padding convention; resolve D1-D12 against the per-twin
+    table values; all eight strategies.
+17. **Abnormal returns (Table VI).** Fama-French factors and 3-month T-bill
+    (public data, versioned with DVC); FF3 and IAPM alphas, risk statistics.
+18. **Our standard.** The same rules through the lab's engine (liquidity
+    costs, total-return P&L, no padding, open positions marked at the end),
+    split by time-zone gap; the gap between conventions is a result.
+19. **Report.**
+
