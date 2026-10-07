@@ -44,6 +44,7 @@ def preprocess(cfg: DictConfig, root: Path) -> dict:
             df,
             f"{leg}:{cfg.legs[leg]}",
             max_abs_log_return=cfg.validation.max_abs_log_return,
+            min_median_turnover=cfg.validation.get("min_median_turnover"),
         )
     issues += check_pair_coverage(
         legs["a"].index, legs["b"].index, max_missing_frac=cfg.validation.max_missing_frac

@@ -52,6 +52,21 @@ def test_ingested_prices_reproduce_the_workbook_parity_deviations(lab, dataset):
     np.testing.assert_allclose(ours, theirs, atol=1e-12)
 
 
+def test_unilever_nv_volume_is_still_implausible(lab):
+    """Pins the known defect behind `volume_reliable: false` in conf/data/unilever.yaml.
+
+    If this ever fails, the NV volume source was fixed: revisit that flag.
+    """
+    cfg = load_dataset_config("unilever", lab)
+    convert(cfg, lab)
+    nv = pd.read_csv(lab / cfg.raw_dir / f"{cfg.legs.a}.csv", index_col="date")
+    plc = pd.read_csv(lab / cfg.raw_dir / f"{cfg.legs.b}.csv", index_col="date")
+    nv_turnover = (nv["volume"] / nv["shares_outstanding"]).median()
+    plc_turnover = (plc["volume"] / plc["shares_outstanding"]).median()
+    assert nv_turnover < 0.0002 <= plc_turnover
+    assert cfg.volume_reliable is False
+
+
 @pytest.mark.parametrize("dataset", PAIRS)
 def test_ingest_is_deterministic(lab, dataset):
     cfg = load_dataset_config(dataset, lab)

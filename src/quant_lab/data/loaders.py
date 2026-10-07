@@ -6,6 +6,7 @@ exchange-local time without a timezone. Columns:
     required   date, close, adj_close, volume
     bars       open, high, low        (all three or none; close-only vendors omit them)
     quotes     bid, ask               (optional; may be empty on days without a quote)
+    shares_outstanding                (optional; enables the turnover plausibility check)
 
 Loaders do not sort, deduplicate or fill: validation must see the file exactly
 as the vendor delivered it.
@@ -18,7 +19,17 @@ import pandas as pd
 REQUIRED_COLUMNS = ("close", "adj_close", "volume")
 BAR_COLUMNS = ("open", "high", "low")
 QUOTE_COLUMNS = ("bid", "ask")
-COLUMN_ORDER = ("open", "high", "low", "close", "adj_close", "volume", "bid", "ask")
+COLUMN_ORDER = (
+    "open",
+    "high",
+    "low",
+    "close",
+    "adj_close",
+    "volume",
+    "bid",
+    "ask",
+    "shares_outstanding",
+)
 
 
 def load_symbol(raw_dir: Path | str, symbol: str) -> pd.DataFrame:

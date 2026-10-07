@@ -144,3 +144,30 @@ def test_quotes_in_the_wrong_unit_are_rejected():
 def test_close_only_frames_validate_without_bars():
     df, _ = build_leg(series([5.0] * 6), series([1.0] * 6), series([1.0] * 6))
     assert check_ohlcv(df, "X", max_abs_log_return=0.25) == []
+
+
+def leg_with_turnover(volume_thousands):
+    return build_leg(
+        series([5.0] * 6),
+        series([1.0] * 6),
+        series([volume_thousands] * 6),
+        shares_outstanding=series([1_000_000.0] * 6),  # thousands, like Datastream NOSH
+        volume_multiplier=1000,
+    )[0]
+
+
+def test_shares_outstanding_uses_the_volume_unit():
+    df = leg_with_turnover(3_000.0)
+    assert df["shares_outstanding"].iloc[0] == 1e9
+    assert df["volume"].iloc[0] == 3e6  # 0.3% daily turnover
+
+
+@pytest.mark.parametrize(
+    ("volume", "minimum", "expect_error"),
+    [(3_000.0, 0.0002, False), (5.0, 0.0002, True), (5.0, 0.0, False), (5.0, None, False)],
+)
+def test_implausible_turnover_check(volume, minimum, expect_error):
+    issues = check_ohlcv(
+        leg_with_turnover(volume), "X", max_abs_log_return=0.25, min_median_turnover=minimum
+    )
+    assert ("implausible_turnover" in {i.check for i in issues}) == expect_error

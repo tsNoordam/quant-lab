@@ -40,13 +40,35 @@ def _dates(index: pd.Index, limit: int = 5) -> str:
     return ", ".join(shown) + more
 
 
-def check_ohlcv(df: pd.DataFrame, name: str, *, max_abs_log_return: float) -> list[Issue]:
-    """Validate one symbol's daily OHLCV frame as loaded (unsorted, unfilled)."""
+def check_ohlcv(
+    df: pd.DataFrame,
+    name: str,
+    *,
+    max_abs_log_return: float,
+    min_median_turnover: float | None = None,
+) -> list[Issue]:
+    """Validate one symbol's daily frame as loaded (unsorted, unfilled).
+
+    ``min_median_turnover`` (fraction of shares outstanding per day) is checked when
+    the frame has ``shares_outstanding``; None or 0 disables it.
+    """
     idx = df.index
     if not isinstance(idx, pd.DatetimeIndex):
         return [Issue("index_type", "error", f"{name}: index is {type(idx).__name__}")]
 
     issues: list[Issue] = []
+    if min_median_turnover and "shares_outstanding" in df.columns:
+        turnover = float((df["volume"] / df["shares_outstanding"]).median())
+        if not turnover >= min_median_turnover:
+            issues.append(
+                Issue(
+                    "implausible_turnover",
+                    "error",
+                    f"{name}: median daily volume is {turnover:.4%} of shares outstanding "
+                    f"(minimum {min_median_turnover:.4%}); volume is probably for another "
+                    "listing or in another unit",
+                )
+            )
     if idx.tz is not None:
         issues.append(Issue("timezone", "error", f"{name}: daily data must use naive local dates"))
     if idx.has_duplicates:

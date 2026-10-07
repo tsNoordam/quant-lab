@@ -43,7 +43,8 @@ def test_run_logs_metrics_tags_and_artifacts(project):
     run = mlflow.get_run(result["run_id"])
     assert {"sharpe", "max_drawdown", "total_return", "n_entries"} <= set(run.data.metrics)
     assert run.data.tags["period"] == "train"
-    assert run.data.tags["cost_model"] == "flat_bps"
+    assert run.data.tags["cost_model"] == "liquidity"
+    assert {"cost_spread_impact_tax", "cost_commission", "cost_borrow"} <= set(run.data.metrics)
     assert run.data.tags["unlock_oos"] == "false"
     assert len(run.data.tags["data_md5"]) == 32
     assert run.data.params["strategy.window"] == "60"
@@ -67,6 +68,15 @@ def test_split_overrides_are_refused():
     bt.check_overrides(["split=synthetic_twin", "strategy.window=40"])  # allowed
 
 
+def test_liquidity_costs_refuse_datasets_with_unreliable_volume(project):
+    with pytest.raises(bt.BacktestGuardError, match="volume_reliable"):
+        bt.run_backtest(config(project, "+data.volume_reliable=false"), project)
+    flat = bt.run_backtest(
+        config(project, "+data.volume_reliable=false", "costs=flat_bps"), project
+    )
+    assert flat["cost_model"] == "flat_bps"
+
+
 def test_clean_tree_requirement_is_enforced(project):
     # tmp project is not a git repo, so its state is unknown and must not pass.
     with pytest.raises(bt.BacktestGuardError, match="dirty"):
@@ -81,18 +91,19 @@ def test_data_after_the_period_cannot_affect_the_run(project, tmp_path):
     later = shocked.index > period.end
     shocked.loc[later, ["open_a", "close_a", "high_a", "low_a", "adj_close_a"]] *= 2.0
 
+    shocked.loc[later, ["volume_a"]] *= 10  # liquidity after the period must not matter either
+
     def equity(p):
         p = p.loc[: period.end]
         s = cfg.strategy
         decisions, _ = bt.target_positions(p, window=s.window, entry_z=s.entry_z, exit_z=s.exit_z)
-        _, orders = bt.execution_targets(decisions, period, s.leg_weight)
-        return bt.simulate(p, orders, cfg).value()
+        return bt.backtest_pair(p, decisions, period, cfg).equity
 
     pd.testing.assert_series_equal(equity(panel), equity(shocked))
 
 
 def _oracle_sharpe(root: Path, sign: int) -> float:
-    cfg = config(root, "costs.fee_bps=0", "costs.slippage_bps=0")
+    cfg = config(root, "costs=flat_bps", "costs.fee_bps=0", "costs.slippage_bps=0")
     period = bt.select_period(cfg)
     panel = pd.read_parquet(root / cfg.data.processed_dir / "panel.parquet").loc[: period.end]
     truth = simulate_truth(cfg.data)["mispricing"].reindex(panel.index)
@@ -112,7 +123,7 @@ def test_known_signal_is_profitable_through_the_engine(project):
 
 
 def test_close_only_data_requires_next_close_execution(project):
-    cfg = config(project)
+    cfg = config(project, "costs=flat_bps")
     period = bt.select_period(cfg)
     panel = pd.read_parquet(project / cfg.data.processed_dir / "panel.parquet")
     close_only = panel.drop(columns=[f"{c}_{leg}" for c in ("open", "high", "low") for leg in "ab"])
@@ -121,15 +132,21 @@ def test_close_only_data_requires_next_close_execution(project):
 
     with pytest.raises(bt.BacktestGuardError, match="next_close"):
         bt.simulate(close_only, orders, cfg)
-    pf = bt.simulate(close_only, orders, config(project, "backtest.execution=next_close"))
+    next_close = config(project, "costs=flat_bps", "backtest.execution=next_close")
+    pf = bt.simulate(close_only, orders, next_close)
     assert pf.value().iloc[-1] == cfg.backtest.init_cash
     with pytest.raises(bt.BacktestGuardError, match="must be one of"):
-        bt.simulate(panel, orders, config(project, "backtest.execution=same_close"))
+        bt.simulate(panel, orders, config(project, "costs=flat_bps", "backtest.execution=x"))
 
 
 def test_costs_reduce_returns(project):
-    cheap = bt.run_backtest(config(project, "costs.fee_bps=0", "costs.slippage_bps=0"), project)
-    dear = bt.run_backtest(config(project, "costs.fee_bps=20", "costs.slippage_bps=20"), project)
+    flat = ("costs=flat_bps",)
+    cheap = bt.run_backtest(
+        config(project, *flat, "costs.fee_bps=0", "costs.slippage_bps=0"), project
+    )
+    dear = bt.run_backtest(
+        config(project, *flat, "costs.fee_bps=20", "costs.slippage_bps=20"), project
+    )
     assert dear["total_return"] < cheap["total_return"]
     assert dear["n_entries"] == cheap["n_entries"]
 

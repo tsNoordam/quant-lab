@@ -116,17 +116,24 @@ def build_leg(
     fx_per_unit: pd.Series | None = None,
     bid: pd.Series | None = None,
     ask: pd.Series | None = None,
+    shares_outstanding: pd.Series | None = None,
     price_scale: float = 1.0,
     quote_scale: float = 1.0,
     volume_multiplier: float = 1.0,
     start: str | None = None,
     end: str | None = None,
 ) -> tuple[pd.DataFrame, dict]:
-    """Assemble one leg in the raw schema. All inputs are indexed by date."""
+    """Assemble one leg in the raw schema. All inputs are indexed by date.
+
+    Volume and shares outstanding share Datastream's unit, so both are scaled by
+    ``volume_multiplier``.
+    """
     frame = pd.DataFrame({"price": price, "ri": total_return_index, "volume": volume})
     frame["fx"] = 1.0 if fx_per_unit is None else fx_per_unit
     frame["bid"] = np.nan if bid is None else bid
     frame["ask"] = np.nan if ask is None else ask
+    if shares_outstanding is not None:
+        frame["nosh"] = shares_outstanding
     frame = frame.loc[start:end]
 
     traded = frame["volume"].notna() & (frame["volume"] > 0)
@@ -148,6 +155,8 @@ def build_leg(
             "ask": frame["ask"] * quote_scale / frame["fx"],
         }
     )
+    if shares_outstanding is not None:
+        out["shares_outstanding"] = frame["nosh"] * volume_multiplier
     out.index.name = "date"
     report |= {
         "rows": len(out),
@@ -177,6 +186,9 @@ def convert(cfg: DictConfig, root: Path) -> dict:
             fx_per_unit=prices.column(spec.fx_per_unit) if spec.get("fx_per_unit") else None,
             bid=flows.column(spec.bid) if spec.get("bid") else None,
             ask=flows.column(spec.ask) if spec.get("ask") else None,
+            shares_outstanding=(
+                prices.column(spec.shares_outstanding) if spec.get("shares_outstanding") else None
+            ),
             price_scale=spec.price_scale,
             quote_scale=spec.quote_scale,
             volume_multiplier=src.volume_multiplier,

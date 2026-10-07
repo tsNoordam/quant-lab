@@ -20,6 +20,7 @@
     "Volume (turnover by volume) in thousands of shares, split-adjusted like prices.",
     "Workbooks extracted at different times use different split adjustments (e.g. Royal Dutch x2): never mix files of one pair.",
     "Unilever NV price stale on most days before ~1993; NV quotes unreliable (median spread 165-420 bps).",
+    "Unilever NV 'TURNOVER BY VOLUME' is ~0.0007% of NV shares outstanding per day (other legs 0.2-0.7%): not primary-market volume. conf/data/unilever.yaml sets volume_reliable: false.",
     "Rio Tinto Ltd (Sydney) and PLC (London) closes are non-synchronous."
   ],
   "used_by": ["conf/data/rd_shell.yaml", "conf/data/unilever.yaml", "conf/data/reed_elsevier.yaml", "conf/data/rio_tinto.yaml"]

@@ -83,6 +83,8 @@ Never use the out-of-sample period for strategy development.
   or pasted into notes, issues or chat.
 - Real pairs are close-only (no open/high/low): backtest them with
   `backtest.execution=next_close`.
+- `volume_reliable: false` in a dataset config (currently `unilever`) means its
+  volume must not be used: no ADV-based costs, no relative-volume analysis.
 - Any rolling statistic used by a cost or signal model (volatility, ADV,
   spread) must be lagged so that it only uses information available before
   the decision time.

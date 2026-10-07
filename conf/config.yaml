@@ -11,7 +11,7 @@ defaults:
   - data: synthetic_twin
   - split: synthetic_twin
   - strategy: parity_zscore
-  - costs: flat_bps
+  - costs: liquidity     # costs=flat_bps only as a labelled sensitivity case
   - backtest: default
   - _self_
 

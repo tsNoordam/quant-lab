@@ -28,6 +28,7 @@ source:
       sheet: Elsevier
       price: 981526(P)
       total_return_index: 981526(RI)
+      shares_outstanding: 981526(NOSH)
       fx_per_unit: "# NLG(€) per £"
       price_scale: 1.0
       quote_scale: 1.0
@@ -38,6 +39,7 @@ source:
       sheet: Reed International
       price: 901080(P)
       total_return_index: 901080(RI)
+      shares_outstanding: 901080(NOSH)
       price_scale: 0.01
       quote_scale: 0.01
       volume: TURNOVER BY VOLUME REED INT.
@@ -51,3 +53,6 @@ alignment:
 validation:
   max_missing_frac: 0.05
   max_abs_log_return: 0.25
+  # Each leg's median daily volume must be at least this fraction of its
+  # shares outstanding (large caps trade ~0.2-0.7%/day in this data).
+  min_median_turnover: 0.0002

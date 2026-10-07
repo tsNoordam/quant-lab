@@ -35,6 +35,7 @@ source:
       sheet: Royal Dutch
       price: 902178(P)
       total_return_index: 902178(RI)
+      shares_outstanding: 902178(NOSH)
       fx_per_unit: "# NLG(€) per £"   # EUR (ex-NLG) per GBP
       price_scale: 1.0
       quote_scale: 1.0
@@ -45,6 +46,7 @@ source:
       sheet: Shell
       price: 900998(P)
       total_return_index: 900998(RI)
+      shares_outstanding: 900998(NOSH)
       price_scale: 0.01           # pence -> GBP
       quote_scale: 0.01
       volume: TURNOVER BY VOLUME SHELL
@@ -60,3 +62,6 @@ validation:
   # Amsterdam and London holidays differ, so each leg misses some union dates.
   max_missing_frac: 0.05
   max_abs_log_return: 0.25
+  # Each leg's median daily volume must be at least this fraction of its
+  # shares outstanding (large caps trade ~0.2-0.7%/day in this data).
+  min_median_turnover: 0.0002
