@@ -22,7 +22,7 @@ import vectorbt as vbt
 from hydra.core.hydra_config import HydraConfig
 from omegaconf import DictConfig, OmegaConf
 
-from quant_lab.backtest import costs
+from quant_lab.backtest import costs, dividends
 from quant_lab.backtest.costs import LEGS
 from quant_lab.backtest.report import plot_equity
 from quant_lab.data.preprocess import PANEL_FILE
@@ -168,7 +168,8 @@ class Simulation:
     orders: pd.DataFrame
     order_cost: pd.DataFrame | None
     borrow: pd.Series
-    equity: pd.Series  # portfolio value net of borrow charges
+    dividends: pd.Series  # net dividend cash per day
+    equity: pd.Series  # portfolio value net of borrow charges, plus dividend cash
     cost_metrics: dict
 
 
@@ -178,11 +179,16 @@ def backtest_pair(
     """Decisions (as of each close) -> sized orders -> costs -> VectorBT -> net equity."""
     c, capital = cfg.costs, cfg.backtest.init_cash
     leg_weight = cfg.strategy.leg_weight
+    min_yield, withholding = dividends.settings(cfg.data)
     if c.model != "liquidity":
         held, orders = execution_targets(decisions, period, leg_weight)
         pf = simulate(panel, orders, cfg)
         borrow = pd.Series(0.0, index=held.index)
-        return Simulation(pf, held, orders, None, borrow, pf.value(), {})
+        dps = dividends.per_share_frame(panel, held.index, min_yield)
+        divs = dividends.dividend_cash(pf.assets(), dps, withholding)
+        equity = pf.value() + divs.cumsum()
+        metrics = {"dividends": float(divs.sum())}
+        return Simulation(pf, held, orders, None, borrow, divs, equity, metrics)
 
     if not cfg.data.get("volume_reliable", True):
         raise BacktestGuardError(
@@ -198,7 +204,9 @@ def backtest_pair(
 
     short_value = pf.asset_value(group_by=False).clip(upper=0.0).sum(axis=1)
     borrow = costs.borrow_charges(short_value, c.borrow_bps_annual, cfg.backtest.annualization)
-    equity = pf.value() - borrow.cumsum()
+    dps = dividends.per_share_frame(panel, orders.index, min_yield)
+    divs = dividends.dividend_cash(pf.assets(), dps, withholding)
+    equity = pf.value() - borrow.cumsum() + divs.cumsum()
 
     records = pf.orders.records_readable
     raw = fill_prices(panel, orders.index, cfg)
@@ -216,11 +224,12 @@ def backtest_pair(
         ),
         "cost_commission": float(records["Fees"].sum()),
         "cost_borrow": float(borrow.sum()),
+        "dividends": float(divs.sum()),  # net cash: received on longs, paid on shorts
         "median_order_cost_bps": float(np.median(paid) * 1e4) if paid.size else 0.0,
         "entries_capped": int((entry_caps < leg_weight).sum()),
         "quoted_spread_share": float(quoted[has_order].mean()) if paid.size else 0.0,
     }
-    return Simulation(pf, held, orders, order_cost, borrow, equity, cost_metrics)
+    return Simulation(pf, held, orders, order_cost, borrow, divs, equity, cost_metrics)
 
 
 def compute_metrics(equity: pd.Series, held: pd.Series, pf: vbt.Portfolio, ann: int) -> dict:
@@ -256,6 +265,7 @@ def run_tags(cfg: DictConfig, root: Path, panel_rel: str, git: dict, period: Per
         "execution": cfg.backtest.execution,
         "strategy": cfg.strategy.name,
         "dataset": cfg.data.name,
+        "run_label": cfg.run_label,
     }
 
 

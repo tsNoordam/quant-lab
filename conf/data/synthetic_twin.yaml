@@ -24,6 +24,13 @@ currency: USD
 # the cash-flow split was 60:40, i.e. parity 1.5 after share-count adjustment.
 parity_ratio: 1.5
 
+# No corporate actions (adj_close == close), so no dividends are booked.
+dividends:
+  withholding:
+    a: 0.0
+    b: 0.0
+  min_yield: 0.005
+
 raw_dir: data/raw/synthetic_twin
 processed_dir: data/processed/synthetic_twin
 

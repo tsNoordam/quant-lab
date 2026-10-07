@@ -48,6 +48,14 @@ def test_split_periods_are_ordered_and_inside_the_data_window(dataset):
         assert periods[-1][1] <= pd.Timestamp(window.end)
 
 
+@pytest.mark.parametrize("dataset", DATASETS)
+def test_every_dataset_states_its_dividend_treatment(dataset):
+    d = compose_for(f"data={dataset}").data.dividends
+    assert set(d.withholding) == {"a", "b"}
+    assert all(0.0 <= d.withholding[leg] < 1.0 for leg in "ab")
+    assert 0.0 < d.min_yield < 0.02
+
+
 def test_mismatched_split_is_refused():
     cfg = compose_for("data=rd_shell", "split=synthetic_twin")
     with pytest.raises(bt.BacktestGuardError, match="does not belong"):

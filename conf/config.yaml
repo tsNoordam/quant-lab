@@ -16,6 +16,9 @@ defaults:
   - backtest: default
   - _self_
 
+# Tagged on every MLflow run. Name sensitivity cases, e.g. run_label=wht25.
+run_label: baseline
+
 mlflow:
   tracking_uri: sqlite:///mlflow.db
   artifact_root: mlartifacts

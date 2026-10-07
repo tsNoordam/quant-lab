@@ -14,6 +14,13 @@ execution: next_close
 # against REEDELSEVIERPLC20F eq agr.pdf.
 parity_ratio: 1.538
 
+# Total-return P&L; see conf/data/rd_shell.yaml. [IMPLEMENTATION-ASSUMPTION]
+dividends:
+  withholding:
+    a: 0.15   # Elsevier (NL): UK-NL treaty rate
+    b: 0.0    # Reed International (UK)
+  min_yield: 0.005
+
 raw_dir: data/interim/reed_elsevier
 processed_dir: data/processed/reed_elsevier
 

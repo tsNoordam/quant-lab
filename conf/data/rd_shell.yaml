@@ -20,6 +20,19 @@ execution: next_close
 # against the equalization agreement (ROYALDUTCH-SHELL eq agr.pdf).
 parity_ratio: 6.863006819188524
 
+# Total-return P&L (quant_lab.backtest.dividends): longs receive the dividend net
+# of withholding, shorts pay it in full. [IMPLEMENTATION-ASSUMPTION] for a
+# UK-based desk: Dutch dividends 15% (UK-NL treaty rate; statutory 25%), UK 0%.
+# Sensitivity runs: dividends.withholding.a=0.0 and =0.25. Not modelled: the
+# pre-1997 UK tax credit (the tax-clientele effect behind the mispricing).
+dividends:
+  withholding:
+    a: 0.15   # Royal Dutch (NL)
+    b: 0.0    # Shell Transport (UK)
+  # Price/total-return residuals below this yield are rounding noise, not
+  # dividends (development data: ex-dates >= 75 bps, noise <= 50 bps).
+  min_yield: 0.005
+
 raw_dir: data/interim/rd_shell
 processed_dir: data/processed/rd_shell
 

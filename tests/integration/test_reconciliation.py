@@ -67,6 +67,50 @@ def test_fills_fees_and_equity_reconcile(project, execution):
     np.testing.assert_allclose(replayed, sim.equity, rtol=1e-10)
 
 
+def test_equity_with_dividends_reconciles(project):
+    # Inject ex-dividend drops on both legs (close falls, adj_close continuous),
+    # then replay with the reference ledger's own dividend bookkeeping.
+    with initialize_config_dir(config_dir=str(project / "conf"), version_base="1.3"):
+        cfg = compose(
+            "config",
+            overrides=["backtest.execution=next_close", "data.dividends.withholding.a=0.15"],
+        )
+    period = bt.select_period(cfg)
+    panel = pd.read_parquet(project / cfg.data.processed_dir / "panel.parquet").loc[: period.end]
+    for leg, offset in (("a", 30), ("b", 75)):
+        for ex in range(offset, len(panel), 120):
+            cols = [f"{c}_{leg}" for c in ("open", "high", "low", "close")]
+            panel.iloc[ex:, [panel.columns.get_loc(c) for c in cols]] *= 0.98
+    s = cfg.strategy
+    decisions, _ = target_positions(panel, window=s.window, entry_z=s.entry_z, exit_z=s.exit_z)
+    sim = bt.backtest_pair(panel, decisions, period, cfg)
+    assert (sim.dividends != 0).sum() > 5  # positions were held across ex-dates
+
+    rec = sim.pf.orders.records_readable
+    side = np.where(rec["Side"] == "Buy", 1.0, -1.0)
+    ledger = pd.DataFrame(
+        {
+            "date": rec["Timestamp"],
+            "leg": rec["Column"],
+            "size": side * rec["Size"],
+            "price": rec["Price"],
+            "fees": rec["Fees"],
+        }
+    )
+    rows = sim.orders.index
+    close = pd.DataFrame({leg: panel.loc[rows, f"close_{leg}"] for leg in "ab"})
+    # Ground truth: each injected ex-date pays 2% of the undropped close.
+    dps = pd.DataFrame(0.0, index=panel.index, columns=["a", "b"])
+    for leg, offset in (("a", 30), ("b", 75)):
+        for ex in range(offset, len(panel), 120):
+            dps.iloc[ex, dps.columns.get_loc(leg)] = panel[f"close_{leg}"].iloc[ex] / 0.98 * 0.02
+    dps = dps.loc[rows]
+    replayed = reference.replay_equity(
+        ledger, close, cfg.backtest.init_cash, sim.borrow, dps, {"a": 0.15, "b": 0.0}
+    )
+    np.testing.assert_allclose(replayed, sim.equity, rtol=1e-10)
+
+
 def test_participation_limit_binds_for_large_capital(project):
     small = simulate(project, "backtest.init_cash=1000000")[2]
     cfg, panel, big = simulate(project, "backtest.init_cash=100000000000")

@@ -16,6 +16,15 @@ execution: next_close
 # [EXTERNAL-RESEARCH] workbook's theoretical ratio (1 Ltd share = 1 PLC share).
 parity_ratio: 1.0
 
+# Total-return P&L; see conf/data/rd_shell.yaml.
+dividends:
+  withholding:
+    # [IMPLEMENTATION-ASSUMPTION] UNVERIFIED: fully franked Australian dividends
+    # carry no withholding tax for non-residents. Settle before the freeze (step 10).
+    a: 0.0    # Rio Tinto Ltd (AU)
+    b: 0.0    # Rio Tinto PLC (UK)
+  min_yield: 0.005
+
 raw_dir: data/interim/rio_tinto
 processed_dir: data/processed/rio_tinto
 

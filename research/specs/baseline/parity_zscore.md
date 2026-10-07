@@ -21,6 +21,7 @@ Code: `src/quant_lab/strategies/parity_zscore.py`. Parameters: `conf/strategy/pa
 | 7 | Dollar-neutral: each leg `leg_weight` of equity, rebalanced only when the spread position changes. | [IMPLEMENTATION-ASSUMPTION] |
 | 8 | Positions are closed on the last bar of the evaluated period. | [IMPLEMENTATION-ASSUMPTION] |
 | 9 | Costs (default `costs=liquidity`): per order half quoted spread (fallback when unquoted) + `k·σ·sqrt(shares/ADV)` impact + commission; daily borrow fee on the short leg. Statistics as of the decision close. | [EXTERNAL-RESEARCH] (square-root impact law) + [IMPLEMENTATION-ASSUMPTION] (parameter values in `conf/costs/liquidity.yaml`). Flat bps (`costs=flat_bps`) only as a labelled sensitivity case. |
+| 11 | Total-return P&L: fills and marks on unadjusted closes, plus dividend cash on each ex-date (implied from the total-return series, residuals below `data.dividends.min_yield` = 50 bps treated as noise). Longs receive the dividend net of `data.dividends.withholding` (Dutch legs 15%, UK legs 0%); shorts pay it in full. Holder of record = position at the previous close. FX legs pay `costs.fx_conversion_bps` (3 bps) per order; locked/crossed quotes count as missing. | [IMPLEMENTATION-ASSUMPTION] (audit 2026-10-07, A1/A2/A5). Sensitivity: withholding 0% and 25%. |
 | 10 | Entry size per leg capped so neither leg trades more than `max_participation` (15%) of its ADV; the size is then held to exit. | [PAPER-DERIVED] example of a self-imposed limit (Maymin), turned into a sizing rule: [PROPOSED-EXTENSION]. |
 
 ## Known gaps
@@ -33,5 +34,9 @@ Code: `src/quant_lab/strategies/parity_zscore.py`. Parameters: `conf/strategy/pa
   roughly offset for a dollar-neutral book).
 - Trade size for the impact model uses `backtest.init_cash` as the equity scale,
   not the running equity.
-- Dividends: signal and P&L use unadjusted closes; twin share classes can pay
-  different dividends, which matters for real data.
+- Dividends: P&L is total-return (rule 11), but the signal still uses raw
+  closes, so each leg's ex-date drop moves the relative price. Kept because raw
+  prices are the paper's relative-price definition; revisit in step 6 when the
+  extraction confirms Maymin's exact definition. Changing it is a strategy change.
+- The pre-1997 UK tax credit on dividends (the tax-clientele effect behind
+  these mispricings) is not modelled.

@@ -224,8 +224,15 @@ def walk_forward(cfg: DictConfig, panel: pd.DataFrame) -> dict:
         "wf_gross_leverage": 2 * float(cfg.strategy.leg_weight),
         "wf_n_trials": len(combos) * len(folds),  # training backtests behind the selection
     }
-    for key in ("cost_spread_impact_tax", "cost_commission", "cost_borrow", "entries_capped"):
-        if f"test_{key}" in folds_df:  # liquidity cost model only
+    sums = (
+        "cost_spread_impact_tax",
+        "cost_commission",
+        "cost_borrow",
+        "entries_capped",
+        "dividends",
+    )
+    for key in sums:
+        if f"test_{key}" in folds_df:  # cost metrics: liquidity cost model only
             summary[f"wf_{key}"] = float(folds_df[f"test_{key}"].sum())
     if "test_quoted_spread_share" in folds_df:
         n = folds_df["test_n_orders"]
