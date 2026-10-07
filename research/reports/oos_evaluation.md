@@ -74,18 +74,71 @@ and net < 0.
      Elsevier give a standard error of about 0.6 on an annualized Sharpe.
    - These results rule out a large edge. They do not rule out a small one.
 
-## Diagnostics
+## Diagnostics (pre-registered; copied unchanged from run c5a6c503)
 
-The pre-registered diagnostics are in the MLflow summary run's artifacts:
+**Secondary cases.** Sharpe ratios:
 
-- `oos_results.csv`: the secondary cases `stamp_duty_50` and `impact_k_0.5`,
-  traded orders, ex-date entry share, and SR0 per run;
-- `oos_years.csv`: yearly net, gross and cost drag;
-- `oos_subperiods.csv`: RD/Shell and Reed split at 2002-07-01; Rio Tinto split
-  at 2000-01-01, to separate the part that shares the development calendar.
+| Pair | Strategy | Primary | Zero cost | Stamp duty 50 bps | Impact k 0.5 | Traded orders | Ex-date entry share |
+|---|---|---|---|---|---|---|---|
+| rd_shell | parity_zscore | -0.117 | 0.666 | -0.787 | 0.022 | 84 | 0.048 |
+| rd_shell | silta_parity | 0.133 | 0.346 | -0.060 | 0.170 | 36 | 0.333 |
+| reed_elsevier | parity_zscore | -0.539 | 0.979 | -1.124 | -0.175 | 92 | 0.087 |
+| reed_elsevier | silta_parity | -0.041 | 0.060 | -0.070 | -0.020 | 8 | 0.000 |
+| rio_tinto | parity_zscore | -0.271 | 0.756 | -0.719 | 0.010 | 244 | 0.049 |
+| rio_tinto | silta_parity | -0.284 | 0.841 | -0.746 | 0.036 | 452 | 0.024 |
 
-They are to be appended here unchanged. They do not affect the verdicts above,
-which were fixed by the primary table alone.
+Max drawdown and gross total return:
+
+| Pair | Strategy | Max drawdown | Gross total return |
+|---|---|---|---|
+| rd_shell | parity_zscore | -7.4% | +9.3% |
+| rd_shell | silta_parity | -5.4% | +7.2% |
+| reed_elsevier | parity_zscore | -11.4% | +16.2% |
+| reed_elsevier | silta_parity | -8.1% | -0.1% |
+| rio_tinto | parity_zscore | -26.9% | +53.4% |
+| rio_tinto | silta_parity | -48.5% | +153.3% |
+
+**Sub-periods.** Net total return (Sharpe):
+
+| Pair | Strategy | Before split | After split |
+|---|---|---|---|
+| rd_shell | parity_zscore | 2000-01..2002-06: +0.8% (0.09) | 2002-07..10: -2.9% (-2.23) |
+| rd_shell | silta_parity | +0.0% (0.04) | +2.1% (1.14) |
+| reed_elsevier | parity_zscore | -7.1% (-0.43) | -2.5% (-2.20) |
+| reed_elsevier | silta_parity | -2.5% (-0.01) | -1.1% (-0.37) |
+| rio_tinto | parity_zscore | 1996-99: -13.1% (-0.35) | 2000-02: -6.5% (-0.18) |
+| rio_tinto | silta_parity | -19.5% (-0.25) | -26.7% (-0.33) |
+
+**Yearly cost drag.** Gross minus net total return, per year:
+
+| Pair | Strategy | Years | Cost drag |
+|---|---|---|---|
+| rd_shell | parity_zscore | 2000 / 2001 / 2002 | 5.9% / 3.3% / 2.1% |
+| reed_elsevier | parity_zscore | 2000 / 2001 / 2002 | 9.0% / 8.6% / 7.5% |
+| rio_tinto | parity_zscore | 1996-2002 | 3.4% to 11.8% |
+| rio_tinto | silta_parity | 1996-2002 | 2.1% to 36.2% (33.9% in 1998, 36.2% in 1999, 32.1% in 2001) |
+
+**What the diagnostics add (none of this changes a verdict):**
+
+- **No cheaper cost case produces an edge.**
+  - With half the impact coefficient, the best evaluable run reaches +0.04
+    (`silta_parity`, Rio Tinto), and `parity_zscore` +0.02 (RD/Shell). The
+    pre-declared not-evaluable `silta_parity` RD/Shell run reaches +0.17.
+  - With 50 bps stamp duty every run is negative.
+- **Rio Tinto loses in both halves, including the part that is new in time**
+  (2000-02: -0.18 and -0.33). The loss is not an artefact of the 1996-99
+  overlap with the development calendar.
+- **`silta_parity` on Rio Tinto has a large gross gain (+153%) and an
+  even larger cost drag** (about a third of equity per year in its busiest
+  years). This fits non-synchronous noise around a 1:1 parity: the deviation
+  reverses on its own, so it looks profitable before costs and is
+  unprofitable to trade.
+- **`silta_parity`'s RD/Shell gain comes mostly from the last three months**
+  (+2.1%, July-October 2002, around Royal Dutch's S&P 500 removal). Before
+  that it is flat. A third of its entries came shortly after an ex-dividend
+  date. Both support declaring it not evaluable in advance.
+- **For the baseline, the ex-dividend artefact (finding B5) is small out of
+  sample:** 5-9% of entries.
 
 ## Conclusion of the project's main question
 
