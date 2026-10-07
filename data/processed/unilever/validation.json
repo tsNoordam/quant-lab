@@ -1,0 +1,19 @@
+{
+  "dataset": "unilever",
+  "legs": {
+    "a": "UNILEVER_NV",
+    "b": "UNILEVER_PLC"
+  },
+  "start": "1998-01-02",
+  "end": "2002-10-03",
+  "rows": 1182,
+  "dates_either_leg": 1220,
+  "rows_dropped": 38,
+  "missing_frac_a": 0.014754,
+  "missing_frac_b": 0.016393,
+  "stale_rows_a": 0,
+  "stale_rows_b": 0,
+  "warnings": [
+    "[warning:crossed_quotes] b:UNILEVER_PLC: bid > ask on 2000-08-07"
+  ]
+}

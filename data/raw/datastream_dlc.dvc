@@ -1,0 +1,6 @@
+outs:
+- md5: 9d9e2813a7c1269e4adc2a6255fc813e.dir
+  size: 15695508
+  nfiles: 4
+  hash: md5
+  path: datastream_dlc

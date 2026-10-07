@@ -1,0 +1,23 @@
+{
+  "dataset": "reed_elsevier",
+  "archive": "data/raw/datastream_dlc/ReedElsevier.zip",
+  "workbook": "Reed Elsevier data incl S.xls",
+  "legs": {
+    "ELSEVIER": {
+      "window_rows": 2545,
+      "no_volume_rows_dropped": 72,
+      "rows": 2473,
+      "start": "1993-01-04",
+      "end": "2002-10-03",
+      "quote_coverage": 0.641326
+    },
+    "REED": {
+      "window_rows": 2545,
+      "no_volume_rows_dropped": 81,
+      "rows": 2464,
+      "start": "1993-01-04",
+      "end": "2002-10-03",
+      "quote_coverage": 0.999594
+    }
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "dataset": "rd_shell",
+  "legs": {
+    "a": "ROYAL_DUTCH",
+    "b": "SHELL"
+  },
+  "start": "1987-01-05",
+  "end": "2002-10-03",
+  "rows": 3894,
+  "dates_either_leg": 4045,
+  "rows_dropped": 151,
+  "missing_frac_a": 0.021755,
+  "missing_frac_b": 0.015575,
+  "stale_rows_a": 0,
+  "stale_rows_b": 0,
+  "warnings": [
+    "[warning:crossed_quotes] a:ROYAL_DUTCH: bid > ask on 1996-06-05, 1996-09-03, 1996-09-23, 1996-11-01, 1996-11-21 (+17 more)",
+    "[warning:crossed_quotes] b:SHELL: bid > ask on 2001-09-06"
+  ]
+}
