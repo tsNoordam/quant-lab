@@ -1,0 +1,21 @@
+{
+  "twin": "bhp_billiton",
+  "archive": "data/raw/datastream_dlc/BHP.zip",
+  "workbook": "BHP Billiton data.xls",
+  "window": [
+    "2001-06-29",
+    "2002-10-03"
+  ],
+  "rows": 330,
+  "start": "2001-06-29",
+  "end": "2002-10-03",
+  "rows_dropped_no_price": 0,
+  "rows_checked_against_workbook": 330,
+  "max_abs_error_vs_workbook": 2.185751579730777e-16,
+  "ratio_constant": true,
+  "ratio": 1.0,
+  "total_return_missing": {
+    "a": 0,
+    "b": 0
+  }
+}

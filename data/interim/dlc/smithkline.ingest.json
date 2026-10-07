@@ -1,0 +1,21 @@
+{
+  "twin": "smithkline",
+  "archive": "data/raw/datastream_dlc/Smithkline.zip",
+  "workbook": "SmithKline data.xls",
+  "window": [
+    "1989-07-26",
+    "1996-01-22"
+  ],
+  "rows": 1642,
+  "start": "1989-07-26",
+  "end": "1996-01-22",
+  "rows_dropped_no_price": 0,
+  "rows_checked_against_workbook": 1642,
+  "max_abs_error_vs_workbook": 2.7755575615628914e-17,
+  "ratio_constant": true,
+  "ratio": 1.0,
+  "total_return_missing": {
+    "a": 0,
+    "b": 0
+  }
+}

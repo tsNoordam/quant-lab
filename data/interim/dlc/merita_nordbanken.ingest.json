@@ -1,0 +1,21 @@
+{
+  "twin": "merita_nordbanken",
+  "archive": "data/raw/datastream_dlc/MeritaNordbanken.zip",
+  "workbook": "MeritaNordbanken data.xls",
+  "window": [
+    "1997-12-15",
+    "1999-08-23"
+  ],
+  "rows": 441,
+  "start": "1997-12-15",
+  "end": "1999-08-23",
+  "rows_dropped_no_price": 0,
+  "rows_checked_against_workbook": 441,
+  "max_abs_error_vs_workbook": 0.0,
+  "ratio_constant": true,
+  "ratio": 1.0,
+  "total_return_missing": {
+    "a": 0,
+    "b": 0
+  }
+}

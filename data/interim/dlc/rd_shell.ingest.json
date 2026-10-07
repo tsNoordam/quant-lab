@@ -1,0 +1,21 @@
+{
+  "twin": "rd_shell",
+  "archive": "data/raw/datastream_dlc/RoyalDutchShell.zip",
+  "workbook": "RD Shell data.xls",
+  "window": [
+    "1980-01-01",
+    "2002-10-03"
+  ],
+  "rows": 5938,
+  "start": "1980-01-01",
+  "end": "2002-10-03",
+  "rows_dropped_no_price": 0,
+  "rows_checked_against_workbook": 5938,
+  "max_abs_error_vs_workbook": 4.440892098500626e-16,
+  "ratio_constant": true,
+  "ratio": 6.863006819188524,
+  "total_return_missing": {
+    "a": 0,
+    "b": 0
+  }
+}

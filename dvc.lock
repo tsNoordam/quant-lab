@@ -454,3 +454,589 @@ stages:
       hash: md5
       md5: 9acf90d5a61fd08afb03b9d775baa301
       size: 515
+  dlc_ingest@abb:
+    cmd: python -m quant_lab.data.dlc --twin abb
+    deps:
+    - path: data/raw/datastream_dlc
+      hash: md5
+      md5: dae0da4020c8770df19f83203aeb60ef.dir
+      size: 70670360
+      nfiles: 14
+    - path: src/quant_lab/data/datastream.py
+      hash: md5
+      md5: 1be425bb0e2932b5de4bccc163f44390
+      size: 9394
+    - path: src/quant_lab/data/dlc.py
+      hash: md5
+      md5: f1f56e5d7bd1438c22ac7027935cde56
+      size: 6979
+    params:
+      conf/dlc/abb.yaml:
+        interim_path: data/interim/dlc/abb.parquet
+        source:
+          archive: data/raw/datastream_dlc/ABB.zip
+          workbook: ABB data.xls
+          legs:
+            a:
+              sheet: ABB AG
+              price: 922924(P)
+              total_return: 922924(RI)
+              fx_per_b: '# CHF per SEK'
+            b:
+              sheet: ABB AB
+              price: 929515(P)
+              total_return: 929515(RI)
+          ratio:
+            sheet: Ratio
+            theoretical_ratio: THEORETICAL RATIO
+            deviation: LOG DEVIATIONS FROM PARITY
+        window:
+          start: '1991-07-08'
+          end: '1999-01-07'
+    outs:
+    - path: data/interim/dlc/abb.ingest.json
+      hash: md5
+      md5: afe92e0459701cf6585ed72ca7560e80
+      size: 455
+    - path: data/interim/dlc/abb.parquet
+      hash: md5
+      md5: 7c08879418c447c1c74557afa4593238
+      size: 131532
+  dlc_ingest@bhp_billiton:
+    cmd: python -m quant_lab.data.dlc --twin bhp_billiton
+    deps:
+    - path: data/raw/datastream_dlc
+      hash: md5
+      md5: dae0da4020c8770df19f83203aeb60ef.dir
+      size: 70670360
+      nfiles: 14
+    - path: src/quant_lab/data/datastream.py
+      hash: md5
+      md5: 1be425bb0e2932b5de4bccc163f44390
+      size: 9394
+    - path: src/quant_lab/data/dlc.py
+      hash: md5
+      md5: f1f56e5d7bd1438c22ac7027935cde56
+      size: 6979
+    params:
+      conf/dlc/bhp_billiton.yaml:
+        interim_path: data/interim/dlc/bhp_billiton.parquet
+        source:
+          archive: data/raw/datastream_dlc/BHP.zip
+          workbook: BHP Billiton data.xls
+          legs:
+            a:
+              sheet: BHP Billiton Ltd
+              price: 906169(P)
+              total_return: 906169(RI)
+              fx_per_b: '# AUS$ per £'
+            b:
+              sheet: BHP Billiton PLC
+              price: 899188(P)
+              total_return: 899188(RI)
+              price_scale: 0.01
+          ratio:
+            sheet: Ratio
+            theoretical_ratio: THEORETICAL RATIO
+            deviation: LOG DEVIATIONS FROM PARITY
+        window:
+          start: '2001-06-29'
+          end: '2002-10-03'
+    outs:
+    - path: data/interim/dlc/bhp_billiton.ingest.json
+      hash: md5
+      md5: 0739b7091cec5fe3c825beaa4b5bd48f
+      size: 455
+    - path: data/interim/dlc/bhp_billiton.parquet
+      hash: md5
+      md5: 60ed0715a4dc72427ddbc74868d430cb
+      size: 32557
+  dlc_ingest@brambles:
+    cmd: python -m quant_lab.data.dlc --twin brambles
+    deps:
+    - path: data/raw/datastream_dlc
+      hash: md5
+      md5: dae0da4020c8770df19f83203aeb60ef.dir
+      size: 70670360
+      nfiles: 14
+    - path: src/quant_lab/data/datastream.py
+      hash: md5
+      md5: 1be425bb0e2932b5de4bccc163f44390
+      size: 9394
+    - path: src/quant_lab/data/dlc.py
+      hash: md5
+      md5: f1f56e5d7bd1438c22ac7027935cde56
+      size: 6979
+    params:
+      conf/dlc/brambles.yaml:
+        interim_path: data/interim/dlc/brambles.parquet
+        source:
+          archive: data/raw/datastream_dlc/brambles.zip
+          workbook: Brambles data.xls
+          legs:
+            a:
+              sheet: Brambles Ltd
+              price: 904800(P)
+              total_return: 904800(RI)
+              fx_per_b: '# AUS$ per £'
+            b:
+              sheet: Brambles PLC
+              price: 900754(P)
+              total_return: 900754(RI)
+              price_scale: 0.01
+          ratio:
+            sheet: Ratio
+            theoretical_ratio: THEORETICAL RATIO
+            deviation: LOG DEVIATIONS FROM PARITY
+        window:
+          start: '2001-08-07'
+          end: '2002-10-03'
+    outs:
+    - path: data/interim/dlc/brambles.ingest.json
+      hash: md5
+      md5: 578b1568b86e413c834ea32abc83c300
+      size: 454
+    - path: data/interim/dlc/brambles.parquet
+      hash: md5
+      md5: f3c9a7c91b8c0f3ee15120795989f57c
+      size: 28597
+  dlc_ingest@dexia:
+    cmd: python -m quant_lab.data.dlc --twin dexia
+    deps:
+    - path: data/raw/datastream_dlc
+      hash: md5
+      md5: dae0da4020c8770df19f83203aeb60ef.dir
+      size: 70670360
+      nfiles: 14
+    - path: src/quant_lab/data/datastream.py
+      hash: md5
+      md5: 1be425bb0e2932b5de4bccc163f44390
+      size: 9394
+    - path: src/quant_lab/data/dlc.py
+      hash: md5
+      md5: f1f56e5d7bd1438c22ac7027935cde56
+      size: 6979
+    params:
+      conf/dlc/dexia.yaml:
+        interim_path: data/interim/dlc/dexia.parquet
+        source:
+          archive: data/raw/datastream_dlc/Dexia.zip
+          workbook: Dexia data.xls
+          legs:
+            a:
+              sheet: Dexia France
+              price: 307419(P)
+              total_return: 307419(RI)
+              fx_per_b: '# FF(€) per BEF(€)'
+            b:
+              sheet: Dexia Belgium
+              price: 885000(P)
+              total_return: 885000(RI)
+          ratio:
+            sheet: Ratio
+            theoretical_ratio: THEORETICAL RATIO
+            deviation: LOG DEVIATIONS FROM PARITY
+        window:
+          start: '1996-11-19'
+          end: '1999-08-20'
+    outs:
+    - path: data/interim/dlc/dexia.ingest.json
+      hash: md5
+      md5: b5d3ad30dcd61873ade0ac36d42a7118
+      size: 444
+    - path: data/interim/dlc/dexia.parquet
+      hash: md5
+      md5: 86b37fc761b12a179b5ce61bdd7ef4eb
+      size: 50512
+  dlc_ingest@fortis:
+    cmd: python -m quant_lab.data.dlc --twin fortis
+    deps:
+    - path: data/raw/datastream_dlc
+      hash: md5
+      md5: dae0da4020c8770df19f83203aeb60ef.dir
+      size: 70670360
+      nfiles: 14
+    - path: src/quant_lab/data/datastream.py
+      hash: md5
+      md5: 1be425bb0e2932b5de4bccc163f44390
+      size: 9394
+    - path: src/quant_lab/data/dlc.py
+      hash: md5
+      md5: f1f56e5d7bd1438c22ac7027935cde56
+      size: 6979
+    params:
+      conf/dlc/fortis.yaml:
+        interim_path: data/interim/dlc/fortis.parquet
+        source:
+          archive: data/raw/datastream_dlc/Fortis.zip
+          workbook: Fortis data.xls
+          legs:
+            a:
+              sheet: Fortis NV
+              price: 923306(P)
+              total_return: 923306(RI)
+              fx_per_b: '# NLG(€) per BEF(€)'
+            b:
+              sheet: Fortis AG
+              price: 929303(P)
+              total_return: 929303(RI)
+          ratio:
+            sheet: Ratio
+            theoretical_ratio: THEORETICAL RATIO
+            deviation: LOG DEVIATIONS FROM PARITY
+        window:
+          start: '1990-12-12'
+          end: '2000-07-31'
+    outs:
+    - path: data/interim/dlc/fortis.ingest.json
+      hash: md5
+      md5: fa0b963a532c43d868db861a41a841b5
+      size: 449
+    - path: data/interim/dlc/fortis.parquet
+      hash: md5
+      md5: 8cd3a15c010d0dc9562182dc3252f64e
+      size: 168290
+  dlc_ingest@merita_nordbanken:
+    cmd: python -m quant_lab.data.dlc --twin merita_nordbanken
+    deps:
+    - path: data/raw/datastream_dlc
+      hash: md5
+      md5: dae0da4020c8770df19f83203aeb60ef.dir
+      size: 70670360
+      nfiles: 14
+    - path: src/quant_lab/data/datastream.py
+      hash: md5
+      md5: 1be425bb0e2932b5de4bccc163f44390
+      size: 9394
+    - path: src/quant_lab/data/dlc.py
+      hash: md5
+      md5: f1f56e5d7bd1438c22ac7027935cde56
+      size: 6979
+    params:
+      conf/dlc/merita_nordbanken.yaml:
+        interim_path: data/interim/dlc/merita_nordbanken.parquet
+        source:
+          archive: data/raw/datastream_dlc/MeritaNordbanken.zip
+          workbook: MeritaNordbanken data.xls
+          legs:
+            a:
+              sheet: Merita Ltd.
+              price: 772923(P)
+              total_return: 772923(RI)
+              fx_per_b: '# FINM per SEK'
+            b:
+              sheet: Nordbanken Holding AB
+              price: 671068(P)
+              total_return: 671068(RI)
+          ratio:
+            sheet: Ratio
+            theoretical_ratio: THEORETICAL RATIO
+            deviation: LOG DEVIATIONS FROM PARITY
+        window:
+          start: '1997-12-15'
+          end: '1999-08-23'
+    outs:
+    - path: data/interim/dlc/merita_nordbanken.ingest.json
+      hash: md5
+      md5: 213dfb48901daa7b14a8ffecb2113ea7
+      size: 459
+    - path: data/interim/dlc/merita_nordbanken.parquet
+      hash: md5
+      md5: f546293e9e73f9b1c0f4747fe1f7d400
+      size: 32520
+  dlc_ingest@rd_shell:
+    cmd: python -m quant_lab.data.dlc --twin rd_shell
+    deps:
+    - path: data/raw/datastream_dlc
+      hash: md5
+      md5: dae0da4020c8770df19f83203aeb60ef.dir
+      size: 70670360
+      nfiles: 14
+    - path: src/quant_lab/data/datastream.py
+      hash: md5
+      md5: 1be425bb0e2932b5de4bccc163f44390
+      size: 9394
+    - path: src/quant_lab/data/dlc.py
+      hash: md5
+      md5: f1f56e5d7bd1438c22ac7027935cde56
+      size: 6979
+    params:
+      conf/dlc/rd_shell.yaml:
+        interim_path: data/interim/dlc/rd_shell.parquet
+        source:
+          archive: data/raw/datastream_dlc/RoyalDutchShell.zip
+          workbook: RD Shell data.xls
+          legs:
+            a:
+              sheet: Royal Dutch
+              price: 902178(P)
+              total_return: 902178(RI)
+              fx_per_b: '# NLG(€) per £'
+            b:
+              sheet: Shell
+              price: 900998(P)
+              total_return: 900998(RI)
+              price_scale: 0.01
+          ratio:
+            sheet: Ratio
+            theoretical_ratio: THEORETICAL RATIO
+            deviation: LOG DEVIATIONS FROM PARITY
+        window:
+          start: '1980-01-01'
+          end: '2002-10-03'
+    outs:
+    - path: data/interim/dlc/rd_shell.ingest.json
+      hash: md5
+      md5: b8e4b0ea5ba5cf090beaf5195bb9c740
+      size: 475
+    - path: data/interim/dlc/rd_shell.parquet
+      hash: md5
+      md5: 99feeee6fd586c429034367658177214
+      size: 396523
+  dlc_ingest@reed_elsevier:
+    cmd: python -m quant_lab.data.dlc --twin reed_elsevier
+    deps:
+    - path: data/raw/datastream_dlc
+      hash: md5
+      md5: dae0da4020c8770df19f83203aeb60ef.dir
+      size: 70670360
+      nfiles: 14
+    - path: src/quant_lab/data/datastream.py
+      hash: md5
+      md5: 1be425bb0e2932b5de4bccc163f44390
+      size: 9394
+    - path: src/quant_lab/data/dlc.py
+      hash: md5
+      md5: f1f56e5d7bd1438c22ac7027935cde56
+      size: 6979
+    params:
+      conf/dlc/reed_elsevier.yaml:
+        interim_path: data/interim/dlc/reed_elsevier.parquet
+        source:
+          archive: data/raw/datastream_dlc/ReedElsevier.zip
+          workbook: Reed Elsevier data incl S.xls
+          legs:
+            a:
+              sheet: Elsevier
+              price: 981526(P)
+              total_return: 981526(RI)
+              fx_per_b: '# NLG(€) per £'
+            b:
+              sheet: Reed International
+              price: 901080(P)
+              total_return: 901080(RI)
+              price_scale: 0.01
+          ratio:
+            sheet: Ratio
+            theoretical_ratio: THEORETICAL RATIO
+            deviation: LOG DEVIATIONS FROM PARITY
+        window:
+          start: '1993-01-01'
+          end: '2002-10-03'
+    outs:
+    - path: data/interim/dlc/reed_elsevier.ingest.json
+      hash: md5
+      md5: 7b0fef463c712ed1ba7050d0e840f156
+      size: 478
+    - path: data/interim/dlc/reed_elsevier.parquet
+      hash: md5
+      md5: 9b05e719e66c967ab295504a0cdcdf51
+      size: 173253
+  dlc_ingest@rio_tinto:
+    cmd: python -m quant_lab.data.dlc --twin rio_tinto
+    deps:
+    - path: data/raw/datastream_dlc
+      hash: md5
+      md5: dae0da4020c8770df19f83203aeb60ef.dir
+      size: 70670360
+      nfiles: 14
+    - path: src/quant_lab/data/datastream.py
+      hash: md5
+      md5: 1be425bb0e2932b5de4bccc163f44390
+      size: 9394
+    - path: src/quant_lab/data/dlc.py
+      hash: md5
+      md5: f1f56e5d7bd1438c22ac7027935cde56
+      size: 6979
+    params:
+      conf/dlc/rio_tinto.yaml:
+        interim_path: data/interim/dlc/rio_tinto.parquet
+        source:
+          archive: data/raw/datastream_dlc/RioTinto.zip
+          workbook: Rio Tinto data.xls
+          legs:
+            a:
+              sheet: Rio Tinto Ltd
+              price: 905473(P)
+              total_return: 905473(RI)
+              fx_per_b: '# AUS$ per £'
+            b:
+              sheet: Rio Tinto PLC
+              price: 901714(P)
+              total_return: 901714(RI)
+          ratio:
+            sheet: Ratio
+            theoretical_ratio: THEORETICAL RATIO
+            deviation: LOG DEVIATIONS FROM PARITY
+        window:
+          start: '1995-12-21'
+          end: '2002-10-03'
+    outs:
+    - path: data/interim/dlc/rio_tinto.ingest.json
+      hash: md5
+      md5: 79af636267b6f028cd1431029d24e0c6
+      size: 457
+    - path: data/interim/dlc/rio_tinto.parquet
+      hash: md5
+      md5: 918820c1f7404deff4e387c98d2dbff6
+      size: 134828
+  dlc_ingest@smithkline:
+    cmd: python -m quant_lab.data.dlc --twin smithkline
+    deps:
+    - path: data/raw/datastream_dlc
+      hash: md5
+      md5: dae0da4020c8770df19f83203aeb60ef.dir
+      size: 70670360
+      nfiles: 14
+    - path: src/quant_lab/data/datastream.py
+      hash: md5
+      md5: 1be425bb0e2932b5de4bccc163f44390
+      size: 9394
+    - path: src/quant_lab/data/dlc.py
+      hash: md5
+      md5: f1f56e5d7bd1438c22ac7027935cde56
+      size: 6979
+    params:
+      conf/dlc/smithkline.yaml:
+        interim_path: data/interim/dlc/smithkline.parquet
+        source:
+          archive: data/raw/datastream_dlc/Smithkline.zip
+          workbook: SmithKline data.xls
+          legs:
+            a:
+              sheet: Smithkline Beecham H Shares
+              price: PRICE H shares
+              price_scale: 2.0
+              total_return: TOTAL RETURN H shares
+              total_return_kind: log_return
+            b:
+              sheet: Smithkline Beecham E Shares
+              price: PRICE E shares
+              total_return: TOTAL RETURN E shares
+              total_return_kind: log_return
+          ratio:
+            sheet: Ratio
+            theoretical_ratio: THEORETICAL RATIO
+            deviation: LOG DEVIATIONS FROM PARITY
+        window:
+          start: '1989-07-26'
+          end: '1996-01-22'
+    outs:
+    - path: data/interim/dlc/smithkline.ingest.json
+      hash: md5
+      md5: aa350f4ef7ea8531a04a19f0b2ff239e
+      size: 461
+    - path: data/interim/dlc/smithkline.parquet
+      hash: md5
+      md5: af916bdd73818a5f2694f6e4bff94508
+      size: 82884
+  dlc_ingest@unilever:
+    cmd: python -m quant_lab.data.dlc --twin unilever
+    deps:
+    - path: data/raw/datastream_dlc
+      hash: md5
+      md5: dae0da4020c8770df19f83203aeb60ef.dir
+      size: 70670360
+      nfiles: 14
+    - path: src/quant_lab/data/datastream.py
+      hash: md5
+      md5: 1be425bb0e2932b5de4bccc163f44390
+      size: 9394
+    - path: src/quant_lab/data/dlc.py
+      hash: md5
+      md5: f1f56e5d7bd1438c22ac7027935cde56
+      size: 6979
+    params:
+      conf/dlc/unilever.yaml:
+        interim_path: data/interim/dlc/unilever.parquet
+        source:
+          archive: data/raw/datastream_dlc/Unilever.zip
+          workbook: Unilever data.xls
+          legs:
+            a:
+              sheet: UNILEVER NV
+              price: 932911(P)
+              total_return: 932911(RI)
+              fx_per_b: '# NLG(€) per £'
+            b:
+              sheet: UNILEVER PLC
+              price: 900789(P)
+              total_return: 900789(RI)
+              price_scale: 0.01
+          ratio:
+            sheet: Ratio
+            theoretical_ratio: THEORETICAL RATIO
+            deviation: LOG DEVIATIONS FROM PARITY
+            deviation_exclude: absolute value
+        window:
+          start: '1980-01-01'
+          end: '2002-10-03'
+    outs:
+    - path: data/interim/dlc/unilever.ingest.json
+      hash: md5
+      md5: a0123002eadcc8149f521b8daa2512b2
+      size: 455
+    - path: data/interim/dlc/unilever.parquet
+      hash: md5
+      md5: 6670ee29a4faba3c73bb67737c1c9717
+      size: 378480
+  dlc_ingest@zurich_allied:
+    cmd: python -m quant_lab.data.dlc --twin zurich_allied
+    deps:
+    - path: data/raw/datastream_dlc
+      hash: md5
+      md5: dae0da4020c8770df19f83203aeb60ef.dir
+      size: 70670360
+      nfiles: 14
+    - path: src/quant_lab/data/datastream.py
+      hash: md5
+      md5: 1be425bb0e2932b5de4bccc163f44390
+      size: 9394
+    - path: src/quant_lab/data/dlc.py
+      hash: md5
+      md5: f1f56e5d7bd1438c22ac7027935cde56
+      size: 6979
+    params:
+      conf/dlc/zurich_allied.yaml:
+        interim_path: data/interim/dlc/zurich_allied.parquet
+        source:
+          archive: data/raw/datastream_dlc/ZurichAllied.zip
+          workbook: Allied Zurich data.xls
+          legs:
+            a:
+              sheet: Zurich Allied AG
+              price: 929733(P)
+              total_return: 929733(RI)
+              fx_per_b: '# CHF per £'
+            b:
+              sheet: Allied Zurich PLC
+              price: 686714(P)
+              total_return: 686714(RI)
+              price_scale: 0.01
+          ratio:
+            sheet: Ratio
+            theoretical_ratio: THEORETICAL RATIO
+            deviation: LOG DEVIATIONS FROM PARITY
+            deviation_exclude: absolute value
+        window:
+          start: '1998-09-07'
+          end: '2000-03-20'
+    outs:
+    - path: data/interim/dlc/zurich_allied.ingest.json
+      hash: md5
+      md5: 7a8e3487525c90d53d105941ccd2a40b
+      size: 469
+    - path: data/interim/dlc/zurich_allied.parquet
+      hash: md5
+      md5: eb3bb7480ea94beba45cb52f89f96b73
+      size: 34014

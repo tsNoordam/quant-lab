@@ -1,0 +1,21 @@
+{
+  "twin": "brambles",
+  "archive": "data/raw/datastream_dlc/brambles.zip",
+  "workbook": "Brambles data.xls",
+  "window": [
+    "2001-08-07",
+    "2002-10-03"
+  ],
+  "rows": 303,
+  "start": "2001-08-07",
+  "end": "2002-10-03",
+  "rows_dropped_no_price": 0,
+  "rows_checked_against_workbook": 303,
+  "max_abs_error_vs_workbook": 2.220446049250313e-16,
+  "ratio_constant": true,
+  "ratio": 1.068,
+  "total_return_missing": {
+    "a": 0,
+    "b": 0
+  }
+}

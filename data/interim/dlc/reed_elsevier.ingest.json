@@ -1,0 +1,21 @@
+{
+  "twin": "reed_elsevier",
+  "archive": "data/raw/datastream_dlc/ReedElsevier.zip",
+  "workbook": "Reed Elsevier data incl S.xls",
+  "window": [
+    "1993-01-01",
+    "2002-10-03"
+  ],
+  "rows": 2545,
+  "start": "1993-01-01",
+  "end": "2002-10-03",
+  "rows_dropped_no_price": 0,
+  "rows_checked_against_workbook": 2545,
+  "max_abs_error_vs_workbook": 3.3306690738754696e-16,
+  "ratio_constant": true,
+  "ratio": 1.538,
+  "total_return_missing": {
+    "a": 0,
+    "b": 0
+  }
+}

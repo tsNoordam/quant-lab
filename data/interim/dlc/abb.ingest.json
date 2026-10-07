@@ -1,0 +1,21 @@
+{
+  "twin": "abb",
+  "archive": "data/raw/datastream_dlc/ABB.zip",
+  "workbook": "ABB data.xls",
+  "window": [
+    "1991-07-08",
+    "1999-01-07"
+  ],
+  "rows": 1959,
+  "start": "1991-07-08",
+  "end": "1999-01-07",
+  "rows_dropped_no_price": 0,
+  "rows_checked_against_workbook": 1959,
+  "max_abs_error_vs_workbook": 1.1102230246251565e-16,
+  "ratio_constant": true,
+  "ratio": 1.5631760736518543,
+  "total_return_missing": {
+    "a": 0,
+    "b": 0
+  }
+}

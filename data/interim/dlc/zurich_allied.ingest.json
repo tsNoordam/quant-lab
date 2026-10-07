@@ -1,0 +1,21 @@
+{
+  "twin": "zurich_allied",
+  "archive": "data/raw/datastream_dlc/ZurichAllied.zip",
+  "workbook": "Allied Zurich data.xls",
+  "window": [
+    "1998-09-07",
+    "2000-03-20"
+  ],
+  "rows": 401,
+  "start": "1998-09-07",
+  "end": "2000-03-20",
+  "rows_dropped_no_price": 0,
+  "rows_checked_against_workbook": 401,
+  "max_abs_error_vs_workbook": 4.440892098500626e-16,
+  "ratio_constant": true,
+  "ratio": 42.928,
+  "total_return_missing": {
+    "a": 0,
+    "b": 0
+  }
+}

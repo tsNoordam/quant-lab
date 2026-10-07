@@ -1,0 +1,21 @@
+{
+  "twin": "fortis",
+  "archive": "data/raw/datastream_dlc/Fortis.zip",
+  "workbook": "Fortis data.xls",
+  "window": [
+    "1990-12-12",
+    "2000-07-31"
+  ],
+  "rows": 2514,
+  "start": "1990-12-12",
+  "end": "2000-07-31",
+  "rows_dropped_no_price": 0,
+  "rows_checked_against_workbook": 2514,
+  "max_abs_error_vs_workbook": 1.3877787807814457e-16,
+  "ratio_constant": true,
+  "ratio": 1.0,
+  "total_return_missing": {
+    "a": 0,
+    "b": 0
+  }
+}

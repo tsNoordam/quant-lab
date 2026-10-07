@@ -1,0 +1,21 @@
+{
+  "twin": "rio_tinto",
+  "archive": "data/raw/datastream_dlc/RioTinto.zip",
+  "workbook": "Rio Tinto data.xls",
+  "window": [
+    "1995-12-21",
+    "2002-10-03"
+  ],
+  "rows": 1771,
+  "start": "1995-12-21",
+  "end": "2002-10-03",
+  "rows_dropped_no_price": 0,
+  "rows_checked_against_workbook": 1771,
+  "max_abs_error_vs_workbook": 1.3877787807814457e-17,
+  "ratio_constant": true,
+  "ratio": 1.0,
+  "total_return_missing": {
+    "a": 0,
+    "b": 0
+  }
+}

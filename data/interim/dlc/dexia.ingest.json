@@ -1,0 +1,21 @@
+{
+  "twin": "dexia",
+  "archive": "data/raw/datastream_dlc/Dexia.zip",
+  "workbook": "Dexia data.xls",
+  "window": [
+    "1996-11-19",
+    "1999-08-20"
+  ],
+  "rows": 719,
+  "start": "1996-11-19",
+  "end": "1999-08-20",
+  "rows_dropped_no_price": 0,
+  "rows_checked_against_workbook": 719,
+  "max_abs_error_vs_workbook": 1.3877787807814457e-17,
+  "ratio_constant": true,
+  "ratio": 1.0,
+  "total_return_missing": {
+    "a": 0,
+    "b": 0
+  }
+}
