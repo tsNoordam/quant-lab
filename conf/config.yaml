@@ -1,0 +1,39 @@
+# Root Hydra config for backtests.
+#
+#   uv run python -m quant_lab.backtest.run                          # train period
+#   uv run python -m quant_lab.backtest.run backtest.period=validation
+#   uv run python -m quant_lab.backtest.run -m strategy.window=40,60,80   # sweep
+#
+# Every run logs params, metrics, provenance tags and artifacts to MLflow:
+#   uv run mlflow ui --backend-store-uri sqlite:///mlflow.db
+
+defaults:
+  - data: synthetic_twin
+  - split: ${data}      # each dataset has its own locked split file
+  - walkforward: default
+  - silta: default
+  - robustness: default
+  - oos: default
+  - strategy: parity_zscore
+  - costs: liquidity     # costs=flat_bps only as a labelled sensitivity case
+  - backtest: default
+  - _self_
+
+# Tagged on every MLflow run. Name sensitivity cases, e.g. run_label=wht25.
+run_label: baseline
+
+mlflow:
+  tracking_uri: sqlite:///mlflow.db
+  artifact_root: mlartifacts
+  experiment: ${data.name}.${strategy.name}
+  # true: refuse to run with uncommitted changes (use for results you cite).
+  # false: run anyway, but the run is tagged git_dirty=true.
+  require_clean_tree: false
+
+hydra:
+  job:
+    chdir: false
+  run:
+    dir: outputs/${now:%Y-%m-%d}/${now:%H-%M-%S}
+  sweep:
+    dir: multirun/${now:%Y-%m-%d}/${now:%H-%M-%S}

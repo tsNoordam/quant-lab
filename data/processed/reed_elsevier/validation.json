@@ -1,0 +1,22 @@
+{
+  "dataset": "reed_elsevier",
+  "legs": {
+    "a": "ELSEVIER",
+    "b": "REED"
+  },
+  "start": "1993-01-04",
+  "end": "2002-10-03",
+  "rows": 2435,
+  "dates_either_leg": 2502,
+  "rows_dropped": 67,
+  "missing_frac_a": 0.011591,
+  "missing_frac_b": 0.015188,
+  "stale_rows_a": 0,
+  "stale_rows_b": 0,
+  "warnings": [
+    "[warning:crossed_quotes] a:ELSEVIER: bid > ask on 1996-03-29, 1996-04-15, 1996-06-11, 1996-10-15, 1996-11-22 (+14 more)",
+    "[warning:locked_quotes] a:ELSEVIER: bid == ask on 21.6% of quoted days; treated as missing",
+    "[warning:wide_quote_regime] a:ELSEVIER: quarterly median quoted spread > 100 bps in 5 quarter(s) ending 1996-12-31, 1997-09-30, 1997-12-31, 1998-03-31, 1998-06-30",
+    "[warning:crossed_quotes] b:REED: bid > ask on 2000-08-07, 2001-09-20"
+  ]
+}

@@ -1,0 +1,7 @@
+# SENSITIVITY CASE ONLY (see CLAUDE.md): flat fee + slippage per order, in bps
+# of traded value, independent of trade size and liquidity, no borrow cost and no
+# participation limit. The default is costs=liquidity.
+
+model: flat_bps
+fee_bps: 5.0
+slippage_bps: 5.0

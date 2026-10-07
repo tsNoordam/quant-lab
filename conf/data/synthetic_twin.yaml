@@ -1,0 +1,65 @@
+# Dataset: synthetic twin-share pair (Siamese-twin / dual-listed company).
+#
+# One file is the single source of truth for this dataset:
+#   - Hydra composes it as the `data` group in backtests (Step 4).
+#   - dvc.yaml lists the keys below under `params:`, so changing them
+#     invalidates the preprocess stage.
+#
+# The synthetic pair has a KNOWN data-generating process (see `synthetic:`),
+# so the pipeline and later strategy code can be checked against ground truth
+# before real data exists. Volume is independent of mispricing: this dataset
+# encodes no relation between relative volume and relative price.
+
+name: synthetic_twin
+calendar: business_daily
+
+# Leg A and leg B. Prices are per share in `currency`.
+legs:
+  a: TWIN_A
+  b: TWIN_B
+currency: USD
+
+# Theoretical price ratio P_a / P_b at parity.
+# [IMPLEMENTATION-ASSUMPTION] for the synthetic pair. For Royal Dutch/Shell
+# the cash-flow split was 60:40, i.e. parity 1.5 after share-count adjustment.
+parity_ratio: 1.5
+
+# No corporate actions (adj_close == close), so no dividends are booked.
+dividends:
+  withholding:
+    a: 0.0
+    b: 0.0
+  min_yield: 0.005
+
+raw_dir: data/raw/synthetic_twin
+processed_dir: data/processed/synthetic_twin
+
+alignment:
+  # drop: keep only dates on which both legs traded.
+  # ffill: carry the last price forward up to `ffill_limit` days, flag stale rows.
+  # [IMPLEMENTATION-ASSUMPTION] until the paper's treatment is extracted.
+  missing_policy: drop
+  ffill_limit: 0
+
+validation:
+  # Fail if more than this fraction of calendar dates is missing for either leg.
+  max_missing_frac: 0.02
+  # Daily |log return| above this is reported as a warning (unadjusted split?).
+  max_abs_log_return: 0.25
+
+synthetic:
+  seed: 20261006
+  start: "2000-01-03"
+  n_days: 2520
+  initial_value: 40.0      # fundamental value per B share
+  drift: 0.05              # annualised drift of the fundamental
+  vol: 0.25                # annualised volatility of the fundamental
+  mispricing:              # log(P_a / (parity * P_b)) follows an OU process
+    mean: 0.0
+    half_life_days: 60
+    vol: 0.03              # annualised volatility of the mispricing
+  intraday_vol: 0.01       # overnight gap common to both legs; high/low range noise
+  open_idio_vol: 0.001     # leg-specific part of the opening gap
+  volume_mean: [2.0e6, 1.2e6]
+  volume_dispersion: 0.4   # lognormal sigma of daily volume
+  missing_frac: 0.005      # independent random non-trading days per leg

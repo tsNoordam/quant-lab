@@ -1,0 +1,90 @@
+# Royal Dutch Petroleum (Amsterdam, EUR) / Shell Transport & Trading (London, GBp).
+# Twin pair studied in Maymin (SILTA). 60:40 cash-flow split.
+#
+# Source: Datastream workbook in data/raw/datastream_dlc/ (see
+# data/metadata/datastream_dlc.json). Converted by quant_lab.data.datastream.
+
+name: rd_shell
+calendar: business_daily
+legs:
+  a: ROYAL_DUTCH
+  b: SHELL
+currency: GBP
+# Close-only data: decisions on close t are filled at close t+1.
+execution: next_close
+
+# Theoretical P_a/P_b in GBP per share.
+# [MATHEMATICALLY-DERIVED] 60/40 dividend split of the equalization agreement x
+# share counts: 1.5 x N_Shell / N_RD = 6.9558, the median over 1997-07-01 ..
+# 1999-12-31 (after the 1997 splits). Split-adjusted, the same value holds in
+# every development year (tests/data/test_parity_point_in_time.py), so it is
+# known at each development date and before the OOS period.
+# Changed at the freeze audit 2026-10-07 (A1): the workbook constant below
+# matches only 2000-02 share counts, i.e. it carried OOS information.
+parity_ratio: 6.9558
+
+# The dataset authors' constant, used by the workbook's "LOG DEVIATIONS FROM
+# PARITY" column. Kept only to verify the ingest against that column
+# (tests/integration/test_datastream_real.py). [EXTERNAL-RESEARCH]
+workbook_parity_ratio: 6.863006819188524
+
+# Total-return P&L (quant_lab.backtest.dividends): longs receive the dividend net
+# of withholding, shorts pay it in full. [IMPLEMENTATION-ASSUMPTION] for a
+# UK-based desk: Dutch dividends 15% (UK-NL treaty rate; statutory 25%), UK 0%.
+# Sensitivity runs: dividends.withholding.a=0.0 and =0.25. Not modelled: the
+# pre-1997 UK tax credit (the tax-clientele effect behind the mispricing).
+dividends:
+  withholding:
+    a: 0.15   # Royal Dutch (NL)
+    b: 0.0    # Shell Transport (UK)
+  # Price/total-return residuals below this yield are rounding noise, not
+  # dividends (development data: ex-dates >= 75 bps, noise <= 50 bps).
+  min_yield: 0.005
+
+raw_dir: data/interim/rd_shell
+processed_dir: data/processed/rd_shell
+
+source:
+  archive: data/raw/datastream_dlc/RoyalDutchShell.zip
+  workbook: RD Shell data.xls
+  volume_sheet: Regression data
+  volume_multiplier: 1000   # Datastream turnover by volume is in thousands of shares
+  # [IMPLEMENTATION-ASSUMPTION] window = where both legs have daily volume.
+  window:
+    start: "1987-01-01"
+    end: "2002-10-03"
+  legs:
+    a:
+      sheet: Royal Dutch
+      price: 902178(P)
+      total_return_index: 902178(RI)
+      shares_outstanding: 902178(NOSH)
+      fx_per_unit: "# NLG(€) per £"   # EUR (ex-NLG) per GBP
+      price_scale: 1.0
+      quote_scale: 1.0
+      volume: TURNOVER BY VOLUME ROYAL DUTCH
+      bid: BID PRICE ROYAL DUTCH
+      ask: ASK PRICE ROYAL DUTCH
+    b:
+      sheet: Shell
+      price: 900998(P)
+      total_return_index: 900998(RI)
+      shares_outstanding: 900998(NOSH)
+      price_scale: 0.01           # pence -> GBP
+      quote_scale: 0.01
+      volume: TURNOVER BY VOLUME SHELL
+      bid: BID PRICE SHELL
+      ask: ASK PRICE SHELL
+
+alignment:
+  # [IMPLEMENTATION-ASSUMPTION] trade the pair only when both markets are open.
+  missing_policy: drop
+  ffill_limit: 0
+
+validation:
+  # Amsterdam and London holidays differ, so each leg misses some union dates.
+  max_missing_frac: 0.05
+  max_abs_log_return: 0.25
+  # Each leg's median daily volume must be at least this fraction of its
+  # shares outstanding (large caps trade ~0.2-0.7%/day in this data).
+  min_median_turnover: 0.0002

@@ -1,0 +1,19 @@
+# Baseline convergence trade on a twin pair's relative price.
+# Spec and rule classification: research/specs/baseline/parity_zscore.md
+#
+# All values below are [IMPLEMENTATION-ASSUMPTION]: the paper (Maymin, SILTA)
+# explains mispricing persistence and proposes no trading rule or parameters.
+
+name: parity_zscore
+window: 60        # trailing days used to standardise the relative price
+entry_z: 2.0      # open when |z| exceeds this
+exit_z: 0.5       # close when |z| falls below this
+leg_weight: 0.5   # |target weight| per leg as a fraction of equity (gross 2 x leg_weight)
+
+# Walk-forward neighbourhood (quant_lab.backtest.walkforward). Values must be
+# listed in increasing order. [IMPLEMENTATION-ASSUMPTION] ranges around the
+# defaults above (60 / 2.0 / 0.5).
+grid:
+  window: [40, 60, 80, 120]
+  entry_z: [1.5, 2.0, 2.5]
+  exit_z: [0.0, 0.5]

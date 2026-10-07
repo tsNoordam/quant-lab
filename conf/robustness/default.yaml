@@ -1,0 +1,86 @@
+# Robustness and multiple testing (quant_lab.backtest.robustness), step 9.
+#
+#   uv run python -m quant_lab.backtest.robustness data=rd_shell
+#   uv run python -m quant_lab.backtest.robustness data=reed_elsevier   # frozen values only
+#
+# Every case is a set of Hydra overrides applied on top of the command line.
+# Each case logs its own MLflow runs (run_label = case name), so every case also
+# counts as a trial. Train and validation only: the OOS period is never touched,
+# and `split.*` / `unlock_oos` overrides are refused.
+
+strategies: [parity_zscore, silta_parity]
+
+# Walk-forward (parameter selection) runs only on this pair. On any other pair
+# the strategies are evaluated at their frozen config values: no tuning there
+# (research/reports/data_decisions.md).
+development_pair: rd_shell
+
+# [EXTERNAL-RESEARCH] UK budget of 2 July 1997 ended dividend tax-credit
+# repayments to pension funds (the tax clientele behind RD/Shell's premium).
+subperiod_breaks: ["1997-07-02"]
+
+vol_regime_window: 60   # trailing days for the pair's volatility regime
+
+# Cases. `all` applies to every strategy; a strategy key adds overrides for that
+# strategy only (a case without either skips the strategy). `frozen: false`
+# skips the frozen-value train/validation runs (cases that only change the
+# walk-forward). [IMPLEMENTATION-ASSUMPTION] case values: about half and double
+# the defaults, plus the paper's figures where it gives one.
+cases:
+  base:
+    all: []
+  # --- costs (conf/costs/liquidity.yaml defaults: k 1.0, fallback 10, commission 5,
+  #     borrow 50, stamp 0)
+  impact_k_0.5:
+    all: [costs.impact.coefficient=0.5]
+  impact_k_2.0:
+    all: [costs.impact.coefficient=2.0]
+  fallback_spread_5:
+    all: [costs.spread.fallback_half_spread_bps=5]
+  fallback_spread_20:
+    all: [costs.spread.fallback_half_spread_bps=20]
+  commission_10:
+    all: [costs.commission_bps=10]
+  borrow_150:
+    all: [costs.borrow_bps_annual=150]
+  stamp_duty_50:
+    all: [costs.buy_tax_bps=50]
+  zero_cost:   # gross of all trading costs: labelled sensitivity case, not a result
+    all: [costs=flat_bps, costs.fee_bps=0, costs.slippage_bps=0]
+  # --- dividends (leg a withholding; default 15%)
+  withholding_0:
+    all: [data.dividends.withholding.a=0.0]
+  withholding_25:
+    all: [data.dividends.withholding.a=0.25]
+  # --- capital and leverage (default 1m, gross 1x). 5x (the paper's example) is
+  #     outside the engine's validated range: equity can approach zero.
+  capital_10m:
+    all: [backtest.init_cash=10000000]
+  capital_100m:
+    all: [backtest.init_cash=100000000]
+  gross_2x:
+    all: [strategy.leg_weight=1.0]
+  # --- selection and walk-forward design
+  selection_best:
+    frozen: false
+    all: [walkforward.selection=best]
+  wf_train_3y:
+    frozen: false
+    all: [walkforward.train_years=3]
+  wf_rolling:
+    frozen: false
+    all: [walkforward.anchored=false]
+  wf_test_6m:
+    frozen: false
+    all: [walkforward.test_months=6]
+  # Audit A3: the default grids put the selected points in a corner. A grid that
+  # brackets them; reported as a sensitivity, never adopted from these results.
+  grid_wide:
+    frozen: false
+    parity_zscore:
+      - strategy.grid.window=[40,60,80,120,160,240]
+      - strategy.grid.entry_z=[1.5,2.0,2.5,3.0,3.5]
+      - strategy.grid.exit_z=[0.0,0.5,1.0]
+    silta_parity:
+      - strategy.grid.entry_bound=[0.018,0.036,0.054,0.072,0.09]
+      - strategy.grid.exit_bound=[0.0,0.009,0.018,0.027]

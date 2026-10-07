@@ -1,0 +1,76 @@
+# Rio Tinto Ltd (Sydney, AUD) / Rio Tinto PLC (London, GBP). Not in Maymin's sample:
+# candidate out-of-sample pair. Source: data/raw/datastream_dlc/RioTinto.zip.
+#
+# NON-SYNCHRONOUS: Sydney closes before London opens, so the same-date closes are
+# ~10 hours apart. Any relative-price signal or execution model must account for this.
+
+name: rio_tinto
+calendar: business_daily
+legs:
+  a: RIO_LTD
+  b: RIO_PLC
+currency: GBP
+# Close-only data: decisions on close t are filled at close t+1.
+execution: next_close
+
+# [EXTERNAL-RESEARCH] workbook's theoretical ratio (1 Ltd share = 1 PLC share).
+# Rio Tinto's DLC description (riotinto.com, "RT DLC structure details"): a share
+# in either company carries the same dividend and voting rights, i.e. 1:1.
+# The 1995 sharing agreement PDF has no text layer; checked at the freeze (step 10).
+parity_ratio: 1.0
+
+# Total-return P&L; see conf/data/rd_shell.yaml.
+dividends:
+  withholding:
+    # [EXTERNAL-RESEARCH] Rio Tinto Ltd dividends 1997-2001 were 100% franked
+    # (investsmart.com.au dividend history); the franked part of a dividend is
+    # exempt from Australian dividend withholding tax for non-residents. Checked
+    # at the freeze (step 10); unfranked parts, if any, are not modelled.
+    a: 0.0    # Rio Tinto Ltd (AU)
+    b: 0.0    # Rio Tinto PLC (UK)
+  min_yield: 0.005
+
+raw_dir: data/interim/rio_tinto
+processed_dir: data/processed/rio_tinto
+
+source:
+  archive: data/raw/datastream_dlc/RioTinto.zip
+  workbook: Rio Tinto data.xls
+  volume_sheet: Regression data
+  volume_multiplier: 1000
+  window:  # [IMPLEMENTATION-ASSUMPTION] skip the first days after the DLC merger (Dec 1995)
+    start: "1996-01-01"
+    end: "2002-10-03"
+  legs:
+    a:
+      sheet: Rio Tinto Ltd
+      price: 905473(P)
+      total_return_index: 905473(RI)
+      shares_outstanding: 905473(NOSH)
+      fx_per_unit: "# AUS$ per £"
+      price_scale: 1.0
+      quote_scale: 1.0
+      volume: TURNOVER BY VOLUME RIO TINTO Ltd
+      bid: BID PRICE RIO TINTO Ltd
+      ask: ASK PRICE RIO TINTO Ltd
+    b:
+      sheet: Rio Tinto PLC
+      price: 901714(P)
+      total_return_index: 901714(RI)
+      shares_outstanding: 901714(NOSH)
+      price_scale: 1.0     # the workbook author already divided this price by 100
+      quote_scale: 0.01    # ...but not the quotes, which are still in pence
+      volume: TURNOVER BY VOLUME RIO TINTO PLC
+      bid: BID PRICE RIO TINTO PLC
+      ask: ASK PRICE RIO TINTO PLC
+
+alignment:
+  missing_policy: drop
+  ffill_limit: 0
+
+validation:
+  max_missing_frac: 0.05
+  max_abs_log_return: 0.25
+  # Each leg's median daily volume must be at least this fraction of its
+  # shares outstanding (large caps trade ~0.2-0.7%/day in this data).
+  min_median_turnover: 0.0002

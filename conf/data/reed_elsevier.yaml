@@ -1,0 +1,67 @@
+# Elsevier NV (Amsterdam, EUR) / Reed International PLC (London, GBp).
+# Twin pair in Maymin (SILTA). Source: data/raw/datastream_dlc/ReedElsevier.zip.
+
+name: reed_elsevier
+calendar: business_daily
+legs:
+  a: ELSEVIER
+  b: REED
+currency: GBP
+# Close-only data: decisions on close t are filled at close t+1.
+execution: next_close
+
+# [EXTERNAL-RESEARCH] workbook's theoretical ratio in GBP per share. Verified in
+# step 6: the equalization agreement's "Equalisation Ratio" is 1.538:1.
+parity_ratio: 1.538
+
+# Total-return P&L; see conf/data/rd_shell.yaml. [IMPLEMENTATION-ASSUMPTION]
+dividends:
+  withholding:
+    a: 0.15   # Elsevier (NL): UK-NL treaty rate
+    b: 0.0    # Reed International (UK)
+  min_yield: 0.005
+
+raw_dir: data/interim/reed_elsevier
+processed_dir: data/processed/reed_elsevier
+
+source:
+  archive: data/raw/datastream_dlc/ReedElsevier.zip
+  workbook: Reed Elsevier data incl S.xls
+  volume_sheet: Regression data
+  volume_multiplier: 1000
+  window:  # [IMPLEMENTATION-ASSUMPTION] full workbook range; volume complete throughout
+    start: "1993-01-01"
+    end: "2002-10-03"
+  legs:
+    a:
+      sheet: Elsevier
+      price: 981526(P)
+      total_return_index: 981526(RI)
+      shares_outstanding: 981526(NOSH)
+      fx_per_unit: "# NLG(€) per £"
+      price_scale: 1.0
+      quote_scale: 1.0
+      volume: TURNOVER BY VOLUME ELSEVIER
+      bid: BID PRICE ELSEVIER
+      ask: ASK PRICE ELSEVIER
+    b:
+      sheet: Reed International
+      price: 901080(P)
+      total_return_index: 901080(RI)
+      shares_outstanding: 901080(NOSH)
+      price_scale: 0.01
+      quote_scale: 0.01
+      volume: TURNOVER BY VOLUME REED INT.
+      bid: BID PRICE REED INT.
+      ask: ASK PRICE REED INT.
+
+alignment:
+  missing_policy: drop
+  ffill_limit: 0
+
+validation:
+  max_missing_frac: 0.05
+  max_abs_log_return: 0.25
+  # Each leg's median daily volume must be at least this fraction of its
+  # shares outstanding (large caps trade ~0.2-0.7%/day in this data).
+  min_median_turnover: 0.0002

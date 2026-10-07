@@ -1,0 +1,10 @@
+# LOCKED. Out-of-sample pair: no train or validation period, so nothing can be
+# developed on it. Decided 2026-10-07 before any backtest on this data; see
+# research/reports/data_decisions.md.
+
+name: rio_tinto
+train: null
+validation: null
+oos:
+  start: "1996-01-01"
+  end: "2002-10-03"

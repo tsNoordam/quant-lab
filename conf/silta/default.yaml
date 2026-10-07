@@ -1,0 +1,16 @@
+# SILTA price-volume regressions (quant_lab.models.silta), research/methodology/maymin_silta.md.
+#
+#   uv run python -m quant_lab.models.silta data=rd_shell
+#
+# Windows: the dataset's development range (train start .. validation end) and
+# its train and validation parts. The OOS period is never used.
+
+# [PAPER-DERIVED] HSBC round-turn cost bound, reused for all pairs by the paper
+# (p. 27); used for the Table VII statistics and the chi > 0 check.
+cost_bound: 0.018
+
+# [IMPLEMENTATION-ASSUMPTION] trailing window for the causal standardization.
+causal_window: 250
+
+# Fixed Newey-West lags for the sensitivity table (no prewhitening).
+sensitivity_lags: [0, 5, 10, 20, 40, 80]

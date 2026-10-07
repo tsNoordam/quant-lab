@@ -1,0 +1,6 @@
+period: train          # train | validation | oos  (oos needs +unlock_oos=true)
+init_cash: 1000000
+# next_open: signal on close t, filled at open t+1 | next_close: filled at close t+1.
+# Datasets without opens declare `execution: next_close` in conf/data/.
+execution: ${oc.select:data.execution,next_open}
+annualization: 252     # trading days per year for Sharpe / volatility

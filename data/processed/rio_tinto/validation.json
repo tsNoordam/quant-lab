@@ -1,0 +1,20 @@
+{
+  "dataset": "rio_tinto",
+  "legs": {
+    "a": "RIO_LTD",
+    "b": "RIO_PLC"
+  },
+  "start": "1996-01-02",
+  "end": "2002-10-03",
+  "rows": 1687,
+  "dates_either_leg": 1730,
+  "rows_dropped": 43,
+  "missing_frac_a": 0.011561,
+  "missing_frac_b": 0.013295,
+  "stale_rows_a": 0,
+  "stale_rows_b": 0,
+  "warnings": [
+    "[warning:crossed_quotes] a:RIO_LTD: bid > ask on 2001-06-20, 2001-08-02, 2001-09-17, 2002-04-23, 2002-08-07",
+    "[warning:crossed_quotes] b:RIO_PLC: bid > ask on 2001-09-19, 2001-10-22"
+  ]
+}

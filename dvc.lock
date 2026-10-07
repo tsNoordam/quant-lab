@@ -1,0 +1,456 @@
+schema: '2.0'
+stages:
+  preprocess@synthetic_twin:
+    cmd: python -m quant_lab.data.preprocess --dataset synthetic_twin
+    deps:
+    - path: data/raw/synthetic_twin
+      hash: md5
+      md5: d11975e4dee053ab5896279e80350d25.dir
+      size: 296376
+      nfiles: 2
+    - path: src/quant_lab/data/loaders.py
+      hash: md5
+      md5: 72bdde389e4e2416990a3662eea5ef9e
+      size: 1482
+    - path: src/quant_lab/data/preprocess.py
+      hash: md5
+      md5: 710728a733c3aa1240dec25c5e20c844
+      size: 3294
+    - path: src/quant_lab/data/synchronization.py
+      hash: md5
+      md5: 8d25a0082cab530cf4943d0773e5d95b
+      size: 2250
+    - path: src/quant_lab/data/validation.py
+      hash: md5
+      md5: b9a253df52dc7e314b48dd82a4a7d227
+      size: 8532
+    params:
+      conf/data/synthetic_twin.yaml:
+        alignment:
+          missing_policy: drop
+          ffill_limit: 0
+        legs:
+          a: TWIN_A
+          b: TWIN_B
+        validation:
+          max_missing_frac: 0.02
+          max_abs_log_return: 0.25
+    outs:
+    - path: data/processed/synthetic_twin/panel.parquet
+      hash: md5
+      md5: 86ddb3990840ad3e0e36c16ce78e0b9d
+      size: 271905
+    - path: data/processed/synthetic_twin/validation.json
+      hash: md5
+      md5: bbd84922942639cd5c35db4cf72ba0ff
+      size: 322
+  ingest@rd_shell:
+    cmd: python -m quant_lab.data.datastream --dataset rd_shell
+    deps:
+    - path: data/raw/datastream_dlc
+      hash: md5
+      md5: 9d9e2813a7c1269e4adc2a6255fc813e.dir
+      size: 15695508
+      nfiles: 4
+    - path: src/quant_lab/data/datastream.py
+      hash: md5
+      md5: 0debb162f21e8c0ee8988d6a778ed331
+      size: 8761
+    params:
+      conf/data/rd_shell.yaml:
+        legs:
+          a: ROYAL_DUTCH
+          b: SHELL
+        raw_dir: data/interim/rd_shell
+        source:
+          archive: data/raw/datastream_dlc/RoyalDutchShell.zip
+          workbook: RD Shell data.xls
+          volume_sheet: Regression data
+          volume_multiplier: 1000
+          window:
+            start: '1987-01-01'
+            end: '2002-10-03'
+          legs:
+            a:
+              sheet: Royal Dutch
+              price: 902178(P)
+              total_return_index: 902178(RI)
+              shares_outstanding: 902178(NOSH)
+              fx_per_unit: '# NLG(€) per £'
+              price_scale: 1.0
+              quote_scale: 1.0
+              volume: TURNOVER BY VOLUME ROYAL DUTCH
+              bid: BID PRICE ROYAL DUTCH
+              ask: ASK PRICE ROYAL DUTCH
+            b:
+              sheet: Shell
+              price: 900998(P)
+              total_return_index: 900998(RI)
+              shares_outstanding: 900998(NOSH)
+              price_scale: 0.01
+              quote_scale: 0.01
+              volume: TURNOVER BY VOLUME SHELL
+              bid: BID PRICE SHELL
+              ask: ASK PRICE SHELL
+    outs:
+    - path: data/interim/rd_shell
+      hash: md5
+      md5: a66ad01957aef0ca762dce058e6d2ef0.dir
+      size: 657020
+      nfiles: 2
+    - path: data/interim/rd_shell.ingest.json
+      hash: md5
+      md5: 76239420d8b0533a2c0ae3563021707e
+      size: 533
+  ingest@unilever:
+    cmd: python -m quant_lab.data.datastream --dataset unilever
+    deps:
+    - path: data/raw/datastream_dlc
+      hash: md5
+      md5: 9d9e2813a7c1269e4adc2a6255fc813e.dir
+      size: 15695508
+      nfiles: 4
+    - path: src/quant_lab/data/datastream.py
+      hash: md5
+      md5: 0debb162f21e8c0ee8988d6a778ed331
+      size: 8761
+    params:
+      conf/data/unilever.yaml:
+        legs:
+          a: UNILEVER_NV
+          b: UNILEVER_PLC
+        raw_dir: data/interim/unilever
+        source:
+          archive: data/raw/datastream_dlc/Unilever.zip
+          workbook: Unilever data.xls
+          volume_sheet: Regression data
+          volume_multiplier: 1000
+          window:
+            start: '1998-01-01'
+            end: '2002-10-03'
+          legs:
+            a:
+              sheet: UNILEVER NV
+              price: 932911(P)
+              total_return_index: 932911(RI)
+              shares_outstanding: 932911(NOSH)
+              fx_per_unit: '# NLG(€) per £'
+              price_scale: 1.0
+              quote_scale: 1.0
+              volume: TURNOVER BY VOLUME UNILEVER NV
+            b:
+              sheet: UNILEVER PLC
+              price: 900789(P)
+              total_return_index: 900789(RI)
+              shares_outstanding: 900789(NOSH)
+              price_scale: 0.01
+              quote_scale: 0.01
+              volume: TURNOVER BY VOLUME UNILEVER PLC
+              bid: BID PRICE UNILEVER PLC
+              ask: ASK PRICE UNILEVER PLC
+    outs:
+    - path: data/interim/unilever
+      hash: md5
+      md5: 908974be88f37349967af953db4141e8.dir
+      size: 175872
+      nfiles: 2
+    - path: data/interim/unilever.ingest.json
+      hash: md5
+      md5: 35df70dc9a73c9f8d68c7613a76d292a
+      size: 523
+  ingest@reed_elsevier:
+    cmd: python -m quant_lab.data.datastream --dataset reed_elsevier
+    deps:
+    - path: data/raw/datastream_dlc
+      hash: md5
+      md5: 9d9e2813a7c1269e4adc2a6255fc813e.dir
+      size: 15695508
+      nfiles: 4
+    - path: src/quant_lab/data/datastream.py
+      hash: md5
+      md5: 0debb162f21e8c0ee8988d6a778ed331
+      size: 8761
+    params:
+      conf/data/reed_elsevier.yaml:
+        legs:
+          a: ELSEVIER
+          b: REED
+        raw_dir: data/interim/reed_elsevier
+        source:
+          archive: data/raw/datastream_dlc/ReedElsevier.zip
+          workbook: Reed Elsevier data incl S.xls
+          volume_sheet: Regression data
+          volume_multiplier: 1000
+          window:
+            start: '1993-01-01'
+            end: '2002-10-03'
+          legs:
+            a:
+              sheet: Elsevier
+              price: 981526(P)
+              total_return_index: 981526(RI)
+              shares_outstanding: 981526(NOSH)
+              fx_per_unit: '# NLG(€) per £'
+              price_scale: 1.0
+              quote_scale: 1.0
+              volume: TURNOVER BY VOLUME ELSEVIER
+              bid: BID PRICE ELSEVIER
+              ask: ASK PRICE ELSEVIER
+            b:
+              sheet: Reed International
+              price: 901080(P)
+              total_return_index: 901080(RI)
+              shares_outstanding: 901080(NOSH)
+              price_scale: 0.01
+              quote_scale: 0.01
+              volume: TURNOVER BY VOLUME REED INT.
+              bid: BID PRICE REED INT.
+              ask: ASK PRICE REED INT.
+    outs:
+    - path: data/interim/reed_elsevier
+      hash: md5
+      md5: 46eb9b3341c3d73efc420f580942fed8.dir
+      size: 411051
+      nfiles: 2
+    - path: data/interim/reed_elsevier.ingest.json
+      hash: md5
+      md5: 28b0c89aa85f4859ecfa21075e8d3fda
+      size: 543
+  ingest@rio_tinto:
+    cmd: python -m quant_lab.data.datastream --dataset rio_tinto
+    deps:
+    - path: data/raw/datastream_dlc
+      hash: md5
+      md5: 9d9e2813a7c1269e4adc2a6255fc813e.dir
+      size: 15695508
+      nfiles: 4
+    - path: src/quant_lab/data/datastream.py
+      hash: md5
+      md5: 0debb162f21e8c0ee8988d6a778ed331
+      size: 8761
+    params:
+      conf/data/rio_tinto.yaml:
+        legs:
+          a: RIO_LTD
+          b: RIO_PLC
+        raw_dir: data/interim/rio_tinto
+        source:
+          archive: data/raw/datastream_dlc/RioTinto.zip
+          workbook: Rio Tinto data.xls
+          volume_sheet: Regression data
+          volume_multiplier: 1000
+          window:
+            start: '1996-01-01'
+            end: '2002-10-03'
+          legs:
+            a:
+              sheet: Rio Tinto Ltd
+              price: 905473(P)
+              total_return_index: 905473(RI)
+              shares_outstanding: 905473(NOSH)
+              fx_per_unit: '# AUS$ per £'
+              price_scale: 1.0
+              quote_scale: 1.0
+              volume: TURNOVER BY VOLUME RIO TINTO Ltd
+              bid: BID PRICE RIO TINTO Ltd
+              ask: ASK PRICE RIO TINTO Ltd
+            b:
+              sheet: Rio Tinto PLC
+              price: 901714(P)
+              total_return_index: 901714(RI)
+              shares_outstanding: 901714(NOSH)
+              price_scale: 1.0
+              quote_scale: 0.01
+              volume: TURNOVER BY VOLUME RIO TINTO PLC
+              bid: BID PRICE RIO TINTO PLC
+              ask: ASK PRICE RIO TINTO PLC
+    outs:
+    - path: data/interim/rio_tinto
+      hash: md5
+      md5: c0d10c20b81ca48da822779c7c488288.dir
+      size: 258619
+      nfiles: 2
+    - path: data/interim/rio_tinto.ingest.json
+      hash: md5
+      md5: 4acc9d077ba1f851927282c902819246
+      size: 521
+  preprocess@rd_shell:
+    cmd: python -m quant_lab.data.preprocess --dataset rd_shell
+    deps:
+    - path: data/interim/rd_shell
+      hash: md5
+      md5: a66ad01957aef0ca762dce058e6d2ef0.dir
+      size: 657020
+      nfiles: 2
+    - path: src/quant_lab/data/loaders.py
+      hash: md5
+      md5: 72bdde389e4e2416990a3662eea5ef9e
+      size: 1482
+    - path: src/quant_lab/data/preprocess.py
+      hash: md5
+      md5: 710728a733c3aa1240dec25c5e20c844
+      size: 3294
+    - path: src/quant_lab/data/synchronization.py
+      hash: md5
+      md5: 8d25a0082cab530cf4943d0773e5d95b
+      size: 2250
+    - path: src/quant_lab/data/validation.py
+      hash: md5
+      md5: b9a253df52dc7e314b48dd82a4a7d227
+      size: 8532
+    params:
+      conf/data/rd_shell.yaml:
+        alignment:
+          missing_policy: drop
+          ffill_limit: 0
+        legs:
+          a: ROYAL_DUTCH
+          b: SHELL
+        validation:
+          max_missing_frac: 0.05
+          max_abs_log_return: 0.25
+          min_median_turnover: 0.0002
+    outs:
+    - path: data/processed/rd_shell/panel.parquet
+      hash: md5
+      md5: 6f8fab1320b36cf09c96096218fccf0c
+      size: 261405
+    - path: data/processed/rd_shell/validation.json
+      hash: md5
+      md5: f144f18730494adee25edd7e0e767e84
+      size: 887
+  preprocess@unilever:
+    cmd: python -m quant_lab.data.preprocess --dataset unilever
+    deps:
+    - path: data/interim/unilever
+      hash: md5
+      md5: 908974be88f37349967af953db4141e8.dir
+      size: 175872
+      nfiles: 2
+    - path: src/quant_lab/data/loaders.py
+      hash: md5
+      md5: 72bdde389e4e2416990a3662eea5ef9e
+      size: 1482
+    - path: src/quant_lab/data/preprocess.py
+      hash: md5
+      md5: 710728a733c3aa1240dec25c5e20c844
+      size: 3294
+    - path: src/quant_lab/data/synchronization.py
+      hash: md5
+      md5: 8d25a0082cab530cf4943d0773e5d95b
+      size: 2250
+    - path: src/quant_lab/data/validation.py
+      hash: md5
+      md5: 23fc9aab3f76458b057ae750363733d6
+      size: 7208
+    params:
+      conf/data/unilever.yaml:
+        alignment:
+          missing_policy: drop
+          ffill_limit: 0
+        legs:
+          a: UNILEVER_NV
+          b: UNILEVER_PLC
+        validation:
+          max_missing_frac: 0.05
+          max_abs_log_return: 0.25
+          min_median_turnover: 0.0
+    outs:
+    - path: data/processed/unilever/panel.parquet
+      hash: md5
+      md5: f07742485e0e4952494b08eb32debc7f
+      size: 77935
+    - path: data/processed/unilever/validation.json
+      hash: md5
+      md5: a503537b37b6cc4862d3a2bae6c5fffd
+      size: 401
+  preprocess@reed_elsevier:
+    cmd: python -m quant_lab.data.preprocess --dataset reed_elsevier
+    deps:
+    - path: data/interim/reed_elsevier
+      hash: md5
+      md5: 46eb9b3341c3d73efc420f580942fed8.dir
+      size: 411051
+      nfiles: 2
+    - path: src/quant_lab/data/loaders.py
+      hash: md5
+      md5: 72bdde389e4e2416990a3662eea5ef9e
+      size: 1482
+    - path: src/quant_lab/data/preprocess.py
+      hash: md5
+      md5: 710728a733c3aa1240dec25c5e20c844
+      size: 3294
+    - path: src/quant_lab/data/synchronization.py
+      hash: md5
+      md5: 8d25a0082cab530cf4943d0773e5d95b
+      size: 2250
+    - path: src/quant_lab/data/validation.py
+      hash: md5
+      md5: b9a253df52dc7e314b48dd82a4a7d227
+      size: 8532
+    params:
+      conf/data/reed_elsevier.yaml:
+        alignment:
+          missing_policy: drop
+          ffill_limit: 0
+        legs:
+          a: ELSEVIER
+          b: REED
+        validation:
+          max_missing_frac: 0.05
+          max_abs_log_return: 0.25
+          min_median_turnover: 0.0002
+    outs:
+    - path: data/processed/reed_elsevier/panel.parquet
+      hash: md5
+      md5: 4026478ab77957f32d6d505b9183f5f5
+      size: 174379
+    - path: data/processed/reed_elsevier/validation.json
+      hash: md5
+      md5: 644b6dce95ef2821be861f40819b2425
+      size: 794
+  preprocess@rio_tinto:
+    cmd: python -m quant_lab.data.preprocess --dataset rio_tinto
+    deps:
+    - path: data/interim/rio_tinto
+      hash: md5
+      md5: c0d10c20b81ca48da822779c7c488288.dir
+      size: 258619
+      nfiles: 2
+    - path: src/quant_lab/data/loaders.py
+      hash: md5
+      md5: 72bdde389e4e2416990a3662eea5ef9e
+      size: 1482
+    - path: src/quant_lab/data/preprocess.py
+      hash: md5
+      md5: 710728a733c3aa1240dec25c5e20c844
+      size: 3294
+    - path: src/quant_lab/data/synchronization.py
+      hash: md5
+      md5: 8d25a0082cab530cf4943d0773e5d95b
+      size: 2250
+    - path: src/quant_lab/data/validation.py
+      hash: md5
+      md5: b9a253df52dc7e314b48dd82a4a7d227
+      size: 8532
+    params:
+      conf/data/rio_tinto.yaml:
+        alignment:
+          missing_policy: drop
+          ffill_limit: 0
+        legs:
+          a: RIO_LTD
+          b: RIO_PLC
+        validation:
+          max_missing_frac: 0.05
+          max_abs_log_return: 0.25
+          min_median_turnover: 0.0002
+    outs:
+    - path: data/processed/rio_tinto/panel.parquet
+      hash: md5
+      md5: cec38ef62e5cddcaf254c368ae638aa6
+      size: 112617
+    - path: data/processed/rio_tinto/validation.json
+      hash: md5
+      md5: 9acf90d5a61fd08afb03b9d775baa301
+      size: 515

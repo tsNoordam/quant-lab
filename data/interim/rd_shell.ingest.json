@@ -1,0 +1,23 @@
+{
+  "dataset": "rd_shell",
+  "archive": "data/raw/datastream_dlc/RoyalDutchShell.zip",
+  "workbook": "RD Shell data.xls",
+  "legs": {
+    "ROYAL_DUTCH": {
+      "window_rows": 4111,
+      "no_volume_rows_dropped": 154,
+      "rows": 3957,
+      "start": "1987-01-01",
+      "end": "2002-10-03",
+      "quote_coverage": 0.3907
+    },
+    "SHELL": {
+      "window_rows": 4111,
+      "no_volume_rows_dropped": 129,
+      "rows": 3982,
+      "start": "1987-01-02",
+      "end": "2002-10-03",
+      "quote_coverage": 0.999498
+    }
+  }
+}
