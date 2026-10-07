@@ -23,7 +23,7 @@
 | A3 | Newey-West settings | R sandwich `NeweyWest` defaults: automatic NW(1994) Bartlett lag, AR(1) prewhitening, n/(n-k) adjustment. Reported with a fixed-lag sensitivity. | [IMPLEMENTATION-ASSUMPTION] |
 | A4 | Text says the New price "increases by another 1.7%" per unit of log volume ratio, Table II says beta = -1.7% | Table is right (the stated relation is negative); the text has a typo | [PAPER-DERIVED table; our reading] |
 | A5 | "RD-Shell 2002-2007" runs past the July 2005 unification of Royal Dutch and Shell Transport | After 2005 presumably Royal Dutch Shell A vs B shares; not stated | [IMPLEMENTATION-ASSUMPTION] (unresolved) |
-| A6 | Which twin leg is "1" (more expensive) and whether chi > 0 was checked for the twins | Check both against parity in our data and report | [IMPLEMENTATION-ASSUMPTION] |
+| A6 | Which twin leg is "1" (more expensive) and whether chi > 0 was checked for the twins | Check both against parity in our data and report. Step 7: leg a is the expensive one in both pairs; chi is reported in shares (the paper's proxy) and in value traded, because RD and Shell shares differ in size ~6.9x (RD/Shell chi < 0 in shares, > 0 in value) | [IMPLEMENTATION-ASSUMPTION] |
 | A7 | Raw prices vs total-return prices in ln(P1/P2) | Raw prices ("prices of the two share classes"); ex-dividend jumps are not removed in the paper | [PAPER-DERIVED reading] |
 | A8 | Treatment of days when one market is closed (twins) | Not stated; we use dates on which both legs traded | [IMPLEMENTATION-ASSUMPTION] |
 | A9 | HSBC data source | Not stated (Bloomberg used for market value) | unresolved |

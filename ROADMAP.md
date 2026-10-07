@@ -18,7 +18,8 @@ the next step started (see "Working in steps" in CLAUDE.md).
 | 5 | `backtest-auditor` agent + audit workflow | ea1827b |
 | 5a | First audit: rd_shell walk-forward. Verdict FAIL (A1 dividends); A4 logging fixed | ffcf775 |
 | 5b | Fixes A1 (total-return dividends), A2 (locked quotes), A5 (FX cost); re-audit verdict WARNING. Walk-forward Sharpe -0.34, total -11.5% | befb58f |
-| 6 | Paper extraction: `research/{extraction,equations,methodology,assumptions,evidence}/maymin_silta.*`; parity checked against the equalization agreements | (this step) |
+| 6 | Paper extraction: `research/{extraction,equations,methodology,assumptions,evidence}/maymin_silta.*`; parity checked against the equalization agreements | d063320 |
+| 7 | SILTA regressions (`quant_lab.models.silta`), Newey-West as in R sandwich, causal variant, chi check. H1 not supported on 1987-99 data (RD/Shell b=+0.02, t 0.4; Reed Elsevier b=+0.08, t 1.9, sign unstable); `research/reports/silta_replication.md` | (this step) |
 
 ## Remaining, in order
 
@@ -34,13 +35,14 @@ of replicating Table VI numbers. Also: `shares_outstanding` (NOSH) is not
 split-adjusted while volume is, so the turnover check overstates pre-split
 turnover (less sensitive, never a false failure); fix before relying on it.
 
-7. **SILTA econometric replication.** `quant_lab.models`: the paper's
-   relative-price-on-relative-volume regressions with Newey-West errors for
-   `rd_shell` and `reed_elsevier`, compared with the paper's numbers; full-
-   sample standardization labelled as explanatory only, plus a causal (rolling)
-   version. Logged to MLflow, tested.
+Found in step 7: chi is measured in value traded as well as shares (RD and
+Shell shares differ in size ~6.9x); H2 calibration (eq. 1) deferred, since only
+~1-13% of development days lie inside the 180 bps bound. Block bootstrap and a
+differenced specification of the step 7 regression are left for step 9.
+
 8. **SILTA-informed strategy.** `/build-strategy`: a strategy spec that uses the
-   replicated relation, every rule tagged; implemented in
+   paper's relation, every rule tagged, with step 7's null result as the stated
+   prior (the relation is not established on our data); implemented in
    `quant_lab.strategies`; walk-forward on `rd_shell` train+validation only.
    Adds the `run-backtest` skill.
 9. **Robustness and multiple testing.** `/robustness`: parameter neighbourhoods,

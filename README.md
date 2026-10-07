@@ -141,6 +141,20 @@ uv run python -m quant_lab.backtest.walkforward data=rd_shell walkforward.select
 Settings in `conf/walkforward/default.yaml` (fold lengths, embargo, grid,
 selection rule). MLflow artifacts: `folds.csv`, `grid_scores.csv`, equity plot.
 
+## SILTA regressions (paper replication)
+
+Maymin's relative-price on relative-volume regressions with Newey-West errors,
+on the development range (train + validation) only:
+
+```bash
+uv run python -m quant_lab.models.silta data=rd_shell
+uv run python -m quant_lab.models.silta data=reed_elsevier
+```
+
+Settings in `conf/silta/default.yaml`. MLflow experiment `<data>.silta`;
+artifacts `regressions.csv`, `chi_condition.csv`, `lag_sensitivity.csv`.
+Results and caveats: `research/reports/silta_replication.md`.
+
 ## Dependencies
 
 | Group | Packages | Why |
