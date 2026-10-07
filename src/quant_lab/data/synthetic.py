@@ -9,6 +9,10 @@ Model (all parameters in ``conf/data/<dataset>.yaml`` under ``synthetic:``):
     P_a        = parity * V_t * exp(+m_t / 2)
     P_b        = V_t * exp(-m_t / 2)        so  log(P_a / (parity * P_b)) = m_t
 
+Prices above are closes. Opens are the previous close times an overnight gap
+shared by both legs plus a small leg-specific gap, so the relative price at the
+open stays close to the previous close's relative price, as for real twins.
+
 Volume is independent lognormal noise: the data encodes no relation between
 relative volume and mispricing. Each leg misses random days independently.
 
@@ -51,12 +55,17 @@ def simulate_truth(cfg: DictConfig) -> pd.DataFrame:
 
 
 def _ohlcv(
-    close: pd.Series, rng: np.random.Generator, s: DictConfig, volume_mean: float
+    close: pd.Series,
+    rng: np.random.Generator,
+    s: DictConfig,
+    volume_mean: float,
+    common_gap: np.ndarray,
 ) -> pd.DataFrame:
     n = len(close)
-    noise = s.intraday_vol * rng.standard_normal((3, n))
+    noise = s.intraday_vol * rng.standard_normal((2, n))
     prev_close = close.shift(1).fillna(close.iloc[0]).to_numpy()
-    open_ = prev_close * np.exp(noise[0])
+    # Overnight news moves both twins together; only a small part is leg-specific.
+    open_ = prev_close * np.exp(common_gap + s.open_idio_vol * rng.standard_normal(n))
     body_high = np.maximum(open_, close.to_numpy())
     body_low = np.minimum(open_, close.to_numpy())
     volume = volume_mean * np.exp(
@@ -65,8 +74,8 @@ def _ohlcv(
     df = pd.DataFrame(
         {
             "open": open_,
-            "high": body_high * np.exp(np.abs(noise[1])),
-            "low": body_low * np.exp(-np.abs(noise[2])),
+            "high": body_high * np.exp(np.abs(noise[0])),
+            "low": body_low * np.exp(-np.abs(noise[1])),
             "close": close.to_numpy(),
             "adj_close": close.to_numpy(),  # no corporate actions in the synthetic pair
             "volume": np.round(volume).astype("int64"),
@@ -88,8 +97,9 @@ def generate_pair(cfg: DictConfig) -> tuple[dict[str, pd.DataFrame], pd.DataFram
         cfg.legs.a: cfg.parity_ratio * truth["fundamental"] * half,
         cfg.legs.b: truth["fundamental"] / half,
     }
+    common_gap = s.intraday_vol * rng.standard_normal(len(truth))
     legs = {
-        symbol: _ohlcv(close, rng, s, volume_mean)
+        symbol: _ohlcv(close, rng, s, volume_mean, common_gap)
         for (symbol, close), volume_mean in zip(closes.items(), s.volume_mean, strict=True)
     }
     return legs, truth

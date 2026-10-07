@@ -1,0 +1,4 @@
+period: train          # train | validation | oos  (oos needs +unlock_oos=true)
+init_cash: 1000000
+execution: next_open   # signal on close t, order filled at open t+1
+annualization: 252     # trading days per year for Sharpe / volatility

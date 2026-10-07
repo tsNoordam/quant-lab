@@ -5,8 +5,8 @@ stages:
     deps:
     - path: data/raw/synthetic_twin
       hash: md5
-      md5: 7d0fb442998fde5dba710c442f937396.dir
-      size: 296310
+      md5: d11975e4dee053ab5896279e80350d25.dir
+      size: 296376
       nfiles: 2
     - path: src/quant_lab/data/loaders.py
       hash: md5
@@ -38,9 +38,9 @@ stages:
     outs:
     - path: data/processed/synthetic_twin/panel.parquet
       hash: md5
-      md5: a913f3b6cb6e06f8fdb48f5fc8553ea0
-      size: 264726
+      md5: 86ddb3990840ad3e0e36c16ce78e0b9d
+      size: 271905
     - path: data/processed/synthetic_twin/validation.json
       hash: md5
-      md5: 208d2dd850a60b957de5b3d3c8136281
+      md5: bbd84922942639cd5c35db4cf72ba0ff
       size: 322

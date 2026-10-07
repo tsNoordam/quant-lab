@@ -51,7 +51,8 @@ synthetic:
     mean: 0.0
     half_life_days: 60
     vol: 0.03              # annualised volatility of the mispricing
-  intraday_vol: 0.01       # daily open/high/low noise
+  intraday_vol: 0.01       # overnight gap common to both legs; high/low range noise
+  open_idio_vol: 0.001     # leg-specific part of the opening gap
   volume_mean: [2.0e6, 1.2e6]
   volume_dispersion: 0.4   # lognormal sigma of daily volume
   missing_frac: 0.005      # independent random non-trading days per leg

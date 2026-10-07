@@ -1,0 +1,8 @@
+# SENSITIVITY CASE ONLY (see CLAUDE.md): flat fee + slippage per order, in bps
+# of traded value, independent of trade size and liquidity. Step 4b adds the
+# liquidity-scaled model (square-root impact on lagged ADV and volatility, plus
+# borrow cost on the short leg) as the default.
+
+model: flat_bps
+fee_bps: 5.0
+slippage_bps: 5.0

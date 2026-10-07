@@ -86,6 +86,25 @@ uv run dvc push && git push          # data blobs to the store, pointers to GitH
 The synthetic twin pair (`conf/data/synthetic_twin.yaml`) is regenerable from
 code: `uv run python -m quant_lab.data.synthetic --dataset synthetic_twin`.
 
+## Backtests (Hydra + VectorBT + MLflow)
+
+```bash
+uv run python -m quant_lab.backtest.run                              # train period
+uv run python -m quant_lab.backtest.run backtest.period=validation
+uv run python -m quant_lab.backtest.run -m strategy.window=40,60,80  # sweep (train only)
+uv run python -m quant_lab.backtest.run costs.fee_bps=20             # cost sensitivity
+
+uv run mlflow ui --backend-store-uri sqlite:///mlflow.db   # http://127.0.0.1:5000
+```
+
+Config lives in `conf/` (`config.yaml` + groups data, split, strategy, costs,
+backtest). Each run logs params, metrics (Sharpe, drawdown, ...), provenance tags
+(git commit, dirty tree, input md5 vs `dvc.lock`) and artifacts (equity curve,
+resolved config, daily positions, orders).
+
+Guards: split boundaries in `conf/split/` cannot be overridden from the CLI, and
+`backtest.period=oos` refuses to run without `+unlock_oos=true`.
+
 ## Dependencies
 
 | Group | Packages | Why |
