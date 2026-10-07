@@ -1,0 +1,24 @@
+# Headline development results, checked by `uv run python -m quant_lab.reproduce`.
+#
+# Source: the clean MLflow runs at commit 9498679 (freeze audit rerun,
+# require_clean_tree) and quant_lab.models.silta at the same code. Development
+# periods only; the one-shot OOS results (research/reports/oos_evaluation.md)
+# are not repeated. A difference beyond the tolerance means the code, the data
+# (dvc.lock) or the environment (uv.lock) differs from the recorded state.
+
+tolerance: 0.0001
+
+checks:
+  # Step 7: SILTA regression slope (std_detrended, development window)
+  - {name: silta_rd_shell_beta, kind: silta, data: rd_shell, window: development, spec: std_detrended, metric: beta, expected: 0.016140252888090293}
+  - {name: silta_rd_shell_t_beta, kind: silta, data: rd_shell, window: development, spec: std_detrended, metric: t_beta, expected: 0.44113691790323495}
+  - {name: silta_reed_elsevier_beta, kind: silta, data: reed_elsevier, window: development, spec: std_detrended, metric: beta, expected: 0.07473490996449189}
+  - {name: silta_reed_elsevier_t_beta, kind: silta, data: reed_elsevier, window: development, spec: std_detrended, metric: t_beta, expected: 1.9216202731194167}
+  # Steps 8-10: frozen-value runs on RD/Shell (Sharpe)
+  - {name: rd_shell_parity_zscore_train, kind: backtest, data: rd_shell, strategy: parity_zscore, period: train, metric: sharpe, expected: -0.3839305168914568}
+  - {name: rd_shell_parity_zscore_validation, kind: backtest, data: rd_shell, strategy: parity_zscore, period: validation, metric: sharpe, expected: -0.9842150713768678}
+  - {name: rd_shell_silta_parity_train, kind: backtest, data: rd_shell, strategy: silta_parity, period: train, metric: sharpe, expected: -0.08283875600888822}
+  - {name: rd_shell_silta_parity_validation, kind: backtest, data: rd_shell, strategy: silta_parity, period: validation, metric: sharpe, expected: 0.13741412428312721}
+  # Steps 8-10: walk-forward on RD/Shell (stitched test-window Sharpe)
+  - {name: rd_shell_parity_zscore_walkforward, kind: walkforward, data: rd_shell, strategy: parity_zscore, metric: wf_sharpe, expected: -0.34104612404835777}
+  - {name: rd_shell_silta_parity_walkforward, kind: walkforward, data: rd_shell, strategy: silta_parity, metric: wf_sharpe, expected: 0.02391690913408161}
