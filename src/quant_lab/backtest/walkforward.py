@@ -200,6 +200,7 @@ def walk_forward(cfg: DictConfig, panel: pd.DataFrame) -> dict:
                 **{f"chosen_{k}": v for k, v in params.items()},
                 "train_selection_score": finite[chosen],
                 **{f"test_{k}": v for k, v in test_metrics.items()},
+                **{f"test_{k}": v for k, v in sim.cost_metrics.items()},
             }
         )
 
@@ -219,7 +220,17 @@ def walk_forward(cfg: DictConfig, panel: pd.DataFrame) -> dict:
             folds_df[[f"chosen_{n}" for n in names]].drop_duplicates().shape[0]
         ),
         "wf_n_entries": int(folds_df["test_n_entries"].sum()),
+        "wf_n_orders": int(folds_df["test_n_orders"].sum()),
+        "wf_gross_leverage": 2 * float(cfg.strategy.leg_weight),
+        "wf_n_trials": len(combos) * len(folds),  # training backtests behind the selection
     }
+    for key in ("cost_spread_impact_tax", "cost_commission", "cost_borrow", "entries_capped"):
+        if f"test_{key}" in folds_df:  # liquidity cost model only
+            summary[f"wf_{key}"] = float(folds_df[f"test_{key}"].sum())
+    if "test_quoted_spread_share" in folds_df:
+        n = folds_df["test_n_orders"]
+        share = (folds_df["test_quoted_spread_share"] * n).sum() / n.sum() if n.sum() else 0.0
+        summary["wf_quoted_spread_share"] = float(share)
     return {
         "summary": summary,
         "folds": folds_df,
@@ -246,7 +257,10 @@ def run_walk_forward(cfg: DictConfig, root: Path, overrides: list[str] | None = 
     mlflow = mlflow_utils.mlflow
     with mlflow.start_run(run_name=f"{cfg.strategy.name}-walkforward") as run:
         mlflow.set_tags(tags)
-        mlflow.log_params(run_params(cfg))
+        # Single-run settings the walk-forward does not use: the traded parameters
+        # are chosen per fold (folds.csv) and the range comes from the split file.
+        unused = {"backtest.period"} | {f"strategy.{name}" for name in cfg.walkforward.grid}
+        mlflow.log_params({k: v for k, v in run_params(cfg).items() if k not in unused})
         mlflow.log_metrics(summary)
         with tempfile.TemporaryDirectory() as tmp:
             tmp = Path(tmp)
