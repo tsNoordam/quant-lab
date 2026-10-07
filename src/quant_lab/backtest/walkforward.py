@@ -160,7 +160,7 @@ def walk_forward(cfg: DictConfig, panel: pd.DataFrame) -> dict:
         raise BacktestGuardError("no walk-forward folds fit in the development range")
     names, combos = parameter_grid(cfg.strategy.grid)
 
-    fold_rows, grid_rows, returns = [], [], []
+    fold_rows, grid_rows, returns, held = [], [], [], []
     for fold in folds:
         raw = {}
         for combo in combos:
@@ -183,6 +183,7 @@ def walk_forward(cfg: DictConfig, panel: pd.DataFrame) -> dict:
 
         sim, test_metrics = evaluate(panel, fold.test, cfg, params)
         returns.append(sim.equity.pct_change().fillna(0.0))
+        held.append(sim.held)
         for combo in combos:
             grid_rows.append(
                 {
@@ -245,6 +246,8 @@ def walk_forward(cfg: DictConfig, panel: pd.DataFrame) -> dict:
         "folds": folds_df,
         "grid": pd.DataFrame(grid_rows),
         "equity": equity,
+        "returns": stitched,
+        "held": pd.concat(held),
         "range": Period("walkforward", start, end),
     }
 
@@ -282,7 +285,7 @@ def run_walk_forward(cfg: DictConfig, root: Path, overrides: list[str] | None = 
             result["grid"].to_csv(tmp / "grid_scores.csv", index=False)
             (tmp / "config.yaml").write_text(OmegaConf.to_yaml(cfg, resolve=True))
             mlflow.log_artifacts(str(tmp))
-    return {"run_id": run.info.run_id, **summary, **tags, "folds": result["folds"]}
+    return {"run_id": run.info.run_id, **summary, **tags, **result}
 
 
 @hydra.main(version_base="1.3", config_path="../../../conf", config_name="config")

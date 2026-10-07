@@ -271,7 +271,8 @@ def run_tags(cfg: DictConfig, root: Path, panel_rel: str, git: dict, period: Per
 
 def run_params(cfg: DictConfig) -> dict[str, str]:
     resolved = OmegaConf.to_container(cfg, resolve=True)
-    return mlflow_utils.flatten({k: v for k, v in resolved.items() if k != "mlflow"})
+    skip = {"mlflow", "robustness"}  # not run settings (the robustness cases are a run list)
+    return mlflow_utils.flatten({k: v for k, v in resolved.items() if k not in skip})
 
 
 def run_backtest(cfg: DictConfig, root: Path, overrides: list[str] | None = None) -> dict:

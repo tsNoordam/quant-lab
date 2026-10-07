@@ -12,6 +12,7 @@ defaults:
   - split: ${data}      # each dataset has its own locked split file
   - walkforward: default
   - silta: default
+  - robustness: default
   - strategy: parity_zscore
   - costs: liquidity     # costs=flat_bps only as a labelled sensitivity case
   - backtest: default
