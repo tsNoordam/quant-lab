@@ -1,7 +1,7 @@
 {
   "dataset": "datastream_dlc",
   "description": "Daily Datastream (and some Bloomberg) data on dual-listed company pairs, compiled for academic DLC research; workbooks dated June 2008, plus equalization agreements and press clippings.",
-  "source": "TODO: record where these archives were obtained (URL / person / date)",
+  "source": "https://www.mathijsavandijk.com/dual-listed-companies (Mathijs A. van DIJK)",
   "license": "Thomson Reuters Datastream data: licensed, do not redistribute. Kept in DVC only, never committed to Git.",
   "layout": "data/raw/datastream_dlc/<Pair>.zip, original archives, unmodified",
   "files": {
