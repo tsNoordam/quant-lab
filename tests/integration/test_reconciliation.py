@@ -140,3 +140,12 @@ def test_costs_rise_with_capital_and_hurt_returns(project):
     assert big.cost_metrics["median_order_cost_bps"] > small.cost_metrics["median_order_cost_bps"]
     flat_free = simulate(project, "costs=flat_bps", "costs.fee_bps=0", "costs.slippage_bps=0")[2]
     assert small.equity.iloc[-1] < flat_free.equity.iloc[-1]
+
+
+def test_leveraged_targets_are_filled_not_silently_capped(project):
+    """Robustness case gross_2x: VectorBT must hold ~1.0 of equity per leg after entry."""
+    cfg, panel, sim = simulate(project, "strategy.leg_weight=1.0", "costs=flat_bps")
+    weights = sim.pf.asset_value(group_by=False).div(sim.pf.value(), axis=0).abs()
+    entries = sim.held.ne(0) & sim.held.ne(sim.held.shift())
+    assert entries.sum() > 5
+    np.testing.assert_allclose(weights[entries], 1.0, atol=0.1)
