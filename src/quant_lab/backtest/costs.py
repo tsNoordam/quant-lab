@@ -4,6 +4,7 @@ Per order, as a fraction of traded notional (applied by VectorBT as an adverse
 move of the fill price):
 
     cost = half_spread + k * sigma * sqrt(shares / ADV) + buy_tax (purchases only)
+           + fx_conversion (legs quoted in a foreign currency)
 
 plus a flat commission (``fees``) and a daily borrow charge on the short leg.
 
@@ -63,12 +64,14 @@ def order_costs(
     stats_at_fill: dict[str, pd.DataFrame],
     capital: float,
     cfg: DictConfig,
+    fx_legs: tuple[str, ...] = (),
 ) -> pd.DataFrame:
     """Cost fraction for each order (NaN where there is no order).
 
     ``orders`` holds target weights per leg (NaN = no order); ``stats_at_fill``
     must already be shifted so that the row of a fill carries the decision-day
-    stats. Order size uses ``capital`` as the equity scale.
+    stats. Order size uses ``capital`` as the equity scale. Orders in ``fx_legs``
+    (quoted in a foreign currency) also pay ``fx_conversion_bps``.
     """
     out = {}
     for leg in LEGS:
@@ -79,9 +82,16 @@ def order_costs(
         shares = delta.abs() * capital / s["price"]
         impact = cfg.impact.coefficient * s["sigma"] * np.sqrt(shares / s["adv"])
         buy_tax = np.where(delta > 0, cfg.buy_tax_bps / 1e4, 0.0)
-        cost = s["half_spread"] + impact + buy_tax
+        fx = cfg.fx_conversion_bps / 1e4 if leg in fx_legs else 0.0
+        cost = s["half_spread"] + impact + buy_tax + fx
         out[leg] = cost.where(delta.abs() > 0)
     return pd.DataFrame(out)
+
+
+def fx_legs(data_cfg: DictConfig) -> tuple[str, ...]:
+    """Legs converted into the dataset currency (``fx_per_unit`` in their source)."""
+    source = data_cfg.get("source") or {}
+    return tuple(leg for leg in LEGS if "fx_per_unit" in (source.get("legs") or {}).get(leg, {}))
 
 
 def borrow_charges(short_value: pd.Series, borrow_bps_annual: float, ann: int) -> pd.Series:

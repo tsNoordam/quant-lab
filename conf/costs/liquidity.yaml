@@ -23,7 +23,11 @@ impact:
   vol_lookback_days: 60
   adv_lookback_days: 20
 
-borrow_bps_annual: 50.0      # [IMPLEMENTATION-ASSUMPTION] stock loan fee on the short leg
+# Orders in a leg quoted in a foreign currency (data.source.legs.<leg>.fx_per_unit,
+# e.g. Royal Dutch in EUR for a GBP desk) also pay a spot FX conversion cost.
+fx_conversion_bps: 3.0       # [IMPLEMENTATION-ASSUMPTION] institutional spot FX, per order
+
+borrow_bps_annual: 50.0     # [IMPLEMENTATION-ASSUMPTION] stock loan fee on the short leg
 
 # UK stamp duty is 50 bps on cash purchases of UK shares; arbitrage desks usually
 # avoid it (intermediary relief, swaps/CFDs). 0 = assume relief; set 50 as a

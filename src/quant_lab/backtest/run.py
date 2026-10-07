@@ -193,7 +193,7 @@ def backtest_pair(
     cap = costs.participation_cap(stats, capital, c.limits.max_participation)
     held, orders = execution_targets(decisions, period, leg_weight, weight_cap=cap)
     at_fill = {leg: st.shift(1).reindex(orders.index) for leg, st in stats.items()}  # decision-day
-    order_cost = costs.order_costs(orders, at_fill, capital, c)
+    order_cost = costs.order_costs(orders, at_fill, capital, c, costs.fx_legs(cfg.data))
     pf = simulate(panel, orders, cfg, order_cost)
 
     short_value = pf.asset_value(group_by=False).clip(upper=0.0).sum(axis=1)
