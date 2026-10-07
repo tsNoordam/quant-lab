@@ -93,3 +93,25 @@ single trade was held for three years and closed by force at the period end.
   a choice informed by the results.
 - **Deflated Sharpe.** Use the MLflow trial count, which includes these 54
   training backtests.
+
+## Erratum 2026-10-07 (freeze audit, A1 and A2)
+
+Two defects found at the freeze audit change some numbers above. The original
+figures are left as reported.
+
+- **A1:** the RD/Shell parity is now 6.9558 instead of 6.863.
+- **A2:** no position is taken before the cost statistics exist.
+
+Corrected `silta_parity` figures (clean rerun at 9498679; details in
+`research/reports/audits/2026-10-07-freeze.md`):
+
+| Run | Corrected |
+|---|---|
+| RD/Shell train | Sharpe -0.08 (-9.4%), 28 entries |
+| RD/Shell validation | unchanged |
+| RD/Shell walk-forward | +0.02 (-0.7%) |
+| Reed train | +0.02 (-1.8%) |
+| DSR | 0.09 |
+
+`parity_zscore` is unchanged. **No conclusion changes:** neither strategy has
+an edge after costs.

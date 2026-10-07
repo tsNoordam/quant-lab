@@ -275,7 +275,7 @@ def run_tags(cfg: DictConfig, root: Path, panel_rel: str, git: dict, period: Per
 
 def run_params(cfg: DictConfig) -> dict[str, str]:
     resolved = OmegaConf.to_container(cfg, resolve=True)
-    skip = {"mlflow", "robustness"}  # not run settings (the robustness cases are a run list)
+    skip = {"mlflow", "robustness", "oos"}  # run lists, not run settings
     return mlflow_utils.flatten({k: v for k, v in resolved.items() if k not in skip})
 
 
@@ -321,7 +321,7 @@ def run_backtest(cfg: DictConfig, root: Path, overrides: list[str] | None = None
             pf.orders.records_readable.to_csv(tmp / "orders.csv", index=False)
             mlflow.log_artifacts(str(tmp))
 
-    return {"run_id": run.info.run_id, **metrics, **tags}
+    return {"run_id": run.info.run_id, **metrics, **tags, "equity": equity, "held": held}
 
 
 @hydra.main(version_base="1.3", config_path="../../../conf", config_name="config")

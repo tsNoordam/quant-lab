@@ -21,7 +21,8 @@ the next step started (see "Working in steps" in CLAUDE.md).
 | 6 | Paper extraction: `research/{extraction,equations,methodology,assumptions,evidence}/maymin_silta.*`; parity checked against the equalization agreements | d063320 |
 | 7 | SILTA regressions (`quant_lab.models.silta`), Newey-West as in R sandwich, causal variant, chi check. H1 not supported on 1987-99 data (RD/Shell b=+0.02, t 0.4; Reed Elsevier b=+0.08, t 1.9, sign unstable); `research/reports/silta_replication.md` | 5079cb1 |
 | 8 | Strategy registry; `silta_parity` (the SILTA arbitrageur: deviation from parity, 180 bps entry, exit at parity) with replication/extension specs and `run-backtest` skill. RD/Shell: train Sharpe -0.12, validation +0.14, walk-forward -0.02 (-3.5%) vs baseline -0.34 (-11.5%); cost-dominated, no edge after costs. `research/reports/silta_parity_rd_shell.md` | b555c5e, 21b18c9 |
-| 9 | Robustness runner (`quant_lab.backtest.robustness`), deflated Sharpe and MLflow trial count. 19 cases x 2 strategies: no positive net Sharpe in any realistic cost/capital/leverage/selection case; baseline gross WF Sharpe +0.75 consumed by costs; DSR 0.001 / 0.027 at 502 trials; Reed Elsevier at frozen values agrees. `research/reports/robustness_step9.md` | 895df80 + (this step) |
+| 9 | Robustness runner (`quant_lab.backtest.robustness`), deflated Sharpe and MLflow trial count. 19 cases x 2 strategies: no positive net Sharpe in any realistic cost/capital/leverage/selection case; baseline gross WF Sharpe +0.75 consumed by costs; DSR 0.001 / 0.027 at 502 trials; Reed Elsevier at frozen values agrees. `research/reports/robustness_step9.md` | 895df80, 0d96ef1 |
+| 10 | Freeze audit (auditor + red-team): FAIL fixed. A1 RD/Shell parity carried OOS share counts -> 6.9558; A2 warm-up zero-size positions and zero-cost orders -> fixed. OOS evaluation code and pre-registration frozen (`conf/oos/`, `research/specs/freeze/preregistration.md`); n_trials 600. Tags `freeze-parity_zscore`, `freeze-silta_parity`. `research/reports/audits/2026-10-07-freeze.md` | (this step) |
 
 ## Remaining, in order
 
@@ -52,15 +53,10 @@ after its ex-dividend drop, so it is never long RD over an RD ex-date in the
 walk-forward (withholding has no effect there). The paper's 5x leverage is
 outside the useful range of the metrics (equity near zero).
 
-10. **Freeze.** `/audit-backtest` and red-team on both strategies at their
-    current values (no tuning after step 9); a pre-registration note (expected
-    outcome: no positive net Sharpe; what OOS result would count as evidence,
-    e.g. DSR > 0.95 at the frozen trial count; how Rio Tinto's non-synchronous
-    closes are handled); git tag `freeze-<strategy>`. Whether to run step 11
-    at all is the user's decision.
-11. **One-shot out-of-sample evaluation.** 2000-2002 for `rd_shell` and
-    `reed_elsevier`, all of `rio_tinto`, with `+unlock_oos=true`, run once on the
-    frozen tag and reported whatever the outcome.
+11. **One-shot out-of-sample evaluation.** On the frozen tag, once:
+    `uv run python -m quant_lab.backtest.oos +unlock_oos=true` (6 primary runs +
+    3 secondary cases each, as pre-registered), reported whatever the outcome
+    against `research/specs/freeze/preregistration.md`.
 12. **Final report and reproducibility.** `research-report` skill and report;
     clean-clone reproduction (dvc pull, uv sync, dvc repro, pytest, headline
     runs match MLflow); CI on GitHub Actions running pytest + ruff on synthetic

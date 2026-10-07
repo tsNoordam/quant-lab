@@ -147,3 +147,14 @@ specification.
   in walk-forward, not tuned until it "works".
 - H2 calibration (eq. 1, Tables VII-VIII) stays deferred: the cost-bound sample
   is too small in our period.
+
+## Erratum 2026-10-07 (freeze audit A1)
+
+The RD/Shell parity used above (6.863, the workbook constant) carried
+post-1999 share-count information; it is now 6.9558 (pre-2000 share counts,
+`research/reports/data_decisions.md`). Recomputed on the development window:
+the regressions are unchanged (they do not use parity; `std_detrended`
+b = +0.016, t 0.44); the chi check is unchanged in every conclusion. Leg a's
+mean deviation from parity becomes +5.7% (was +7.1%), above parity on 79% of
+days (was 84%); chi in shares -1.41, in value +0.59; inside the cost bound on
+13% of days. The numbers above are left as originally reported.

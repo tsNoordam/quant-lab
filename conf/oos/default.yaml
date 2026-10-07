@@ -1,0 +1,58 @@
+# Pre-registered one-shot OOS evaluation (quant_lab.backtest.oos), ROADMAP step 11.
+# Written in step 10, before any OOS data was used; frozen with the freeze-* tag.
+# Rationale and predictions: research/specs/freeze/preregistration.md.
+#
+#   uv run python -m quant_lab.backtest.oos +unlock_oos=true
+#
+# Nothing in this file may change after the freeze tag. A bug found during the
+# run is fixed only if a test reproduces it on non-OOS data, in a new commit
+# with a new tag (-r1), and then ALL runs are repeated and both attempts reported.
+
+pairs: [rd_shell, reed_elsevier, rio_tinto]
+strategies: [parity_zscore, silta_parity]   # at their config values, no tuning
+
+# Secondary cases, all reported; nothing else is ever run on the OOS period.
+secondary:
+  zero_cost: [costs=flat_bps, costs.fee_bps=0, costs.slippage_bps=0]  # gross of trading costs
+  stamp_duty_50: [costs.buy_tax_bps=50]
+  impact_k_0.5: [costs.impact.coefficient=0.5]
+
+# Sub-periods: RD/Shell and Reed Elsevier split at 2002-07-01 (Royal Dutch left
+# the S&P 500 in July 2002); Rio Tinto at 2000-01-01 (its 1996-99 part shares
+# the calendar of the development data).
+subperiod_breaks:
+  rd_shell: ["2002-07-01"]
+  reed_elsevier: ["2002-07-01"]
+  rio_tinto: ["2000-01-01"]
+
+ex_date_window_days: 5     # entries filled within 5 trading days after an ex-date
+
+# Declared before the run: reported, but never read as evidence whatever the sign.
+not_evaluable:
+  - pair: rd_shell
+    strategy: silta_parity
+    reason: about one trade on a premium path shaped by known events (S&P removal July 2002)
+
+# Verdict for each (pair, strategy). "evidence of edge" needs ALL of:
+decision:
+  dsr_threshold: 0.95        # deflated Sharpe at the frozen n_trials and var_sr
+  min_entries_evidence: 10
+  max_top_trade_share: 0.5   # largest trade < 50% of absolute P&L
+  holm_alpha: 0.05           # Holm over the 6 primary runs, p = 1 - PSR(SR > 0)
+  min_entries_evaluable: 5   # fewer entries: "not evaluable"
+
+# The limits-to-arbitrage prediction: parity_zscore gross >= 0 and net < 0.
+prediction_pairs: [rd_shell, reed_elsevier]
+
+# Deflation inputs, from the clean development rerun at the freeze commit
+# (research/reports/audits/2026-10-07-freeze.md). Per-period (daily) units.
+# n_trials: distinct strategy configurations evaluated on rd_shell, counted in
+# both MLflow stores (the scratch store of steps 4c-9 and the clean freeze rerun),
+# parity ignored for parity_zscore (it drops out of the z-score): 600.
+# var_sr: variance of the walk-forward grid's training Sharpe ratios in the clean
+# rerun (summary run 5a731497fd9f46f5a52117566f059bd6), converted to daily units.
+deflation:
+  n_trials: 600
+  var_sr_per_period:
+    parity_zscore: 0.000288
+    silta_parity: 0.000097

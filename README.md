@@ -170,6 +170,18 @@ uv run python -m quant_lab.backtest.robustness data=reed_elsevier
 
 Results: `research/reports/robustness_step9.md`.
 
+## Freeze and one-shot out-of-sample evaluation (steps 10-11)
+
+The strategies, costs, deflation inputs and decision rules for the OOS run are
+frozen in `research/specs/freeze/preregistration.md` and `conf/oos/default.yaml`
+(tags `freeze-parity_zscore`, `freeze-silta_parity`). The evaluation runs only
+on a clean checkout of a `freeze-*` tag, and only with the explicit unlock:
+
+```bash
+git checkout freeze-silta_parity
+uv run python -m quant_lab.backtest.oos +unlock_oos=true
+```
+
 ## SILTA regressions (paper replication)
 
 Maymin's relative-price on relative-volume regressions with Newey-West errors,

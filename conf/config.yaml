@@ -13,6 +13,7 @@ defaults:
   - walkforward: default
   - silta: default
   - robustness: default
+  - oos: default
   - strategy: parity_zscore
   - costs: liquidity     # costs=flat_bps only as a labelled sensitivity case
   - backtest: default
