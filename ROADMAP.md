@@ -20,7 +20,8 @@ the next step started (see "Working in steps" in CLAUDE.md).
 | 5b | Fixes A1 (total-return dividends), A2 (locked quotes), A5 (FX cost); re-audit verdict WARNING. Walk-forward Sharpe -0.34, total -11.5% | befb58f |
 | 6 | Paper extraction: `research/{extraction,equations,methodology,assumptions,evidence}/maymin_silta.*`; parity checked against the equalization agreements | d063320 |
 | 7 | SILTA regressions (`quant_lab.models.silta`), Newey-West as in R sandwich, causal variant, chi check. H1 not supported on 1987-99 data (RD/Shell b=+0.02, t 0.4; Reed Elsevier b=+0.08, t 1.9, sign unstable); `research/reports/silta_replication.md` | 5079cb1 |
-| 8 | Strategy registry; `silta_parity` (the SILTA arbitrageur: deviation from parity, 180 bps entry, exit at parity) with replication/extension specs and `run-backtest` skill. RD/Shell: train Sharpe -0.12, validation +0.14, walk-forward -0.02 (-3.5%) vs baseline -0.34 (-11.5%); cost-dominated, no edge after costs. `research/reports/silta_parity_rd_shell.md` | b555c5e + (this step) |
+| 8 | Strategy registry; `silta_parity` (the SILTA arbitrageur: deviation from parity, 180 bps entry, exit at parity) with replication/extension specs and `run-backtest` skill. RD/Shell: train Sharpe -0.12, validation +0.14, walk-forward -0.02 (-3.5%) vs baseline -0.34 (-11.5%); cost-dominated, no edge after costs. `research/reports/silta_parity_rd_shell.md` | b555c5e, 21b18c9 |
+| 9 | Robustness runner (`quant_lab.backtest.robustness`), deflated Sharpe and MLflow trial count. 19 cases x 2 strategies: no positive net Sharpe in any realistic cost/capital/leverage/selection case; baseline gross WF Sharpe +0.75 consumed by costs; DSR 0.001 / 0.027 at 502 trials; Reed Elsevier at frozen values agrees. `research/reports/robustness_step9.md` | 895df80 + (this step) |
 
 ## Remaining, in order
 
@@ -46,16 +47,17 @@ strategy (`research/specs/replication/maymin_silta.md`); relative volume (H1)
 is not used as a signal (contemporaneous, and absent in our data); the
 walk-forward grid now lives in each strategy's config (`strategy.grid`).
 
-9. **Robustness and multiple testing.** `/robustness` on `parity_zscore` and
-   `silta_parity`: parameter neighbourhoods, cost and capital sensitivity
-   (stamp duty, impact k, fallback spread, leverage), sub-periods (pre/post the
-   1997 UK tax-credit change), the `reed_elsevier` validation pair at frozen
-   values, the corner-selection issue (A3), number of trials from MLflow and a
-   deflated Sharpe ratio.
-10. **Freeze.** `/audit-backtest` and red-team on the final candidate; a
-    pre-registration note (what OOS result would count as success or failure,
-    how Rio Tinto's non-synchronous closes are handled); git tag
-    `freeze-<strategy>`.
+Found in step 9: with the raw-close signal, the baseline buys Royal Dutch just
+after its ex-dividend drop, so it is never long RD over an RD ex-date in the
+walk-forward (withholding has no effect there). The paper's 5x leverage is
+outside the useful range of the metrics (equity near zero).
+
+10. **Freeze.** `/audit-backtest` and red-team on both strategies at their
+    current values (no tuning after step 9); a pre-registration note (expected
+    outcome: no positive net Sharpe; what OOS result would count as evidence,
+    e.g. DSR > 0.95 at the frozen trial count; how Rio Tinto's non-synchronous
+    closes are handled); git tag `freeze-<strategy>`. Whether to run step 11
+    at all is the user's decision.
 11. **One-shot out-of-sample evaluation.** 2000-2002 for `rd_shell` and
     `reed_elsevier`, all of `rio_tinto`, with `+unlock_oos=true`, run once on the
     frozen tag and reported whatever the outcome.

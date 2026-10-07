@@ -154,6 +154,22 @@ uv run python -m quant_lab.backtest.run data=rd_shell strategy=silta_parity
 uv run python -m quant_lab.backtest.walkforward data=rd_shell strategy=silta_parity
 ```
 
+## Robustness (step 9)
+
+Every case in `conf/robustness/default.yaml` (costs, dividends, capital and
+leverage, selection rule, fold design, a wider grid) for both strategies:
+walk-forward plus frozen-value train/validation runs on `rd_shell`, frozen
+values only elsewhere. The summary run (experiment `<data>.robustness`) holds
+sub-periods, volatility regimes, trade concentration, grid position and the
+deflated Sharpe ratio with the number of trials counted from MLflow.
+
+```bash
+uv run python -m quant_lab.backtest.robustness data=rd_shell        # ~35 min
+uv run python -m quant_lab.backtest.robustness data=reed_elsevier
+```
+
+Results: `research/reports/robustness_step9.md`.
+
 ## SILTA regressions (paper replication)
 
 Maymin's relative-price on relative-volume regressions with Newey-West errors,
