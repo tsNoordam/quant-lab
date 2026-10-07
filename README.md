@@ -154,6 +154,19 @@ uv run python -m quant_lab.backtest.run data=rd_shell strategy=silta_parity
 uv run python -m quant_lab.backtest.walkforward data=rd_shell strategy=silta_parity
 ```
 
+## Paper 2: de Jong, Rosenthal & van Dijk (2009)
+
+Paper-convention panels for all 12 dual-listed companies (`conf/dlc/<twin>.yaml`,
+DVC stage `dlc_ingest`), each checked row by row against the authors' own
+deviation-from-parity column, and the Table II replication:
+
+```bash
+uv run dvc repro dlc_ingest
+uv run python -m quant_lab.models.dejong      # MLflow experiment dejong.replication
+```
+
+Results: `research/reports/dejong_table2.md`. Notes: `research/*/dejong_dlc.md`.
+
 ## Robustness (step 9)
 
 Every case in `conf/robustness/default.yaml` (costs, dividends, capital and

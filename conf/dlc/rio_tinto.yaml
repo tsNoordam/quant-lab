@@ -1,0 +1,15 @@
+# Rio Tinto Ltd (Sydney) / Rio Tinto PLC (London). de Jong et al. (2009) twin.
+# Closes ~10 hours apart (non-synchronous).
+name: rio_tinto
+paper_name: Rio Tinto
+interim_path: data/interim/dlc/rio_tinto.parquet
+table_i: {countries: Australia/United Kingdom, time_diff_hours: -10, structure: separate entities,
+          merger: "1995-12-21", unification_announced: null, unification: null}
+window: {start: "1995-12-21", end: "2002-10-03"}
+source:
+  archive: data/raw/datastream_dlc/RioTinto.zip
+  workbook: Rio Tinto data.xls
+  legs:
+    a: {sheet: Rio Tinto Ltd, price: 905473(P), total_return: 905473(RI), fx_per_b: "# AUS$ per £"}
+    b: {sheet: Rio Tinto PLC, price: 901714(P), total_return: 901714(RI)}
+  ratio: {sheet: Ratio, theoretical_ratio: THEORETICAL RATIO, deviation: LOG DEVIATIONS FROM PARITY}

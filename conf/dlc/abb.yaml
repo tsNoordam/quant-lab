@@ -1,0 +1,15 @@
+# ABB AG (bearer) / ABB AB (A shares). de Jong et al. (2009) paper-convention twin.
+# The window ends 20 trading days before the unification announcement (Table II).
+name: abb
+paper_name: ABB
+interim_path: data/interim/dlc/abb.parquet
+table_i: {countries: Switzerland/Sweden, time_diff_hours: 0, structure: combined entities,
+          merger: "1991-07-08", unification_announced: "1999-02-04", unification: "1999-06-25"}
+window: {start: "1991-07-08", end: "1999-01-07"}
+source:
+  archive: data/raw/datastream_dlc/ABB.zip
+  workbook: ABB data.xls
+  legs:
+    a: {sheet: ABB AG, price: 922924(P), total_return: 922924(RI), fx_per_b: "# CHF per SEK"}
+    b: {sheet: ABB AB, price: 929515(P), total_return: 929515(RI)}
+  ratio: {sheet: Ratio, theoretical_ratio: THEORETICAL RATIO, deviation: LOG DEVIATIONS FROM PARITY}

@@ -1,19 +1,28 @@
 {
   "dataset": "datastream_dlc",
-  "description": "Daily Datastream (and some Bloomberg) data on dual-listed company pairs, compiled for academic DLC research; workbooks dated June 2008, plus equalization agreements and press clippings.",
+  "description": "Daily Datastream (and some Bloomberg) data on the 12 dual-listed companies of de Jong, Rosenthal & van Dijk (2009), compiled for academic DLC research; workbooks dated June 2008, plus equalization agreements, prospectuses and press clippings.",
   "source": "https://www.mathijsavandijk.com/dual-listed-companies (Mathijs A. van DIJK)",
   "license": "Thomson Reuters Datastream data: licensed, do not redistribute. Kept in DVC only, never committed to Git.",
-  "layout": "data/raw/datastream_dlc/<Pair>.zip, original archives, unmodified",
+  "layout": "data/raw/datastream_dlc/<Pair>.zip, original archives, unmodified (12 files)",
   "files": {
     "RoyalDutchShell.zip": {"md5": "14d3a7e732e35c84c80573cf021ffb51", "workbooks": ["RD Shell data.xls", "RD Shell data - update and unification.xls", "RD Shell ADR data.xls"]},
     "Unilever.zip": {"md5": "cea207a475d9ba9f0444376b82df8782", "workbooks": ["Unilever data.xls", "Unilever ADR data.xls"]},
     "ReedElsevier.zip": {"md5": "076d7b5411f656eac76a2620509f0ed1", "workbooks": ["Reed Elsevier data incl S.xls", "Reed Elsevier ADR data.xls"]},
-    "RioTinto.zip": {"md5": "1cd544ecf8c39eab65e5522c29a0c37d", "workbooks": ["Rio Tinto data.xls", "Rio Tinto ADR data Datastream.xls", "Rio Tinto ADR data Bloomberg - Datastream.xls"]}
+    "RioTinto.zip": {"md5": "1cd544ecf8c39eab65e5522c29a0c37d", "workbooks": ["Rio Tinto data.xls", "Rio Tinto ADR data Datastream.xls", "Rio Tinto ADR data Bloomberg - Datastream.xls"]},
+    "ABB.zip": {"md5": "1649fbb43b188a5cfbb88f92a4312270", "workbooks": ["ABB data.xls", "ABB ADR data.xls"]},
+    "BHP.zip": {"md5": "c1d3b9a34abe1e7ae6c0d2992afd4c31", "workbooks": ["BHP Billiton data.xls", "BHP Billiton ADR data.xls"]},
+    "Dexia.zip": {"md5": "9cabd6150447dd8acf6c846e4079dc3b", "workbooks": ["Dexia data.xls"]},
+    "Fortis.zip": {"md5": "3565e21cfcb31eaaf656371746aaeff7", "workbooks": ["Fortis data.xls"]},
+    "MeritaNordbanken.zip": {"md5": "01c4f1632baed6514f992987394824ad", "workbooks": ["MeritaNordbanken data.xls"]},
+    "Smithkline.zip": {"md5": "24974ff272db6915fdb38d1aa15582b2", "workbooks": ["SmithKline data.xls"]},
+    "ZurichAllied.zip": {"md5": "0fef0e7d78b029eb4a19d9cef6273a57", "workbooks": ["Allied Zurich data.xls", "Allied Zurich ADR data.xls"]},
+    "brambles.zip": {"md5": "9d2c3410bffc753cf02b47c451f8928d", "workbooks": ["Brambles data.xls"]}
   },
   "calendar": "business_daily (Datastream pads exchange holidays with the previous price)",
   "timezone": "naive exchange-local dates",
   "known_issues": [
     "Dates exported as dd/mm/yy: days 1-12 stored by Excel as month/day, days 13-31 as text. Repaired in quant_lab.data.datastream.",
+    "Smithkline Beecham sheets are Bloomberg exports: m/d/yyyy text dates, total returns as daily log returns, both legs in US$; the workbook's H/E price ratio is 2 x the two price columns (an ADR/unit conversion), reproduced in conf/dlc/smithkline.yaml.",
     "Excel #N/A error cells (code 42) mean missing.",
     "UK prices in pence except Rio Tinto PLC price (divided by 100 by the workbook author); UK quotes in pence.",
     "Dutch legs in EUR (ex-NLG); Rio Tinto Ltd in AUD; FX per GBP included per workbook.",
@@ -21,9 +30,11 @@
     "Workbooks extracted at different times use different split adjustments (e.g. Royal Dutch x2): never mix files of one pair.",
     "Unilever NV price stale on most days before ~1993; NV quotes unreliable (median spread 165-420 bps).",
     "Unilever NV 'TURNOVER BY VOLUME' is ~0.0007% of NV shares outstanding per day (other legs 0.2-0.7%): not primary-market volume. conf/data/unilever.yaml sets volume_reliable: false.",
-    "Rio Tinto Ltd (Sydney) and PLC (London) closes are non-synchronous.",
-    "FX per GBP is Datastream's daily rate; its fixing time relative to the Amsterdam/Sydney close is not documented in the workbooks. GBP-converted foreign legs (close = price / fx) therefore may not be exactly tradable at the reported close. FX conversion is costed by costs.fx_conversion_bps (audit 2026-10-07, A5)."
+    "Rio Tinto, BHP Billiton and Brambles: Sydney and London closes are ~10 hours apart (non-synchronous).",
+    "FX per GBP is Datastream's daily rate; its fixing time relative to the Amsterdam/Sydney close is not documented in the workbooks. GBP-converted foreign legs (close = price / fx) therefore may not be exactly tradable at the reported close. FX conversion is costed by costs.fx_conversion_bps (audit 2026-10-07, A5).",
+    "Dexia: one-day spike on 1997-12-19 (log deviation -32.4%, reversing the next day); the archive contains 'Dexia outlier causes 19 December 1997.doc'. The paper's Table II minimum (-17.66%) does not contain it. Kept as delivered (raw is immutable); treatment decided in ROADMAP step 16.",
+    "Dexia and Fortis: Table II statistics from these workbooks differ from the paper's beyond rounding (research/reports/dejong_table2.md), most likely a different data version than the paper used."
   ],
-  "used_by": ["conf/data/rd_shell.yaml", "conf/data/reed_elsevier.yaml", "conf/data/rio_tinto.yaml"],
-  "not_used": {"Unilever.zip": "dropped 2026-10-07, see research/reports/data_decisions.md"}
+  "used_by": ["conf/data/rd_shell.yaml", "conf/data/reed_elsevier.yaml", "conf/data/rio_tinto.yaml", "conf/dlc/*.yaml (all 12 archives, de Jong et al. replication)"],
+  "not_used": {"Unilever.zip": "not used by the lab's ingest (dropped 2026-10-07, research/reports/data_decisions.md); used by conf/dlc/unilever.yaml"}
 }

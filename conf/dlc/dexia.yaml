@@ -1,0 +1,14 @@
+# Dexia France / Dexia Belgium. de Jong et al. (2009) paper-convention twin.
+name: dexia
+paper_name: Dexia
+interim_path: data/interim/dlc/dexia.parquet
+table_i: {countries: France/Belgium, time_diff_hours: 0, structure: combined entities,
+          merger: "1996-11-19", unification_announced: "1999-09-19", unification: "1999-11-26"}
+window: {start: "1996-11-19", end: "1999-08-20"}
+source:
+  archive: data/raw/datastream_dlc/Dexia.zip
+  workbook: Dexia data.xls
+  legs:
+    a: {sheet: Dexia France, price: 307419(P), total_return: 307419(RI), fx_per_b: "# FF(€) per BEF(€)"}
+    b: {sheet: Dexia Belgium, price: 885000(P), total_return: 885000(RI)}
+  ratio: {sheet: Ratio, theoretical_ratio: THEORETICAL RATIO, deviation: LOG DEVIATIONS FROM PARITY}

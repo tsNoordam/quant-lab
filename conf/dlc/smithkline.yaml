@@ -1,0 +1,21 @@
+# Smithkline Beecham H shares (ADR on the UK A shares) / E shares (US equity units,
+# stapled stock). de Jong et al. (2009) paper-convention twin. Bloomberg data
+# (paper p. 500): m/d/yyyy text dates, total returns as daily log returns.
+name: smithkline
+paper_name: Smithkline Beecham
+interim_path: data/interim/dlc/smithkline.parquet
+table_i: {countries: United Kingdom/United States, time_diff_hours: -5, structure: stapled stock,
+          merger: "1989-07-26", unification_announced: "1996-02-20", unification: "1996-04-12"}
+window: {start: "1989-07-26", end: "1996-01-22"}
+source:
+  archive: data/raw/datastream_dlc/Smithkline.zip
+  workbook: SmithKline data.xls
+  legs:
+    # [IMPLEMENTATION-ASSUMPTION] price_scale 2: the workbook's PRICE H/PRICE E ratio is
+    # exactly 2 x the two price columns on every row (an ADR/unit conversion the
+    # workbook applies); reproduced, not derived. Both legs in US$.
+    a: {sheet: Smithkline Beecham H Shares, price: PRICE H shares, price_scale: 2.0,
+        total_return: TOTAL RETURN H shares, total_return_kind: log_return}
+    b: {sheet: Smithkline Beecham E Shares, price: PRICE E shares,
+        total_return: TOTAL RETURN E shares, total_return_kind: log_return}
+  ratio: {sheet: Ratio, theoretical_ratio: THEORETICAL RATIO, deviation: LOG DEVIATIONS FROM PARITY}

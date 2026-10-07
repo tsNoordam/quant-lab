@@ -1,0 +1,14 @@
+# Elsevier NV / Reed International PLC. de Jong et al. (2009) paper-convention twin.
+name: reed_elsevier
+paper_name: Elsevier/Reed International
+interim_path: data/interim/dlc/reed_elsevier.parquet
+table_i: {countries: Netherlands/United Kingdom, time_diff_hours: -1, structure: combined entities,
+          merger: "1993-01-01", unification_announced: null, unification: null}
+window: {start: "1993-01-01", end: "2002-10-03"}
+source:
+  archive: data/raw/datastream_dlc/ReedElsevier.zip
+  workbook: Reed Elsevier data incl S.xls
+  legs:
+    a: {sheet: Elsevier, price: 981526(P), total_return: 981526(RI), fx_per_b: "# NLG(€) per £"}
+    b: {sheet: Reed International, price: 901080(P), total_return: 901080(RI), price_scale: 0.01}
+  ratio: {sheet: Ratio, theoretical_ratio: THEORETICAL RATIO, deviation: LOG DEVIATIONS FROM PARITY}

@@ -37,6 +37,8 @@ import xlrd
 from omegaconf import DictConfig, OmegaConf
 
 TEXT_DATE = re.compile(r"^\d{2}/\d{2}/\d{2}$")
+# Bloomberg exports (e.g. the Smithkline Beecham workbook) write m/d/yyyy text.
+TEXT_DATE_US = re.compile(r"^\d{1,2}/\d{1,2}/\d{4}$")
 EXCEL_SERIAL_RANGE = (20_000, 50_000)  # 1954-10-03 .. 2036-11-21
 
 
@@ -67,9 +69,16 @@ class Sheet:
     header: list[list[str]]  # rows above the data, normalized text per column
     data: pd.DataFrame  # one float column per sheet column (1-based), NaN if not a number
 
-    def column(self, label: str) -> pd.Series:
+    def column(self, label: str, exclude: str | None = None) -> pd.Series:
+        """The one column with a header row equal to ``label``; columns with any header
+        row containing ``exclude`` are skipped (e.g. an absolute-value duplicate)."""
         want = normalize(label)
-        hits = [c for c in self.data.columns if any(row[c] == want for row in self.header)]
+        hits = [
+            c
+            for c in self.data.columns
+            if any(row[c] == want for row in self.header)
+            and not (exclude and any(exclude in row[c] for row in self.header))
+        ]
         if len(hits) != 1:
             raise DatastreamFormatError(
                 f"sheet '{self.name}': header '{label}' matches {len(hits)} columns"
@@ -89,6 +98,8 @@ def read_sheet(book: xlrd.Book, name: str) -> Sheet:
             entries.append(("cell", xlrd.xldate_as_datetime(value, book.datemode).date()))
         elif kind == xlrd.XL_CELL_TEXT and TEXT_DATE.match(value.strip()):
             entries.append(("text", dt.datetime.strptime(value.strip(), "%d/%m/%y").date()))
+        elif kind == xlrd.XL_CELL_TEXT and TEXT_DATE_US.match(value.strip()):
+            entries.append(("text", dt.datetime.strptime(value.strip(), "%m/%d/%Y").date()))
         else:
             continue
         rows.append(r)

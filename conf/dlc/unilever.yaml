@@ -1,0 +1,16 @@
+# Unilever NV / PLC. de Jong et al. (2009) paper-convention twin. Not used by the
+# Maymin work (NV volume unusable); the paper's rules use no volume.
+name: unilever
+paper_name: Unilever
+interim_path: data/interim/dlc/unilever.parquet
+table_i: {countries: Netherlands/United Kingdom, time_diff_hours: -1, structure: separate entities,
+          merger: "1930", unification_announced: null, unification: null}
+window: {start: "1980-01-01", end: "2002-10-03"}
+source:
+  archive: data/raw/datastream_dlc/Unilever.zip
+  workbook: Unilever data.xls
+  legs:
+    a: {sheet: UNILEVER NV, price: 932911(P), total_return: 932911(RI), fx_per_b: "# NLG(€) per £"}
+    b: {sheet: UNILEVER PLC, price: 900789(P), total_return: 900789(RI), price_scale: 0.01}
+  ratio: {sheet: Ratio, theoretical_ratio: THEORETICAL RATIO, deviation: LOG DEVIATIONS FROM PARITY,
+          deviation_exclude: absolute value}

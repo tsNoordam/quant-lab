@@ -10,8 +10,9 @@
 #   data/raw/datastream_dlc (dvc add) --ingest--> data/interim/<pair> --preprocess--> data/processed/<pair>
 #   data/raw/synthetic_twin (dvc add) ---------------------------------preprocess--> data/processed/synthetic_twin
 #
-# Unilever.zip stays in data/raw/datastream_dlc but is not ingested
-# (see research/reports/data_decisions.md).
+# Unilever.zip is not ingested by the lab's `ingest` stage (unusable NV volume,
+# research/reports/data_decisions.md); the paper replication (`dlc_ingest`) uses
+# it, as its rules need no volume.
 
 stages:
   ingest:
@@ -33,6 +34,40 @@ stages:
         - data/interim/${item}
       metrics:
         - data/interim/${item}.ingest.json:
+            cache: false
+
+  # de Jong, Rosenthal & van Dijk (2009) replication: paper-convention twin panels
+  # (all workbook rows in the paper's Table II window, deviation checked against
+  # the authors' own column). Independent of the lab's ingest/preprocess above.
+  dlc_ingest:
+    foreach:
+      - abb
+      - bhp_billiton
+      - brambles
+      - dexia
+      - fortis
+      - merita_nordbanken
+      - rd_shell
+      - reed_elsevier
+      - rio_tinto
+      - smithkline
+      - unilever
+      - zurich_allied
+    do:
+      cmd: python -m quant_lab.data.dlc --twin ${item}
+      deps:
+        - data/raw/datastream_dlc
+        - src/quant_lab/data/dlc.py
+        - src/quant_lab/data/datastream.py
+      params:
+        - conf/dlc/${item}.yaml:
+            - window
+            - source
+            - interim_path
+      outs:
+        - data/interim/dlc/${item}.parquet
+      metrics:
+        - data/interim/dlc/${item}.ingest.json:
             cache: false
 
   preprocess:

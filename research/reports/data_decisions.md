@@ -3,6 +3,36 @@
 Decisions that shape what the lab can conclude, with the evidence behind them.
 Newest first. Each entry is fixed once a result depends on it.
 
+## 2026-10-07: Sample design for the de Jong et al. (2009) replication (paper 2, step 14)
+
+**User decision (2026-10-07).** The paper-2 replication uses the paper's own
+windows (Table II), 1980-2002, including 2000-01-01 .. 2002-10-03. That period
+was locked OOS for the Maymin strategies and was used once in step 11.
+
+| Twin | Window (Table II) | Role |
+|---|---|---|
+| all 12 DLCs (`conf/dlc/`) | merger date (1980-01-01 for RD/Shell and Unilever) to 20 trading days before the unification announcement, or 2002-10-03 | replication of a published in-sample result |
+
+What this decision does:
+
+- **It does not change step 11.** That one-shot evaluation of the frozen
+  Maymin strategies is complete and stays as reported.
+- **No OOS period is left in this dataset for paper 2.** No new strategy
+  developed from this paper can claim an out-of-sample test on this data. A
+  real test needs data after 2002-10-03.
+- **Analyses that read 2000-02 rows are tagged `unlock_oos=true`** in MLflow.
+
+Data conventions for the replication (`quant_lab.data.dlc`):
+
+- every workbook row in the window is kept, as delivered (no volume filter,
+  holiday-padded prices included);
+- theoretical ratios are the workbook's own: for RD/Shell the paper's 6.863,
+  not the lab's 6.9558, which is used only by the Maymin strategies;
+- the deviation must reproduce the authors' column to 1e-9 on every row.
+
+The Dexia spike of 1997-12-19 is kept as delivered. Its treatment for the
+trading replication is decided in step 16, before any strategy is run.
+
 ## 2026-10-07: RD/Shell parity from pre-2000 share counts (freeze audit A1)
 
 The workbook's constant parity 6.863 cannot be derived from information before

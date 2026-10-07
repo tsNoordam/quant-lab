@@ -70,22 +70,18 @@ a numerical replication is possible. Branch: work on `claude/sharp-bohr-snz350`
 
 | Step | What | Commit |
 |---|---|---|
-| 13 | Paper extraction: `research/{extraction,equations,methodology,assumptions}/dejong_dlc.md`, evidence CSV (539 rows: Tables II-VI, sensitivity, unifications); ambiguities D1-D12; review | (this step) |
+| 13 | Paper extraction: `research/{extraction,equations,methodology,assumptions}/dejong_dlc.md`, evidence CSV (539 rows: Tables II-VI, sensitivity, unifications); ambiguities D1-D12; review | 947f8a9 |
+| 14 | All 12 DLCs: paper-convention panels (`quant_lab.data.dlc`, `conf/dlc/`, DVC stage `dlc_ingest`) reproducing the authors' deviation column on every row; Table II replicated (`quant_lab.models.dejong`): 58/72 statistics within rounding, differences documented (Rio sign, ABB st. dev., Dexia and Fortis data versions); user approved the full 1980-2002 windows. `research/reports/dejong_table2.md` | (this step) |
 
 Planned, in order:
 
-14. **Data for all 12 DLCs.** Ingest configs for the 8 new workbooks (sheets,
-    units, theoretical ratio from the workbook), validation, per-twin sample
-    windows of Table II (unified twins end 20 trading days before the
-    announcement). Reproduce Table II from our panels. Sample-design decision
-    recorded in `data_decisions.md`, including whether the replication may
-    touch 2000-02 (`+unlock_oos`; the user's call).
 15. **Comovement (Table III).** Regression E2 with Newey-West errors from the
     workbooks' `Regression data`; compare with the paper per twin.
 16. **Paper-convention arbitrage engine (Tables IV-V).** Threshold strategy
     with Reg T margin account, maintenance calls, fixed interest, flat costs
-    and the T-bill padding convention; resolve D1-D12 against the per-twin
-    table values; all eight strategies.
+    and the T-bill padding convention; resolve D2-D11 against the per-twin
+    table values; all eight strategies. Decide the Dexia 1997-12-19 spike
+    treatment before running (report both).
 17. **Abnormal returns (Table VI).** Fama-French factors and 3-month T-bill
     (public data, versioned with DVC); FF3 and IAPM alphas, risk statistics.
 18. **Our standard.** The same rules through the lab's engine (liquidity

@@ -1,0 +1,15 @@
+# Zurich Allied AG (Zurich) / Allied Zurich PLC (London). de Jong et al. (2009) twin.
+name: zurich_allied
+paper_name: Zürich Allied/Allied Zürich
+interim_path: data/interim/dlc/zurich_allied.parquet
+table_i: {countries: Switzerland/United Kingdom, time_diff_hours: -1, structure: combined entities,
+          merger: "1998-09-07", unification_announced: "2000-04-17", unification: "2000-10-13"}
+window: {start: "1998-09-07", end: "2000-03-20"}
+source:
+  archive: data/raw/datastream_dlc/ZurichAllied.zip
+  workbook: Allied Zurich data.xls
+  legs:
+    a: {sheet: Zurich Allied AG, price: 929733(P), total_return: 929733(RI), fx_per_b: "# CHF per £"}
+    b: {sheet: Allied Zurich PLC, price: 686714(P), total_return: 686714(RI), price_scale: 0.01}
+  ratio: {sheet: Ratio, theoretical_ratio: THEORETICAL RATIO, deviation: LOG DEVIATIONS FROM PARITY,
+          deviation_exclude: absolute value}
