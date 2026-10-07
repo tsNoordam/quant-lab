@@ -1,5 +1,6 @@
 import math
 
+import numpy as np
 import pandas as pd
 import pytest
 from omegaconf import OmegaConf
@@ -70,6 +71,23 @@ def test_neighbourhood_mean_prefers_stable_regions():
     assert score[(4, 1.0)] == pytest.approx(1.0)  # (1 + 1 + 1) / 3
     assert max(raw, key=raw.get) == (1, 1.0)  # "best" picks the spike
     assert max(score, key=score.get) == (4, 1.0)  # neighbourhood picks the plateau
+
+
+def test_neighbourhood_mean_favours_grid_corners_under_noise():
+    # Audit 2026-10-07 A3 (WARNING, documented): corners average fewer members, so
+    # their scores vary more and win more often under pure noise. This pins the
+    # measured bias so that any change to the selection rule is a visible decision.
+    grid = OmegaConf.create({"window": [40, 60, 80, 120], "entry_z": [1.5, 2.0, 2.5],
+                             "exit_z": [0.0, 0.5]})  # fmt: skip
+    names, combos = parameter_grid(grid)
+    corners = {c for c in combos if c[0] in (40, 120) and c[1] in (1.5, 2.5)}
+    rng = np.random.default_rng(0)
+    draws, hits = 4000, 0
+    for _ in range(draws):
+        s = neighbourhood_scores(names, grid, {c: rng.normal() for c in combos})
+        hits += max(s, key=lambda c: (s[c], tuple(-x for x in c))) in corners
+    uniform = len(corners) / len(combos)
+    assert hits / draws > 1.25 * uniform  # measured: ~0.47 vs uniform 0.33
 
 
 def test_neighbourhood_mean_ignores_invalid_points():

@@ -1,11 +1,13 @@
 """Walk-forward selection sees only its training window; the OOS period is never used."""
 
+import copy
 import shutil
 from pathlib import Path
 
 import pandas as pd
 import pytest
 from hydra import compose, initialize_config_dir
+from omegaconf import open_dict
 
 from quant_lab.backtest.run import BacktestGuardError
 from quant_lab.backtest.walkforward import walk_forward
@@ -64,6 +66,18 @@ def test_selection_and_test_returns_ignore_later_data(setup):
     result = walk_forward(cfg, shocked_after(panel, day_before_test))
     chosen = [c for c in base["folds"] if c.startswith("chosen_") or c.startswith("train_")]
     pd.testing.assert_frame_equal(base["folds"].iloc[:2][chosen], result["folds"].iloc[:2][chosen])
+
+
+def test_backtest_period_and_oos_unlock_do_not_affect_walk_forward(setup):
+    # Audit 2026-10-07 A8: the walk-forward range comes from the split file alone.
+    cfg, panel, base = setup
+    other = copy.deepcopy(cfg)
+    with open_dict(other):
+        other.backtest.period = "oos"
+        other.unlock_oos = True
+    result = walk_forward(other, panel)
+    pd.testing.assert_frame_equal(base["folds"], result["folds"])
+    pd.testing.assert_series_equal(base["equity"], result["equity"])
 
 
 def test_oos_only_datasets_are_refused(setup):

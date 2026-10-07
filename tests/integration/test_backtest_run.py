@@ -170,6 +170,36 @@ def test_walk_forward_run_is_logged(project):
     assert result["folds"]["test_end"].max() <= pd.Timestamp(cfg.split.validation.end).date()
 
 
+def test_walk_forward_run_logs_costs_trades_and_trials(project):
+    # Audit 2026-10-07 A4: CLAUDE.md requires costs, number of trades and leverage on
+    # every run; a walk-forward run must also disclose how many trials it made, and
+    # must not log single-run settings it does not use.
+    from quant_lab.backtest.walkforward import run_walk_forward
+
+    cfg = config(
+        project,
+        "walkforward.grid.window=[40,80]",
+        "walkforward.grid.entry_z=[2.0]",
+        "walkforward.grid.exit_z=[0.5]",
+    )
+    run = mlflow.get_run(run_walk_forward(cfg, project)["run_id"])
+    expected = {
+        "wf_n_orders",
+        "wf_cost_spread_impact_tax",
+        "wf_cost_commission",
+        "wf_cost_borrow",
+        "wf_entries_capped",
+        "wf_quoted_spread_share",
+        "wf_gross_leverage",
+        "wf_n_trials",
+    }
+    assert expected <= set(run.data.metrics)
+    assert run.data.metrics["wf_n_trials"] == 2 * run.data.metrics["wf_n_folds"]
+    assert run.data.metrics["wf_gross_leverage"] == 2 * cfg.strategy.leg_weight
+    unused = {"backtest.period", "strategy.window", "strategy.entry_z", "strategy.exit_z"}
+    assert not unused & set(run.data.params)
+
+
 def test_hydra_cli_end_to_end(project, tmp_path):
     cmd = [
         sys.executable,

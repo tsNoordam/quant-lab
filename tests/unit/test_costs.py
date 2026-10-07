@@ -88,6 +88,19 @@ def test_impact_grows_with_the_square_root_of_size():
     assert large.iloc[0, 0] == pytest.approx(2 * small.iloc[0, 0])
 
 
+@pytest.mark.xfail(
+    strict=True,
+    reason="audit 2026-10-07 A2 CONFIRMED: bid == ask is treated as a valid zero spread",
+)
+def test_locked_quotes_are_not_a_zero_spread():
+    # Locked (bid == ask) quotes are a data artefact, not a free market: treat as missing.
+    df = panel()
+    df["bid_a"] = df["close_a"]
+    df["ask_a"] = df["close_a"]
+    stats = costs.market_stats(df, "a", CFG)
+    assert (stats["half_spread"] > 0).all()
+
+
 def test_borrow_charges_accrue_on_the_short_value():
     charges = costs.borrow_charges(pd.Series([-500_000.0, 0.0]), 50.0, 252)
     assert charges.tolist() == pytest.approx([500_000 * 0.005 / 252, 0.0])
