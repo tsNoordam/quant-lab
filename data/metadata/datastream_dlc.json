@@ -24,5 +24,6 @@
     "Rio Tinto Ltd (Sydney) and PLC (London) closes are non-synchronous.",
     "FX per GBP is Datastream's daily rate; its fixing time relative to the Amsterdam/Sydney close is not documented in the workbooks. GBP-converted foreign legs (close = price / fx) therefore may not be exactly tradable at the reported close. FX conversion is costed by costs.fx_conversion_bps (audit 2026-10-07, A5)."
   ],
-  "used_by": ["conf/data/rd_shell.yaml", "conf/data/unilever.yaml", "conf/data/reed_elsevier.yaml", "conf/data/rio_tinto.yaml"]
+  "used_by": ["conf/data/rd_shell.yaml", "conf/data/reed_elsevier.yaml", "conf/data/rio_tinto.yaml"],
+  "not_used": {"Unilever.zip": "dropped 2026-10-07, see research/reports/data_decisions.md"}
 }

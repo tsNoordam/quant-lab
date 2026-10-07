@@ -45,6 +45,15 @@ multirun/
 # Claude Code: personal overrides stay local
 .claude/settings.local.json
 
+# Node artefacts from installing tools inside the repo (this is not a JS project).
+# Untracked files here would otherwise tag every MLflow run as git_dirty=true.
+node_modules/
+package.json
+package-lock.json
+
+# Claude Code local state
+.claude/claude.json
+
 # Temporary files
 tmp/
 .cache/
