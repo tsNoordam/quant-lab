@@ -24,7 +24,8 @@ def market_stats(panel: pd.DataFrame, leg: str, cfg: DictConfig) -> pd.DataFrame
     """Per-day liquidity statistics of one leg, as of each close.
 
     half_spread  rolling median quoted half-spread (fraction of mid), falling back to
-                 ``spread.fallback_half_spread_bps`` without enough recent quotes
+                 ``spread.fallback_half_spread_bps`` without enough recent quotes;
+                 locked (bid == ask) and crossed quotes count as missing
     sigma        rolling std of daily log close returns
     adv          rolling mean daily volume, in shares
     price        close (used to convert notional into shares)
@@ -33,7 +34,7 @@ def market_stats(panel: pd.DataFrame, leg: str, cfg: DictConfig) -> pd.DataFrame
     sp = cfg.spread
     if f"bid_{leg}" in panel and f"ask_{leg}" in panel:
         bid, ask = panel[f"bid_{leg}"], panel[f"ask_{leg}"]
-        quoted = ((ask - bid) / ((ask + bid) / 2) / 2).where(ask >= bid)
+        quoted = ((ask - bid) / ((ask + bid) / 2) / 2).where(ask > bid)
     else:
         quoted = pd.Series(np.nan, index=panel.index)
     half_spread = quoted.rolling(sp.lookback_days, min_periods=sp.min_quote_days).median()

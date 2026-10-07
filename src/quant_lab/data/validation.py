@@ -16,6 +16,7 @@ Severity = Literal["error", "warning"]
 PRICE_COLUMNS = ("open", "high", "low", "close", "adj_close")
 MAX_QUOTE_UNIT_OFFSET = 0.05
 MAX_MEDIAN_SPREAD_BPS = 100.0
+MAX_LOCKED_QUOTE_FRAC = 0.05
 
 
 @dataclass(frozen=True)
@@ -130,6 +131,17 @@ def _check_quotes(df: pd.DataFrame, name: str) -> list[Issue]:
     crossed = both.index[(both["bid"] > both["ask"]).to_numpy()]
     if len(crossed):
         issues.append(Issue("crossed_quotes", "warning", f"{name}: bid > ask on {_dates(crossed)}"))
+    # Locked quotes (bid == ask) are a recording artefact, not a free market; the
+    # cost model treats them as missing (quant_lab.backtest.costs.market_stats).
+    locked = float((both["bid"] == both["ask"]).mean()) if len(both) else 0.0
+    if locked > MAX_LOCKED_QUOTE_FRAC:
+        issues.append(
+            Issue(
+                "locked_quotes",
+                "warning",
+                f"{name}: bid == ask on {locked:.1%} of quoted days; treated as missing",
+            )
+        )
     if len(both):
         mid = (both["bid"] + both["ask"]) / 2
         spread_bps = float(((both["ask"] - both["bid"]) / mid).median() * 1e4)

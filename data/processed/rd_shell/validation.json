@@ -15,6 +15,7 @@
   "stale_rows_b": 0,
   "warnings": [
     "[warning:crossed_quotes] a:ROYAL_DUTCH: bid > ask on 1996-06-05, 1996-09-03, 1996-09-23, 1996-11-01, 1996-11-21 (+17 more)",
+    "[warning:locked_quotes] a:ROYAL_DUTCH: bid == ask on 22.1% of quoted days; treated as missing",
     "[warning:crossed_quotes] b:SHELL: bid > ask on 2001-09-06"
   ]
 }

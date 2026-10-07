@@ -88,17 +88,25 @@ def test_impact_grows_with_the_square_root_of_size():
     assert large.iloc[0, 0] == pytest.approx(2 * small.iloc[0, 0])
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="audit 2026-10-07 A2 CONFIRMED: bid == ask is treated as a valid zero spread",
-)
 def test_locked_quotes_are_not_a_zero_spread():
-    # Locked (bid == ask) quotes are a data artefact, not a free market: treat as missing.
+    # Audit 2026-10-07 A2: locked (bid == ask) quotes are a data artefact, not a
+    # free market: treat as missing, so the fallback applies.
     df = panel()
     df["bid_a"] = df["close_a"]
     df["ask_a"] = df["close_a"]
     stats = costs.market_stats(df, "a", CFG)
     assert (stats["half_spread"] > 0).all()
+    assert not stats["quoted"].any()
+
+
+def test_locked_and_crossed_days_are_left_out_of_the_median():
+    df = panel()
+    df.loc[DATES[1], ["bid_a", "ask_a"]] = 100.0  # locked
+    df.loc[DATES[2], ["bid_a", "ask_a"]] = [99.5, 98.5]  # crossed
+    stats = costs.market_stats(df, "a", CFG)
+    # window t=0..2 has one valid quote (< min_quote_days=2): fallback
+    assert stats["half_spread"].iloc[2] == 0.001 and not stats["quoted"].iloc[2]
+    assert stats["half_spread"].iloc[4] == pytest.approx(0.1 / 101, rel=0.02)
 
 
 def test_borrow_charges_accrue_on_the_short_value():

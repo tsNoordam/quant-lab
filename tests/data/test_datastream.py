@@ -141,6 +141,18 @@ def test_quotes_in_the_wrong_unit_are_rejected():
     assert checks.get("quote_units") == "error"
 
 
+def test_locked_quotes_are_reported():
+    df, _ = build_leg(
+        price=series([5.0] * 6),
+        total_return_index=series([1.0] * 6),
+        volume=series([1.0] * 6),
+        bid=series([5.0, 5.0, 4.99, 4.99, 4.99, 4.99]),
+        ask=series([5.0, 5.0, 5.01, 5.01, 5.01, 5.01]),
+    )
+    checks = {i.check: i.severity for i in check_ohlcv(df, "X", max_abs_log_return=0.25)}
+    assert checks.get("locked_quotes") == "warning"
+
+
 def test_close_only_frames_validate_without_bars():
     df, _ = build_leg(series([5.0] * 6), series([1.0] * 6), series([1.0] * 6))
     assert check_ohlcv(df, "X", max_abs_log_return=0.25) == []
