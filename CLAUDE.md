@@ -50,6 +50,8 @@ Git + DVC + MLflow record what happened.
 | `src/quant_lab/` | `data`, `features`, `models` (statsmodels), `strategies`, `backtest`, `tracking` | Git |
 | `tests/` | `unit`, `data`, `structural` (look-ahead/leakage), `integration` (engine reconciliation) | Git |
 | `notebooks/` | Exploration only. Final backtests live in `.py` files | Git |
+| `research/reports/audits/` | Backtest audit reports (`/audit-backtest`) | Git |
+| `ROADMAP.md` | Numbered steps: done and remaining | Git |
 | `mlflow.db`, `mlruns/` | Experiment tracking (local, not committed) | MLflow |
 
 ## Research rules
@@ -147,6 +149,22 @@ Before declaring a task complete:
 uv run pytest
 uv run ruff check . && uv run ruff format --check .
 ```
+
+## Working in steps
+
+- Work follows the numbered steps in `ROADMAP.md`, one step at a time.
+- A step is finished when its code, tests and docs are committed and pushed,
+  pytest and ruff are green, and `ROADMAP.md` is updated.
+- End every step with a summary for the user and exactly one proposed next
+  step. Do not start that step until the user confirms the current one works
+  on their machine.
+
+## Audits
+
+- `/audit-backtest` runs the deterministic gate, then the read-only
+  `backtest-auditor` agent. Each HYPOTHESIS finding gets its falsification test
+  added and run before the audit is closed; reports go to
+  `research/reports/audits/`.
 
 ## Git
 
