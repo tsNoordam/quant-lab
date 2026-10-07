@@ -170,6 +170,18 @@ uv run python -m quant_lab.backtest.robustness data=reed_elsevier
 
 Results: `research/reports/robustness_step9.md`.
 
+## Reproduce
+
+```bash
+uv sync --locked
+uv run dvc pull && uv run dvc repro      # licensed data (DVC remote access needed)
+uv run pytest
+uv run python -m quant_lab.reproduce     # 10 headline development numbers vs research/reports/headlines.yaml
+```
+
+CI (`.github/workflows/ci.yml`) runs ruff and pytest on synthetic data only.
+Final report: `research/reports/final_report.md`.
+
 ## Freeze and one-shot out-of-sample evaluation (steps 10-11)
 
 The strategies, costs, deflation inputs and decision rules for the OOS run are

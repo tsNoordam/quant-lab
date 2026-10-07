@@ -23,13 +23,15 @@ the next step started (see "Working in steps" in CLAUDE.md).
 | 8 | Strategy registry; `silta_parity` (the SILTA arbitrageur: deviation from parity, 180 bps entry, exit at parity) with replication/extension specs and `run-backtest` skill. RD/Shell: train Sharpe -0.12, validation +0.14, walk-forward -0.02 (-3.5%) vs baseline -0.34 (-11.5%); cost-dominated, no edge after costs. `research/reports/silta_parity_rd_shell.md` | b555c5e, 21b18c9 |
 | 9 | Robustness runner (`quant_lab.backtest.robustness`), deflated Sharpe and MLflow trial count. 19 cases x 2 strategies: no positive net Sharpe in any realistic cost/capital/leverage/selection case; baseline gross WF Sharpe +0.75 consumed by costs; DSR 0.001 / 0.027 at 502 trials; Reed Elsevier at frozen values agrees. `research/reports/robustness_step9.md` | 895df80, 0d96ef1 |
 | 10 | Freeze audit (auditor + red-team): FAIL fixed. A1 RD/Shell parity carried OOS share counts -> 6.9558; A2 warm-up zero-size positions and zero-cost orders -> fixed. OOS evaluation code and pre-registration frozen (`conf/oos/`, `research/specs/freeze/preregistration.md`); n_trials 600. Tags `freeze-parity_zscore`, `freeze-silta_parity`. `research/reports/audits/2026-10-07-freeze.md` | ff1e9eb |
-| 11 | One-shot OOS evaluation on the frozen tag (run once by the user, MLflow c5a6c503): no evidence of edge in any run; parity_zscore net -0.12 / -0.54 / -0.27 vs gross +0.67 / +0.98 / +0.76 (limits-to-arbitrage pattern holds); silta_parity RD/Shell not evaluable (pre-declared), Reed too few entries, Rio -41%. `research/reports/oos_evaluation.md` | (this step) |
+| 11 | One-shot OOS evaluation on the frozen tag (run once by the user, MLflow c5a6c503): no evidence of edge in any run; parity_zscore net -0.12 / -0.54 / -0.27 vs gross +0.67 / +0.98 / +0.76 (limits-to-arbitrage pattern holds); silta_parity RD/Shell not evaluable (pre-declared), Reed too few entries, Rio -41%. `research/reports/oos_evaluation.md` | bc3a8e8, 4131fc9 |
+| 12 | Final report (`research/reports/final_report.md`, `research-report` skill); `quant_lab.reproduce` checks 10 headline development numbers (10/10); CI on synthetic data (`.github/workflows/ci.yml`); fresh clone without data: 268 passed, 11 real-data skips | a84c952 + (this step) |
 
-## Remaining, in order
+## Notes from the steps
 
 Open from the audits (decisions, not fixes): B6 treatment of RD/Elsevier
-1996-98 wide quotes (needs a source); A3 corner-biased selection; Rio Tinto
-Ltd withholding (before step 10).
+1996-98 wide quotes (needs a source); A3 corner-biased selection (documented
+in step 9 as cost-driven). Rio Tinto Ltd withholding: settled at the freeze
+(fully franked dividends, 0%).
 
 Settled in step 6: the paper's relative price uses raw prices (A7 in
 `research/assumptions/maymin_silta.md`), so the signal stays on raw closes.
@@ -42,7 +44,7 @@ turnover (less sensitive, never a false failure); fix before relying on it.
 Found in step 7: chi is measured in value traded as well as shares (RD and
 Shell shares differ in size ~6.9x); H2 calibration (eq. 1) deferred, since only
 ~1-13% of development days lie inside the 180 bps bound. Block bootstrap and a
-differenced specification of the step 7 regression are left for step 9.
+differenced specification of the step 7 regression were not run (open).
 
 Decided in step 8: the paper has no trading rule, so there is no replication
 strategy (`research/specs/replication/maymin_silta.md`); relative volume (H1)
@@ -54,7 +56,7 @@ after its ex-dividend drop, so it is never long RD over an RD ex-date in the
 walk-forward (withholding has no effect there). The paper's 5x leverage is
 outside the useful range of the metrics (equity near zero).
 
-12. **Final report and reproducibility.** `research-report` skill and report;
-    clean-clone reproduction (dvc pull, uv sync, dvc repro, pytest, headline
-    runs match MLflow); CI on GitHub Actions running pytest + ruff on synthetic
-    data only (licensed data never leaves DVC).
+All numbered steps are done. Open items for any follow-up study (not started):
+B6 sourced RD/Elsevier spreads 1996-98; impact sized on running equity (A7);
+H2 calibration (needs the paper's 2002-07 sample); the 2000-02 OOS period is
+spent for these strategies.
