@@ -10,3 +10,15 @@
 /smithkline.parquet
 /unilever.parquet
 /zurich_allied.parquet
+/abb.regression.parquet
+/bhp_billiton.regression.parquet
+/brambles.regression.parquet
+/dexia.regression.parquet
+/fortis.regression.parquet
+/merita_nordbanken.regression.parquet
+/rd_shell.regression.parquet
+/reed_elsevier.regression.parquet
+/rio_tinto.regression.parquet
+/smithkline.regression.parquet
+/unilever.regression.parquet
+/zurich_allied.regression.parquet

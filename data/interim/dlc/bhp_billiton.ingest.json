@@ -17,5 +17,13 @@
   "total_return_missing": {
     "a": 0,
     "b": 0
+  },
+  "regression": {
+    "sheet": "Regression data",
+    "rows": 330,
+    "start": "2001-06-29",
+    "end": "2002-10-03",
+    "returns_checked_against_panel": 658,
+    "max_abs_error_vs_panel": 1.925543058334256e-15
   }
 }

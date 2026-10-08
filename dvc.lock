@@ -468,11 +468,19 @@ stages:
       size: 9394
     - path: src/quant_lab/data/dlc.py
       hash: md5
-      md5: f1f56e5d7bd1438c22ac7027935cde56
-      size: 6979
+      md5: e3bc4497b9351723639cd87c21653695
+      size: 9846
     params:
       conf/dlc/abb.yaml:
         interim_path: data/interim/dlc/abb.parquet
+        regression:
+          sheet: Regression data
+          return_a: TOTAL RETURN ABB AG
+          return_b: TOTAL RETURN ABB AB
+          fx: SWISS FR./ SWED. KR.
+          index_a: SWISS PERFORMANCE INDEX
+          index_b: Stockholmborsen allshare
+          exclude_dates: []
         source:
           archive: data/raw/datastream_dlc/ABB.zip
           workbook: ABB data.xls
@@ -496,12 +504,16 @@ stages:
     outs:
     - path: data/interim/dlc/abb.ingest.json
       hash: md5
-      md5: afe92e0459701cf6585ed72ca7560e80
-      size: 455
+      md5: f68e442675b2a86753d6bf6000d2cc9d
+      size: 676
     - path: data/interim/dlc/abb.parquet
       hash: md5
       md5: 7c08879418c447c1c74557afa4593238
       size: 131532
+    - path: data/interim/dlc/abb.regression.parquet
+      hash: md5
+      md5: d9947e32ee152dd5b6ed495b6fbbe0d0
+      size: 110491
   dlc_ingest@bhp_billiton:
     cmd: python -m quant_lab.data.dlc --twin bhp_billiton
     deps:
@@ -516,11 +528,19 @@ stages:
       size: 9394
     - path: src/quant_lab/data/dlc.py
       hash: md5
-      md5: f1f56e5d7bd1438c22ac7027935cde56
-      size: 6979
+      md5: e3bc4497b9351723639cd87c21653695
+      size: 9846
     params:
       conf/dlc/bhp_billiton.yaml:
         interim_path: data/interim/dlc/bhp_billiton.parquet
+        regression:
+          sheet: Regression data
+          return_a: TOTAL RETURN BHP Ltd
+          return_b: TOTAL RETURN BHP PLC
+          fx: AUS$/ BRITISH £
+          index_a: ASX ALL ORD
+          index_b: FTSE Allshare
+          exclude_dates: []
         source:
           archive: data/raw/datastream_dlc/BHP.zip
           workbook: BHP Billiton data.xls
@@ -545,12 +565,16 @@ stages:
     outs:
     - path: data/interim/dlc/bhp_billiton.ingest.json
       hash: md5
-      md5: 0739b7091cec5fe3c825beaa4b5bd48f
-      size: 455
+      md5: 15bc44161f5f85ff8fbb42aa12be331e
+      size: 673
     - path: data/interim/dlc/bhp_billiton.parquet
       hash: md5
       md5: 60ed0715a4dc72427ddbc74868d430cb
       size: 32557
+    - path: data/interim/dlc/bhp_billiton.regression.parquet
+      hash: md5
+      md5: f034b13b8422bf27307af2c418c215a2
+      size: 21506
   dlc_ingest@brambles:
     cmd: python -m quant_lab.data.dlc --twin brambles
     deps:
@@ -565,11 +589,19 @@ stages:
       size: 9394
     - path: src/quant_lab/data/dlc.py
       hash: md5
-      md5: f1f56e5d7bd1438c22ac7027935cde56
-      size: 6979
+      md5: e3bc4497b9351723639cd87c21653695
+      size: 9846
     params:
       conf/dlc/brambles.yaml:
         interim_path: data/interim/dlc/brambles.parquet
+        regression:
+          sheet: Regression data
+          return_a: TOTAL RETURN BRAMBLES Ltd
+          return_b: TOTAL RETURN BRAMBLES PLC
+          fx: AUS$/ BRITISH £
+          index_a: ASX ALL ORD
+          index_b: FTSE Allshare
+          exclude_dates: []
         source:
           archive: data/raw/datastream_dlc/brambles.zip
           workbook: Brambles data.xls
@@ -594,12 +626,16 @@ stages:
     outs:
     - path: data/interim/dlc/brambles.ingest.json
       hash: md5
-      md5: 578b1568b86e413c834ea32abc83c300
-      size: 454
+      md5: 7befa2574996ed0c06d39adc1e4b942b
+      size: 673
     - path: data/interim/dlc/brambles.parquet
       hash: md5
       md5: f3c9a7c91b8c0f3ee15120795989f57c
       size: 28597
+    - path: data/interim/dlc/brambles.regression.parquet
+      hash: md5
+      md5: 655b8e8b6ae7d1f34457e38e68fb0a3d
+      size: 20043
   dlc_ingest@dexia:
     cmd: python -m quant_lab.data.dlc --twin dexia
     deps:
@@ -614,11 +650,23 @@ stages:
       size: 9394
     - path: src/quant_lab/data/dlc.py
       hash: md5
-      md5: f1f56e5d7bd1438c22ac7027935cde56
-      size: 6979
+      md5: e3bc4497b9351723639cd87c21653695
+      size: 9846
     params:
       conf/dlc/dexia.yaml:
         interim_path: data/interim/dlc/dexia.parquet
+        regression:
+          sheet: Regression data
+          return_a: TOTAL RETURN DEXIA FRANCE
+          return_b: TOTAL RETURN DEXIA BELGIUM
+          fx: FR. FR. (€)/ BELG. FR. (€)
+          index_a: SBF 250 (BROAD FRENCH)
+          index_b: BRUSSELS ALL SHARE
+          exclude_dates:
+          - '1997-12-19'
+          - '1997-12-22'
+          as_stated:
+            exclude_dates: []
         source:
           archive: data/raw/datastream_dlc/Dexia.zip
           workbook: Dexia data.xls
@@ -642,12 +690,16 @@ stages:
     outs:
     - path: data/interim/dlc/dexia.ingest.json
       hash: md5
-      md5: b5d3ad30dcd61873ade0ac36d42a7118
-      size: 444
+      md5: 68a47061326f45542887aa1e64b64a8d
+      size: 663
     - path: data/interim/dlc/dexia.parquet
       hash: md5
       md5: 86b37fc761b12a179b5ce61bdd7ef4eb
       size: 50512
+    - path: data/interim/dlc/dexia.regression.parquet
+      hash: md5
+      md5: 630f213b96ba1ecd7265207732b969bf
+      size: 42644
   dlc_ingest@fortis:
     cmd: python -m quant_lab.data.dlc --twin fortis
     deps:
@@ -662,11 +714,19 @@ stages:
       size: 9394
     - path: src/quant_lab/data/dlc.py
       hash: md5
-      md5: f1f56e5d7bd1438c22ac7027935cde56
-      size: 6979
+      md5: e3bc4497b9351723639cd87c21653695
+      size: 9846
     params:
       conf/dlc/fortis.yaml:
         interim_path: data/interim/dlc/fortis.parquet
+        regression:
+          sheet: Regression data
+          return_a: TOTAL RETURN FORTIS NV
+          return_b: TOTAL RETURN FORTIS AG
+          fx: GUILDER (€)/ BELG. FR. (€)
+          index_a: CBS ALLSHARE PRICE INDEX
+          index_b: BRUSSELS ALL SHARE
+          exclude_dates: []
         source:
           archive: data/raw/datastream_dlc/Fortis.zip
           workbook: Fortis data.xls
@@ -690,12 +750,16 @@ stages:
     outs:
     - path: data/interim/dlc/fortis.ingest.json
       hash: md5
-      md5: fa0b963a532c43d868db861a41a841b5
-      size: 449
+      md5: ab22f06e6afbd7d7e1977b6e10ed8b7f
+      size: 670
     - path: data/interim/dlc/fortis.parquet
       hash: md5
       md5: 8cd3a15c010d0dc9562182dc3252f64e
       size: 168290
+    - path: data/interim/dlc/fortis.regression.parquet
+      hash: md5
+      md5: 599f840bce688097f59fbb6da13246d5
+      size: 146908
   dlc_ingest@merita_nordbanken:
     cmd: python -m quant_lab.data.dlc --twin merita_nordbanken
     deps:
@@ -710,11 +774,19 @@ stages:
       size: 9394
     - path: src/quant_lab/data/dlc.py
       hash: md5
-      md5: f1f56e5d7bd1438c22ac7027935cde56
-      size: 6979
+      md5: e3bc4497b9351723639cd87c21653695
+      size: 9846
     params:
       conf/dlc/merita_nordbanken.yaml:
         interim_path: data/interim/dlc/merita_nordbanken.parquet
+        regression:
+          sheet: Regression data
+          return_a: TOTAL RETURN MERITA
+          return_b: TOTAL RETURN NORDBANKEN
+          fx: FIN. MARK. (€)/ SWED. KR.
+          index_a: HELSINKI HEX
+          index_b: Stockholmborsen allshare
+          exclude_dates: []
         source:
           archive: data/raw/datastream_dlc/MeritaNordbanken.zip
           workbook: MeritaNordbanken data.xls
@@ -738,12 +810,16 @@ stages:
     outs:
     - path: data/interim/dlc/merita_nordbanken.ingest.json
       hash: md5
-      md5: 213dfb48901daa7b14a8ffecb2113ea7
-      size: 459
+      md5: 865e1bbdde60995733b47cdfc22041f7
+      size: 676
     - path: data/interim/dlc/merita_nordbanken.parquet
       hash: md5
       md5: f546293e9e73f9b1c0f4747fe1f7d400
       size: 32520
+    - path: data/interim/dlc/merita_nordbanken.regression.parquet
+      hash: md5
+      md5: 02a6f9bdbed871d21ffa11f613a88d4d
+      size: 33727
   dlc_ingest@rd_shell:
     cmd: python -m quant_lab.data.dlc --twin rd_shell
     deps:
@@ -758,11 +834,21 @@ stages:
       size: 9394
     - path: src/quant_lab/data/dlc.py
       hash: md5
-      md5: f1f56e5d7bd1438c22ac7027935cde56
-      size: 6979
+      md5: e3bc4497b9351723639cd87c21653695
+      size: 9846
     params:
       conf/dlc/rd_shell.yaml:
         interim_path: data/interim/dlc/rd_shell.parquet
+        regression:
+          sheet: Regression data
+          return_a: TOTAL RETURN ROYAL DUTCH
+          return_b: TOTAL RETURN SHELL
+          fx: GUILDER (€)/ BRITISH £
+          index_a: CBS Allshare ex. Royal Dutch
+          index_b: FTSE Allshare
+          exclude_dates: []
+          as_stated:
+            index_a: CBS ALLSHARE PRICE INDEX
         source:
           archive: data/raw/datastream_dlc/RoyalDutchShell.zip
           workbook: RD Shell data.xls
@@ -787,12 +873,16 @@ stages:
     outs:
     - path: data/interim/dlc/rd_shell.ingest.json
       hash: md5
-      md5: b8e4b0ea5ba5cf090beaf5195bb9c740
-      size: 475
+      md5: 28452356f02761cf874b1fe32e510944
+      size: 697
     - path: data/interim/dlc/rd_shell.parquet
       hash: md5
       md5: 99feeee6fd586c429034367658177214
       size: 396523
+    - path: data/interim/dlc/rd_shell.regression.parquet
+      hash: md5
+      md5: 40f947109dd1f599ea300e5b92719717
+      size: 367214
   dlc_ingest@reed_elsevier:
     cmd: python -m quant_lab.data.dlc --twin reed_elsevier
     deps:
@@ -807,11 +897,19 @@ stages:
       size: 9394
     - path: src/quant_lab/data/dlc.py
       hash: md5
-      md5: f1f56e5d7bd1438c22ac7027935cde56
-      size: 6979
+      md5: e3bc4497b9351723639cd87c21653695
+      size: 9846
     params:
       conf/dlc/reed_elsevier.yaml:
         interim_path: data/interim/dlc/reed_elsevier.parquet
+        regression:
+          sheet: Regression data
+          return_a: TOTAL RETURN ELSEVIER
+          return_b: TOTAL RETURN REED INT.
+          fx: GUILDER (€)/ BRITISH £
+          index_a: CBS ALLSHARE PRICE INDEX
+          index_b: FTSE Allshare
+          exclude_dates: []
         source:
           archive: data/raw/datastream_dlc/ReedElsevier.zip
           workbook: Reed Elsevier data incl S.xls
@@ -836,12 +934,16 @@ stages:
     outs:
     - path: data/interim/dlc/reed_elsevier.ingest.json
       hash: md5
-      md5: 7b0fef463c712ed1ba7050d0e840f156
-      size: 478
+      md5: 9aa02b891653c61512562bcfb38b67d4
+      size: 698
     - path: data/interim/dlc/reed_elsevier.parquet
       hash: md5
       md5: 9b05e719e66c967ab295504a0cdcdf51
       size: 173253
+    - path: data/interim/dlc/reed_elsevier.regression.parquet
+      hash: md5
+      md5: 5ee68df48dbf07b6b4467d9f61b42af7
+      size: 137874
   dlc_ingest@rio_tinto:
     cmd: python -m quant_lab.data.dlc --twin rio_tinto
     deps:
@@ -856,11 +958,19 @@ stages:
       size: 9394
     - path: src/quant_lab/data/dlc.py
       hash: md5
-      md5: f1f56e5d7bd1438c22ac7027935cde56
-      size: 6979
+      md5: e3bc4497b9351723639cd87c21653695
+      size: 9846
     params:
       conf/dlc/rio_tinto.yaml:
         interim_path: data/interim/dlc/rio_tinto.parquet
+        regression:
+          sheet: Regression data
+          return_a: TOTAL RETURN RIO TINTO Ltd
+          return_b: TOTAL RETURN RIO TINTO PLC
+          fx: AUS$/ BRITISH £
+          index_a: ASX ALL ORD
+          index_b: FTSE Allshare
+          exclude_dates: []
         source:
           archive: data/raw/datastream_dlc/RioTinto.zip
           workbook: Rio Tinto data.xls
@@ -884,12 +994,16 @@ stages:
     outs:
     - path: data/interim/dlc/rio_tinto.ingest.json
       hash: md5
-      md5: 79af636267b6f028cd1431029d24e0c6
-      size: 457
+      md5: 65251dedbc7ea4283acf905b649289d4
+      size: 678
     - path: data/interim/dlc/rio_tinto.parquet
       hash: md5
       md5: 918820c1f7404deff4e387c98d2dbff6
       size: 134828
+    - path: data/interim/dlc/rio_tinto.regression.parquet
+      hash: md5
+      md5: d5e05a0f06df1fdc05d054bfda842689
+      size: 98411
   dlc_ingest@smithkline:
     cmd: python -m quant_lab.data.dlc --twin smithkline
     deps:
@@ -904,11 +1018,21 @@ stages:
       size: 9394
     - path: src/quant_lab/data/dlc.py
       hash: md5
-      md5: f1f56e5d7bd1438c22ac7027935cde56
-      size: 6979
+      md5: e3bc4497b9351723639cd87c21653695
+      size: 9846
     params:
       conf/dlc/smithkline.yaml:
         interim_path: data/interim/dlc/smithkline.parquet
+        regression:
+          sheet: Regression data DS dates
+          return_a: TOTAL RETURN H SHARES
+          return_b: TOTAL RETURN E SHARES
+          fx: BRITISH £/ US$
+          index_a: FTSE Allshare
+          index_b: S&P 500
+          exclude_dates: []
+          as_stated:
+            index_a: FTSE 100
         source:
           archive: data/raw/datastream_dlc/Smithkline.zip
           workbook: SmithKline data.xls
@@ -934,12 +1058,16 @@ stages:
     outs:
     - path: data/interim/dlc/smithkline.ingest.json
       hash: md5
-      md5: aa350f4ef7ea8531a04a19f0b2ff239e
-      size: 461
+      md5: f94ee4351673f3028a03166b8cf1d1d2
+      size: 690
     - path: data/interim/dlc/smithkline.parquet
       hash: md5
       md5: af916bdd73818a5f2694f6e4bff94508
       size: 82884
+    - path: data/interim/dlc/smithkline.regression.parquet
+      hash: md5
+      md5: 366e78b4892627d27d1e677d9388ecb0
+      size: 107936
   dlc_ingest@unilever:
     cmd: python -m quant_lab.data.dlc --twin unilever
     deps:
@@ -954,11 +1082,19 @@ stages:
       size: 9394
     - path: src/quant_lab/data/dlc.py
       hash: md5
-      md5: f1f56e5d7bd1438c22ac7027935cde56
-      size: 6979
+      md5: e3bc4497b9351723639cd87c21653695
+      size: 9846
     params:
       conf/dlc/unilever.yaml:
         interim_path: data/interim/dlc/unilever.parquet
+        regression:
+          sheet: Regression data
+          return_a: TOTAL RETURN UNILEVER NV
+          return_b: TOTAL RETURN UNILEVER PLC
+          fx: GUILDER (€)/ BRITISH £
+          index_a: CBS ALLSHARE PRICE INDEX
+          index_b: FTSE Allshare
+          exclude_dates: []
         source:
           archive: data/raw/datastream_dlc/Unilever.zip
           workbook: Unilever data.xls
@@ -984,12 +1120,16 @@ stages:
     outs:
     - path: data/interim/dlc/unilever.ingest.json
       hash: md5
-      md5: a0123002eadcc8149f521b8daa2512b2
-      size: 455
+      md5: 419134395783adcf0f8a088efc425e1f
+      size: 676
     - path: data/interim/dlc/unilever.parquet
       hash: md5
       md5: 6670ee29a4faba3c73bb67737c1c9717
       size: 378480
+    - path: data/interim/dlc/unilever.regression.parquet
+      hash: md5
+      md5: 4f1167696fabee5a6f056222712dcd9b
+      size: 306144
   dlc_ingest@zurich_allied:
     cmd: python -m quant_lab.data.dlc --twin zurich_allied
     deps:
@@ -1004,11 +1144,19 @@ stages:
       size: 9394
     - path: src/quant_lab/data/dlc.py
       hash: md5
-      md5: f1f56e5d7bd1438c22ac7027935cde56
-      size: 6979
+      md5: e3bc4497b9351723639cd87c21653695
+      size: 9846
     params:
       conf/dlc/zurich_allied.yaml:
         interim_path: data/interim/dlc/zurich_allied.parquet
+        regression:
+          sheet: Regression data
+          return_a: TOTAL RETURN ZURICH ALLIED
+          return_b: TOTAL RETURN ALLIED ZURICH
+          fx: SWISS FR./ BRITISH £
+          index_a: SWISS PERFORMANCE INDEX
+          index_b: FTSE Allshare
+          exclude_dates: []
         source:
           archive: data/raw/datastream_dlc/ZurichAllied.zip
           workbook: Allied Zurich data.xls
@@ -1034,9 +1182,13 @@ stages:
     outs:
     - path: data/interim/dlc/zurich_allied.ingest.json
       hash: md5
-      md5: 7a8e3487525c90d53d105941ccd2a40b
-      size: 469
+      md5: 60118be5e361e6e5a25ad5c0df522d44
+      size: 687
     - path: data/interim/dlc/zurich_allied.parquet
       hash: md5
       md5: eb3bb7480ea94beba45cb52f89f96b73
       size: 34014
+    - path: data/interim/dlc/zurich_allied.regression.parquet
+      hash: md5
+      md5: 76a3281ad580cbce94da725e543df71a
+      size: 32817
