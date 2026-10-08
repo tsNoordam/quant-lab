@@ -5,6 +5,7 @@ interim_path: data/interim/dlc/reed_elsevier.parquet
 table_i: {countries: Netherlands/United Kingdom, time_diff_hours: -1, structure: combined entities,
           merger: "1993-01-01", unification_announced: null, unification: null}
 window: {start: "1993-01-01", end: "2002-10-03"}
+trading: {rows_after_window: 0}   # not unified in the sample: open positions are discarded
 source:
   archive: data/raw/datastream_dlc/ReedElsevier.zip
   workbook: Reed Elsevier data incl S.xls

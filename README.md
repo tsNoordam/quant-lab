@@ -177,6 +177,18 @@ MLflow experiment `dejong.replication`, runs `table2` and `table3`. Results:
 `research/reports/dejong_table2.md`, `research/reports/dejong_table3.md`.
 Notes: `research/*/dejong_dlc.md`.
 
+The arbitrage strategies of Tables IV-V, under the paper's own conventions
+(`conf/dejong/default.yaml`), need the 3-month T-bill (public FRED data, once):
+
+```bash
+mkdir -p data/raw/fred_tbill
+curl -L -o data/raw/fred_tbill/DTB3.csv "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DTB3"
+uv run dvc add data/raw/fred_tbill          # metadata: data/metadata/fred_tbill.json
+uv run python -m quant_lab.backtest.dejong  # MLflow run dejong.replication/tables45
+```
+
+Results: `research/reports/dejong_tables45.md`.
+
 ## Robustness (step 9)
 
 Every case in `conf/robustness/default.yaml` (costs, dividends, capital and

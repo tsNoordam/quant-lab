@@ -1,0 +1,17 @@
+{
+  "dataset": "fred_tbill",
+  "description": "3-Month Treasury Bill Secondary Market Rate, Discount Basis (FRED series DTB3), daily, percent per year. Used by de Jong et al. (2009) to pad positions shorter than a month (Tables IV-V) and as the risk-free rate (Table VI).",
+  "source": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DTB3 (Board of Governors of the Federal Reserve System, H.15, via FRED, Federal Reserve Bank of St. Louis)",
+  "license": "Public domain US government data; FRED terms of use apply. Versioned with DVC like all raw data.",
+  "layout": "data/raw/fred_tbill/DTB3.csv, FRED's CSV export, unmodified",
+  "files": {
+    "DTB3.csv": {"md5": "recorded at dvc add (data/raw/fred_tbill.dvc); copy it here when the file is added"}
+  },
+  "calendar": "US business days; FRED marks holidays with '.' (missing)",
+  "timezone": "naive US dates",
+  "known_issues": [
+    "Discount-basis yield, not a bond-equivalent yield; used as a simple annual rate (quant_lab.data.tbill), as in the paper.",
+    "Not reachable from the cloud sessions' network policy (2026-10-08): downloaded by the user and added with dvc add."
+  ],
+  "used_by": ["conf/dejong/default.yaml (tbill), quant_lab.backtest.dejong"]
+}

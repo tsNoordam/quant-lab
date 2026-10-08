@@ -48,6 +48,26 @@ literally is kept as the `as_stated` variant.
 | D17 | R² and sample | Unadjusted R² (the caption says adjusted); every complete window row, leads and lags read across the window edges | PAPER-DERIVED (identified) |
 | D18 | Newey-West variant | Bartlett, fixed lag floor(4 (n/100)^(2/9)), no prewhitening, n/(n-k): the EViews default. Chosen before comparing; all 48 significance marks match | IMPLEMENTATION-ASSUMPTION |
 
+## Arbitrage conventions (step 16, `research/reports/dejong_tables45.md`)
+
+Settings live in `conf/dejong/default.yaml`; the evidence for each is in the
+report. "Identified" means the paper's Table IV-V numbers single it out.
+
+| # | Question | Answer | Tag |
+|---|---|---|---|
+| D2 | Total return or price only | Total return; price only is a variant (small effect) | IMPLEMENTATION-ASSUMPTION |
+| D3 | Half spread at exit too? | Yes, on both legs | PAPER-DERIVED (identified) |
+| D4 | Timing | Exit signal on the first close with \|d\| <= s; both trades at the close on which the signal is observed (delay 0); delay 1 is the paper's own sensitivity case | PAPER-DERIVED (identified) |
+| D5 | Short positions and the month | % per month = total return × 22 / days (days at least 22; shorter positions earn the T-bill for the rest of the month); no new position within 22 trading days of the last entry | PAPER-DERIVED (identified) |
+| D6 | Re-entry | Only on a fresh crossing of b | PAPER-DERIVED (identified) |
+| D7 | Deviation beyond b at the start | No entry until it crosses b (follows from D6) | PAPER-DERIVED (identified) |
+| D8 | 136 vs 127 positions | Our count is 128 with Table IV's rules; 127 is the table's figure | open |
+| D10 | Margin rule | Per leg (each leg against its own maintenance); pooled as a variant. Neither reproduces the margin-call counts (27 and 1 vs 14) | IMPLEMENTATION-ASSUMPTION, open |
+| D11 | T-bill | FRED DTB3, the rate at the exit date | IMPLEMENTATION-ASSUMPTION |
+| D19 | Currency of the leg returns | One currency (A converted into B's) | PAPER-DERIVED (identified) |
+| D20 | Open positions in unified twins | Closed on the first trading day after the unification announcement, not discarded | PAPER-DERIVED (identified) |
+| D21 | Interest on the short sale's margin deposit | None: it is collateral; only free cash earns 5% | PAPER-DERIVED (identified) |
+
 ## Lab rules that conflict with the paper's design (flag, do not silently change)
 
 | Lab rule (CLAUDE.md) | Paper | Resolution proposed for step 14 |

@@ -6,6 +6,7 @@ interim_path: data/interim/dlc/unilever.parquet
 table_i: {countries: Netherlands/United Kingdom, time_diff_hours: -1, structure: separate entities,
           merger: "1930", unification_announced: null, unification: null}
 window: {start: "1980-01-01", end: "2002-10-03"}
+trading: {rows_after_window: 0}   # not unified in the sample: open positions are discarded
 source:
   archive: data/raw/datastream_dlc/Unilever.zip
   workbook: Unilever data.xls

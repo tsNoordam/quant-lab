@@ -6,6 +6,7 @@ interim_path: data/interim/dlc/bhp_billiton.parquet
 table_i: {countries: Australia/United Kingdom, time_diff_hours: -10, structure: separate entities,
           merger: "2001-06-29", unification_announced: null, unification: null}
 window: {start: "2001-06-29", end: "2002-10-03"}
+trading: {rows_after_window: 0}   # not unified in the sample: open positions are discarded
 source:
   archive: data/raw/datastream_dlc/BHP.zip
   workbook: BHP Billiton data.xls

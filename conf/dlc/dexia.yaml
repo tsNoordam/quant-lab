@@ -5,6 +5,9 @@ interim_path: data/interim/dlc/dexia.parquet
 table_i: {countries: France/Belgium, time_diff_hours: 0, structure: combined entities,
           merger: "1996-11-19", unification_announced: "1999-09-19", unification: "1999-11-26"}
 window: {start: "1996-11-19", end: "1999-08-20"}
+# [PAPER-DERIVED, identified from Table IV days, D20] positions open at the end of a
+# unified twin's window are closed on the first trading day after the announcement
+trading: {rows_after_window: 21}
 source:
   archive: data/raw/datastream_dlc/Dexia.zip
   workbook: Dexia data.xls

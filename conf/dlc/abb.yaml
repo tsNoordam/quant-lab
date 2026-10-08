@@ -6,6 +6,9 @@ interim_path: data/interim/dlc/abb.parquet
 table_i: {countries: Switzerland/Sweden, time_diff_hours: 0, structure: combined entities,
           merger: "1991-07-08", unification_announced: "1999-02-04", unification: "1999-06-25"}
 window: {start: "1991-07-08", end: "1999-01-07"}
+# [PAPER-DERIVED, identified from Table IV days, D20] positions open at the end of a
+# unified twin's window are closed on the first trading day after the announcement
+trading: {rows_after_window: 21}
 source:
   archive: data/raw/datastream_dlc/ABB.zip
   workbook: ABB data.xls

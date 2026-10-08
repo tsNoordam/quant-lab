@@ -65,9 +65,11 @@ stages:
             - source
             - interim_path
             - regression
+            - trading
       outs:
         - data/interim/dlc/${item}.parquet
         - data/interim/dlc/${item}.regression.parquet
+        - data/interim/dlc/${item}.trading.parquet
       metrics:
         - data/interim/dlc/${item}.ingest.json:
             cache: false

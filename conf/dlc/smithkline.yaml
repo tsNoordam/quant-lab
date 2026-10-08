@@ -7,6 +7,9 @@ interim_path: data/interim/dlc/smithkline.parquet
 table_i: {countries: United Kingdom/United States, time_diff_hours: -5, structure: stapled stock,
           merger: "1989-07-26", unification_announced: "1996-02-20", unification: "1996-04-12"}
 window: {start: "1989-07-26", end: "1996-01-22"}
+# [PAPER-DERIVED, identified from Table IV days, D20] positions open at the end of a
+# unified twin's window are closed on the first trading day after the announcement
+trading: {rows_after_window: 21}
 source:
   archive: data/raw/datastream_dlc/Smithkline.zip
   workbook: SmithKline data.xls

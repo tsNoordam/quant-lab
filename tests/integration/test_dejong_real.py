@@ -57,7 +57,8 @@ KNOWN_T3_DIFFERENCES = {
 def test_every_twin_reproduces_the_authors_deviation_column(result):
     reports, _, _ = result
     for twin, r in reports.items():
-        assert r["rows_checked_against_workbook"] == r["rows"] > 0, twin
+        kept = r["rows"] + r.get("rows_after_window", 0)  # window + trading extension
+        assert r["rows_checked_against_workbook"] == kept > 0, twin
         assert r["max_abs_error_vs_workbook"] < 1e-12, twin
         assert r["ratio_constant"], twin
         reg = r["regression"]

@@ -6,6 +6,7 @@ interim_path: data/interim/dlc/rd_shell.parquet
 table_i: {countries: Netherlands/United Kingdom, time_diff_hours: -1, structure: combined entities,
           merger: "1907-02-15", unification_announced: "2004-10-28", unification: "2005-07-20"}
 window: {start: "1980-01-01", end: "2002-10-03"}   # Table II sample period
+trading: {rows_after_window: 0}   # not unified in the sample: open positions are discarded
 source:
   archive: data/raw/datastream_dlc/RoyalDutchShell.zip
   workbook: RD Shell data.xls

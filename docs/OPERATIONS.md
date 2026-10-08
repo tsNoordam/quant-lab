@@ -117,8 +117,9 @@ uv run python -m quant_lab.backtest.run data=rd_shell strategy=silta_parity back
 uv run python -m quant_lab.backtest.walkforward data=rd_shell strategy=parity_zscore
 uv run python -m quant_lab.backtest.robustness data=rd_shell          # ~35 min, 19 cases x 2 strategies
 
-# C. Paper 2 (de Jong et al.): Table II and III replications
+# C. Paper 2 (de Jong et al.): Table II and III replications, then Tables IV-V
 uv run python -m quant_lab.models.dejong      # expect "58/72" (Table II), then "77/84" and "48/48" (Table III, identified)
+uv run python -m quant_lab.backtest.dejong    # needs data/raw/fred_tbill (README); research/reports/dejong_tables45.md
 
 # D. Check that the recorded headline numbers still reproduce
 uv run python -m quant_lab.reproduce          # expect "10/10 headline numbers reproduced"

@@ -96,7 +96,7 @@ flowchart LR
     GEN["quant_lab.data.synthetic<br/>(one-off generator)"] -->|writes once| SYN
 
     ZIP -->|"stage: ingest@pair<br/>quant_lab.data.datastream"| INT["data/interim/{pair}/*.csv<br/>+ {pair}.ingest.json"]
-    ZIP -->|"stage: dlc_ingest@twin<br/>quant_lab.data.dlc"| DLC["data/interim/dlc/{twin}.parquet<br/>+ .regression.parquet + .ingest.json"]
+    ZIP -->|"stage: dlc_ingest@twin<br/>quant_lab.data.dlc"| DLC["data/interim/dlc/{twin}.parquet<br/>+ .regression / .trading.parquet + .ingest.json"]
     INT -->|"stage: preprocess@pair<br/>loaders + validation + synchronization"| PANEL["data/processed/{pair}/panel.parquet<br/>+ validation.json"]
     SYN -->|"stage: preprocess@synthetic_twin"| PANEL
 
@@ -340,6 +340,7 @@ applied once, in `backtest.run`.
 |---|---|---|---|---|
 | `models.silta` | Maymin's price-volume regressions, Newey-West (R `sandwich` defaults), the chi > 0 check, lag sensitivity; development windows only | cfg, panel | MLflow `<data>.silta` + CSV artifacts | Hydra CLI; imports guards from `backtest.run` |
 | `models.dejong` | de Jong et al. Table II (deviation statistics) and Table III (comovement regression E2, EViews-style Newey-West; variants `identified` and `as_stated`) vs the paper's values from the evidence CSV | `conf/dlc/*`, DLC panels and regression data, `research/evidence/dejong_dlc_evidence.csv` | MLflow `dejong.replication/table2`, `/table3` + CSV | plain CLI (reads `conf/config.yaml` for MLflow settings) |
+| `backtest.dejong` | de Jong et al. Tables IV-V: the paper's own arbitrage engine (crossing entries, same-close trades, Reg T account with margin calls, fixed rates, flat costs, T-bill padding), separate from the lab's VectorBT engine | `conf/dejong/default.yaml`, trading panels, FRED DTB3 (`data.tbill`), evidence CSV | MLflow `dejong.replication/tables45` + positions/table CSVs per variant | plain CLI |
 | `reproduce` | Recompute 10 headline development numbers without logging; compare with `research/reports/headlines.yaml` | panels, configs | exit code 0/1, printed table | CLI; used in `tests/integration/test_reproduce.py` |
 | `tracking.mlflow_utils` | `git_state`, `file_md5`, `dvc_locked_md5`, `data_provenance`, `flatten`, `set_experiment` | repo root, `dvc.lock` | tag dicts | imported by every logging module |
 
@@ -374,6 +375,7 @@ writes only the paths listed.
 | E10 | `uv run python -m quant_lab.backtest.oos +unlock_oos=true` | `check_ready` (tag, clean tree) → `run_backtest` × 24 → Holm, DSR, verdicts | MLflow `oos.evaluation`. **Spent**: run once at `ff1e9eb` (run `c5a6c503`) |
 | E11 | `uv run python -m quant_lab.models.silta data=<pair>` | `analyse` → `regressions` (`ols_nw`) → `chi_condition`, `lag_sensitivity` | MLflow `<pair>.silta` |
 | E12 | `uv run python -m quant_lab.models.dejong [--table 2\|3]` | `table2` → `deviation_stats` per twin vs `paper_table2`; `table3` → `comovement_design` → `comovement` per twin and variant vs `paper_table3` | MLflow `dejong.replication` |
+| E12b | `uv run python -m quant_lab.backtest.dejong` | per twin and strategy: `find_positions` → `run_account` → `monthly_return`; `table4`, `table5` vs the evidence; every `variants` case | MLflow `dejong.replication/tables45` |
 | E13 | `uv run python -m quant_lab.reproduce [<dataset>]` | `measure` → `silta.analyse` / `backtest_pair` / `walk_forward` | stdout only; exit code |
 | E14 | `uv run mlflow ui --backend-store-uri sqlite:///mlflow.db` | MLflow web UI | none (read) |
 | E15 | `uv run pytest` / `uv run ruff check . && uv run ruff format --check .` | test tiers / lint | `.pytest_cache`, `.ruff_cache` |

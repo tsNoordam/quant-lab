@@ -1,0 +1,82 @@
+# de Jong, Rosenthal & van Dijk (2009): the arbitrage strategies of Tables IV-V
+# under the paper's own conventions (quant_lab.backtest.dejong, ROADMAP step 16).
+# Plain OmegaConf, like conf/dlc/. Tags and the D numbers refer to
+# research/assumptions/dejong_dlc.md; research/reports/dejong_tables45.md has
+# the evidence for every identified convention.
+
+benchmark: 10/5/12m                  # Table IV [PAPER-DERIVED]
+strategies:                          # Table V [PAPER-DERIVED]; horizon in trading days, null = unlimited
+  5/1/1m: {buy: 0.05, sell: 0.01, horizon: 22}
+  5/1/3m: {buy: 0.05, sell: 0.01, horizon: 65}
+  5/1/12m: {buy: 0.05, sell: 0.01, horizon: 260}
+  5/1/inf: {buy: 0.05, sell: 0.01, horizon: null}
+  10/5/1m: {buy: 0.10, sell: 0.05, horizon: 22}
+  10/5/3m: {buy: 0.10, sell: 0.05, horizon: 65}
+  10/5/12m: {buy: 0.10, sell: 0.05, horizon: 260}
+  10/5/inf: {buy: 0.10, sell: 0.05, horizon: null}
+
+rules:
+  # [PAPER-DERIVED, identified, D6] a position opens on a crossing: |d| >= buy on
+  # the signal day and < buy the day before.
+  entry: crossing
+  # [PAPER-DERIVED, identified, D4] trades at the close on which the signal is
+  # observed (delay 0). The paper's "one extra day" sensitivity is delay 1.
+  delay: 0
+  # [PAPER-DERIVED] at most one position per twin; [identified, D5] the proceeds of
+  # a position shorter than a month stay in the T-bill until the month is over, so
+  # the next position can start 22 trading days after the previous entry at the earliest.
+  month_days: 22
+  # [PAPER-DERIVED] open positions at the sample end are discarded; [identified, D20]
+  # for twins unified in the sample they are closed on the trading panel's last
+  # row, the first trading day after the unification announcement
+  # (conf/dlc/<twin>.yaml trading.rows_after_window).
+
+account:
+  # [PAPER-DERIVED] Regulation T: 50% initial margin on each leg, maintenance 25%
+  # long and 30% short, partial liquidation of both legs on a margin call.
+  initial_margin: 0.50
+  maintenance_long: 0.25
+  maintenance_short: 0.30
+  # [IMPLEMENTATION-ASSUMPTION, D10] per_leg: each leg's own equity against its own
+  # maintenance requirement; pooled: account equity against the sum. Neither
+  # reproduces the paper's margin-call counts (report); per_leg reads the text
+  # ("25% for long positions and 30% for short positions").
+  margin_rule: per_leg
+  # [PAPER-DERIVED] fixed rates per year: cash 5%, margin loan 5.5%, short rebate 3%.
+  cash_rate: 0.05
+  loan_rate: 0.055
+  rebate_rate: 0.03
+  # [PAPER-DERIVED, identified, D21] the 50% margin deposit of the short sale is
+  # collateral and earns nothing; "cash" is free cash only.
+  short_deposit_earns: false
+  days_per_year: 260                 # [IMPLEMENTATION-ASSUMPTION] interest per trading day
+
+costs:
+  commission: 0.0025                 # [PAPER-DERIVED] 25 bps per transaction, every leg
+  half_spread: 0.0020                # [PAPER-DERIVED] half of a 40 bps spread
+  # [PAPER-DERIVED, identified, D3] the half spread is paid at exit as well.
+  spread_at_exit: true
+
+returns:
+  # [PAPER-DERIVED, identified, D19] leg returns in one currency (A converted to
+  # B's), so a position's P&L follows the parity deviation.
+  currency: common
+  # [IMPLEMENTATION-ASSUMPTION, D2] total-return indices (dividends included).
+  total_return: true
+  # [PAPER-DERIVED, D5] % per month = total return x 22 / days, days at least 22;
+  # positions shorter than a month earn the 3-month T-bill (rate at the exit date,
+  # D11) for the rest of the month.
+  monthly: arithmetic
+
+tbill:
+  path: data/raw/fred_tbill/DTB3.csv
+  series: DTB3
+
+exclude_dates: {}                     # per twin, rows dropped from the trading panel
+
+# Sensitivity cases: overrides of the settings above, each run on all strategies.
+variants:
+  dexia_spike_removed: {exclude_dates: {dexia: ["1997-12-19"]}}   # D15: the 1997-12-19 spike
+  margin_pooled: {account: {margin_rule: pooled}}                  # D10
+  price_only: {returns: {total_return: false}}                     # D2
+  one_day_delay: {rules: {delay: 1}}                               # the paper's p. 515 case

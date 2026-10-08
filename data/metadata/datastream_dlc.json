@@ -32,7 +32,7 @@
     "Unilever NV 'TURNOVER BY VOLUME' is ~0.0007% of NV shares outstanding per day (other legs 0.2-0.7%): not primary-market volume. conf/data/unilever.yaml sets volume_reliable: false.",
     "Rio Tinto, BHP Billiton and Brambles: Sydney and London closes are ~10 hours apart (non-synchronous).",
     "FX per GBP is Datastream's daily rate; its fixing time relative to the Amsterdam/Sydney close is not documented in the workbooks. GBP-converted foreign legs (close = price / fx) therefore may not be exactly tradable at the reported close. FX conversion is costed by costs.fx_conversion_bps (audit 2026-10-07, A5).",
-    "Dexia: one-day spike on 1997-12-19 (log deviation -32.4%, reversing the next day); the archive contains 'Dexia outlier causes 19 December 1997.doc'. The paper's Table II minimum (-17.66%) does not contain it. Kept as delivered (raw is immutable); treatment decided in ROADMAP step 16.",
+    "Dexia: one-day spike on 1997-12-19 (log deviation -32.4%, reversing the next day); the archive contains 'Dexia outlier causes 19 December 1997.doc'. The paper's Table II minimum (-17.66%) does not contain it. Kept as delivered (raw is immutable). The authors left its two return observations out of Table III (research/reports/dejong_table3.md); the step-16 arbitrage runs report both the data as delivered and the variant dexia_spike_removed (conf/dejong/default.yaml).",
     "Dexia and Fortis: Table II statistics from these workbooks differ from the paper's beyond rounding (research/reports/dejong_table2.md), most likely a different data version than the paper used."
   ],
   "used_by": ["conf/data/rd_shell.yaml", "conf/data/reed_elsevier.yaml", "conf/data/rio_tinto.yaml", "conf/dlc/*.yaml (all 12 archives, de Jong et al. replication)"],

@@ -26,6 +26,11 @@ returns of both legs, the exchange-rate log change, the index log returns), on
 every row of that sheet, since the regression's leads and lags read the rows
 next to the window. Both legs' returns must equal the panel's total-return log
 differences to 1e-9 on every panel date where those are defined.
+
+And ``<twin>.trading.parquet``: the panel plus ``trading.rows_after_window``
+workbook rows after the window (column ``in_window``), checked the same way.
+The paper's arbitrage strategies (quant_lab.backtest.dejong) close positions
+that are still open at the end of a unified twin's window on those rows.
 """
 
 import argparse
@@ -78,8 +83,13 @@ def assemble(
     fx: pd.Series | None,
     start: str,
     end: str,
+    extend_rows: int = 0,
 ) -> tuple[pd.DataFrame, dict]:
-    """Build the twin panel on the window and check it against the workbook."""
+    """Build the twin panel on the window and check it against the workbook.
+
+    ``extend_rows`` keeps that many workbook rows after the window end as well
+    (column ``in_window`` is False there); they are checked the same way.
+    """
     frame = pd.DataFrame(
         {
             "price_a": price_a,
@@ -96,7 +106,11 @@ def assemble(
             f"window {start}..{end} not inside the workbook "
             f"({frame.index.min().date()}..{frame.index.max().date()})"
         )
-    frame = frame.loc[start:end]
+    after = frame.loc[pd.Timestamp(end) + pd.Timedelta(days=1) :].index[:extend_rows]
+    if len(after) < extend_rows:
+        raise DatastreamFormatError(f"fewer than {extend_rows} workbook rows after {end}")
+    frame = frame.loc[start : after[-1] if extend_rows else end].copy()
+    frame["in_window"] = frame.index <= pd.Timestamp(end)
     if not frame.index.is_monotonic_increasing or frame.index.has_duplicates:
         raise DatastreamFormatError("dates are not strictly increasing")
     if (frame.index.dayofweek >= 5).any():
@@ -113,30 +127,37 @@ def assemble(
             f"deviation does not reproduce the workbook (max error {err.max():.3g} on {worst})"
         )
     usable = frame["deviation"].notna()
-    window_rows = len(frame)
+    window_rows = int(frame["in_window"].sum())
     frame = frame.loc[usable].copy()
     for leg in ("a", "b"):
         tr = frame[f"tr_{leg}"]
         first = tr.first_valid_index()
         frame[f"tr_{leg}"] = tr / tr.loc[first] if first is not None else tr
     frame.index.name = "date"
+    window = frame[frame["in_window"]]
     report = {
         "window": [start, end],
-        "rows": len(frame),
-        "start": str(frame.index.min().date()),
-        "end": str(frame.index.max().date()),
-        "rows_dropped_no_price": int(window_rows - len(frame)),
+        "rows": len(window),
+        "start": str(window.index.min().date()),
+        "end": str(window.index.max().date()),
+        "rows_dropped_no_price": int(window_rows - len(window)),
         "rows_checked_against_workbook": int(both.sum()),
         "max_abs_error_vs_workbook": float(err.max()),
         "ratio_constant": bool((frame["ratio"] == frame["ratio"].iloc[0]).all()),
         "ratio": float(frame["ratio"].iloc[0]),
-        "total_return_missing": {leg: int(frame[f"tr_{leg}"].isna().sum()) for leg in ("a", "b")},
+        "total_return_missing": {leg: int(window[f"tr_{leg}"].isna().sum()) for leg in ("a", "b")},
     }
-    return frame[COLUMNS], report
+    if extend_rows:
+        report["rows_after_window"] = int(len(frame) - len(window))
+    return frame[[*COLUMNS, "in_window"]], report
 
 
 def regression_path(cfg: DictConfig) -> Path:
     return Path(cfg.interim_path).with_suffix(".regression.parquet")
+
+
+def trading_path(cfg: DictConfig) -> Path:
+    return Path(cfg.interim_path).with_suffix(".trading.parquet")
 
 
 def regression_indices(spec: DictConfig) -> list[str]:
@@ -204,7 +225,7 @@ def convert(cfg: DictConfig, root: Path) -> dict:
         fx = sheet.column(spec.fx_per_b) if spec.get("fx_per_b") else None
         legs[leg] = (price, tr, fx)
     ratio_sheet = read_sheet(book, src.ratio.sheet)
-    panel, report = assemble(
+    trading, report = assemble(
         legs["a"][0],
         legs["b"][0],
         legs["a"][1],
@@ -214,10 +235,13 @@ def convert(cfg: DictConfig, root: Path) -> dict:
         fx=legs["a"][2],
         start=cfg.window.start,
         end=cfg.window.end,
+        extend_rows=cfg.trading.rows_after_window,
     )
+    panel = trading.loc[trading["in_window"], COLUMNS]
     out = root / cfg.interim_path
     out.parent.mkdir(parents=True, exist_ok=True)
     panel.to_parquet(out)
+    trading.to_parquet(root / trading_path(cfg))
     regression, report["regression"] = regression_panel(
         read_sheet(book, cfg.regression.sheet), cfg.regression, panel
     )
