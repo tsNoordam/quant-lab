@@ -108,3 +108,8 @@ and so does one of these disappearing.
   - D12: ratios read from the workbooks.
 - **Table III** (comovement) needs the `Regression data` sheets. That is step
   15.
+- **Update from step 15** (`dejong_table3.md`):
+  - Fortis and Dexia reproduce Table III exactly; for Dexia this holds once the
+    two spike observations are left out.
+  - So their daily returns are the authors' returns, and the Table II
+    differences lie in the deviation levels.

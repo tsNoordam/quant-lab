@@ -64,8 +64,10 @@ stages:
             - window
             - source
             - interim_path
+            - regression
       outs:
         - data/interim/dlc/${item}.parquet
+        - data/interim/dlc/${item}.regression.parquet
       metrics:
         - data/interim/dlc/${item}.ingest.json:
             cache: false

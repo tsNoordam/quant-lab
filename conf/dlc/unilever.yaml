@@ -14,3 +14,12 @@ source:
     b: {sheet: UNILEVER PLC, price: 900789(P), total_return: 900789(RI), price_scale: 0.01}
   ratio: {sheet: Ratio, theoretical_ratio: THEORETICAL RATIO, deviation: LOG DEVIATIONS FROM PARITY,
           deviation_exclude: absolute value}
+# Table III inputs. Indices as named on paper p. 501 (research/reports/dejong_table3.md).
+regression:
+  sheet: Regression data
+  return_a: "TOTAL RETURN UNILEVER NV"
+  return_b: "TOTAL RETURN UNILEVER PLC"
+  fx: "GUILDER (€)/ BRITISH £"
+  index_a: "CBS ALLSHARE PRICE INDEX"
+  index_b: "FTSE Allshare"
+  exclude_dates: []

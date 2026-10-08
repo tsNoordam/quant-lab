@@ -19,3 +19,16 @@ source:
     b: {sheet: Smithkline Beecham E Shares, price: PRICE E shares,
         total_return: TOTAL RETURN E shares, total_return_kind: log_return}
   ratio: {sheet: Ratio, theoretical_ratio: THEORETICAL RATIO, deviation: LOG DEVIATIONS FROM PARITY}
+# Table III inputs (research/reports/dejong_table3.md). [PAPER-DERIVED, identified from
+# Table III, D16] the "Datastream dates" sheet with the Datastream FTSE Allshare
+# reproduces every Table III value; p. 501 says the Smithkline FTSE index is from
+# Bloomberg (the sheet's FTSE 100 column), which does not.
+regression:
+  sheet: Regression data DS dates
+  return_a: "TOTAL RETURN H SHARES"
+  return_b: "TOTAL RETURN E SHARES"
+  fx: "BRITISH £/ US$"
+  index_a: "FTSE Allshare"
+  index_b: "S&P 500"
+  exclude_dates: []
+  as_stated: {index_a: "FTSE 100"}

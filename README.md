@@ -165,14 +165,17 @@ uv run python -m quant_lab.backtest.walkforward data=rd_shell strategy=silta_par
 
 Paper-convention panels for all 12 dual-listed companies (`conf/dlc/<twin>.yaml`,
 DVC stage `dlc_ingest`), each checked row by row against the authors' own
-deviation-from-parity column, and the Table II replication:
+deviation-from-parity column, plus each workbook's regression data; the Table II
+(deviations) and Table III (comovement) replications:
 
 ```bash
 uv run dvc repro dlc_ingest
-uv run python -m quant_lab.models.dejong      # MLflow experiment dejong.replication
+uv run python -m quant_lab.models.dejong      # both tables; --table 2 or --table 3 for one
 ```
 
-Results: `research/reports/dejong_table2.md`. Notes: `research/*/dejong_dlc.md`.
+MLflow experiment `dejong.replication`, runs `table2` and `table3`. Results:
+`research/reports/dejong_table2.md`, `research/reports/dejong_table3.md`.
+Notes: `research/*/dejong_dlc.md`.
 
 ## Robustness (step 9)
 

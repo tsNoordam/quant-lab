@@ -12,3 +12,12 @@ source:
     a: {sheet: Elsevier, price: 981526(P), total_return: 981526(RI), fx_per_b: "# NLG(€) per £"}
     b: {sheet: Reed International, price: 901080(P), total_return: 901080(RI), price_scale: 0.01}
   ratio: {sheet: Ratio, theoretical_ratio: THEORETICAL RATIO, deviation: LOG DEVIATIONS FROM PARITY}
+# Table III inputs. Indices as named on paper p. 501 (research/reports/dejong_table3.md).
+regression:
+  sheet: Regression data
+  return_a: "TOTAL RETURN ELSEVIER"
+  return_b: "TOTAL RETURN REED INT."
+  fx: "GUILDER (€)/ BRITISH £"
+  index_a: "CBS ALLSHARE PRICE INDEX"
+  index_b: "FTSE Allshare"
+  exclude_dates: []

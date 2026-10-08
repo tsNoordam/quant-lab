@@ -13,3 +13,12 @@ source:
     b: {sheet: Allied Zurich PLC, price: 686714(P), total_return: 686714(RI), price_scale: 0.01}
   ratio: {sheet: Ratio, theoretical_ratio: THEORETICAL RATIO, deviation: LOG DEVIATIONS FROM PARITY,
           deviation_exclude: absolute value}
+# Table III inputs. Indices as named on paper p. 501 (research/reports/dejong_table3.md).
+regression:
+  sheet: Regression data
+  return_a: "TOTAL RETURN ZURICH ALLIED"
+  return_b: "TOTAL RETURN ALLIED ZURICH"
+  fx: "SWISS FR./ BRITISH £"
+  index_a: "SWISS PERFORMANCE INDEX"
+  index_b: "FTSE Allshare"
+  exclude_dates: []

@@ -12,3 +12,12 @@ source:
     a: {sheet: Fortis NV, price: 923306(P), total_return: 923306(RI), fx_per_b: "# NLG(€) per BEF(€)"}
     b: {sheet: Fortis AG, price: 929303(P), total_return: 929303(RI)}
   ratio: {sheet: Ratio, theoretical_ratio: THEORETICAL RATIO, deviation: LOG DEVIATIONS FROM PARITY}
+# Table III inputs. Indices as named on paper p. 501 (research/reports/dejong_table3.md).
+regression:
+  sheet: Regression data
+  return_a: "TOTAL RETURN FORTIS NV"
+  return_b: "TOTAL RETURN FORTIS AG"
+  fx: "GUILDER (€)/ BELG. FR. (€)"
+  index_a: "CBS ALLSHARE PRICE INDEX"
+  index_b: "BRUSSELS ALL SHARE"
+  exclude_dates: []

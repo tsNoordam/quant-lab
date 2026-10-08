@@ -13,3 +13,12 @@ source:
     a: {sheet: Brambles Ltd, price: 904800(P), total_return: 904800(RI), fx_per_b: "# AUS$ per £"}
     b: {sheet: Brambles PLC, price: 900754(P), total_return: 900754(RI), price_scale: 0.01}
   ratio: {sheet: Ratio, theoretical_ratio: THEORETICAL RATIO, deviation: LOG DEVIATIONS FROM PARITY}
+# Table III inputs. Indices as named on paper p. 501 (research/reports/dejong_table3.md).
+regression:
+  sheet: Regression data
+  return_a: "TOTAL RETURN BRAMBLES Ltd"
+  return_b: "TOTAL RETURN BRAMBLES PLC"
+  fx: "AUS$/ BRITISH £"
+  index_a: "ASX ALL ORD"
+  index_b: "FTSE Allshare"
+  exclude_dates: []

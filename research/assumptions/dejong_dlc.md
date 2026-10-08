@@ -33,6 +33,21 @@
 | D11 | Which T-bill rate pads short positions, and how are the daily excess returns in Table VI pooled across overlapping positions? | FRED 3-month T-bill at the exit date; equal-weight average of open positions' daily returns | Table VI, after Tables IV and V match |
 | D12 | Which six twins have a 1:1 ratio? | The workbooks' THEORETICAL RATIO column says it | Read from the workbooks |
 
+## Table III conventions (settled in step 15, `research/reports/dejong_table3.md`)
+
+Each was identified by the paper's own Table III numbers. The data is never
+altered; only a workbook column or the sample is chosen. The paper's text taken
+literally is kept as the `as_stated` variant.
+
+| # | Question | Answer | Tag |
+|---|---|---|---|
+| D13 | Direction of e.r. | B's currency per unit of A's: the negative of the workbook's log-return column | PAPER-DERIVED (identified) |
+| D14 | Royal Dutch/Shell's Dutch index | CBS Allshare ex. Royal Dutch (the text says CBS Allshare) | PAPER-DERIVED (identified) |
+| D15 | Dexia's regression sample | Without the return observations of 1997-12-19 and 1997-12-22 (the spike) | PAPER-DERIVED (identified) |
+| D16 | Smithkline's data | "Regression data DS dates" with the Datastream FTSE Allshare (the text says a Bloomberg FTSE) | PAPER-DERIVED (identified) |
+| D17 | R² and sample | Unadjusted R² (the caption says adjusted); every complete window row, leads and lags read across the window edges | PAPER-DERIVED (identified) |
+| D18 | Newey-West variant | Bartlett, fixed lag floor(4 (n/100)^(2/9)), no prewhitening, n/(n-k): the EViews default. Chosen before comparing; all 48 significance marks match | IMPLEMENTATION-ASSUMPTION |
+
 ## Lab rules that conflict with the paper's design (flag, do not silently change)
 
 | Lab rule (CLAUDE.md) | Paper | Resolution proposed for step 14 |

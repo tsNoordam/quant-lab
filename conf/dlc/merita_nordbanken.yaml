@@ -12,3 +12,12 @@ source:
     a: {sheet: Merita Ltd., price: 772923(P), total_return: 772923(RI), fx_per_b: "# FINM per SEK"}
     b: {sheet: Nordbanken Holding AB, price: 671068(P), total_return: 671068(RI)}
   ratio: {sheet: Ratio, theoretical_ratio: THEORETICAL RATIO, deviation: LOG DEVIATIONS FROM PARITY}
+# Table III inputs. Indices as named on paper p. 501 (research/reports/dejong_table3.md).
+regression:
+  sheet: Regression data
+  return_a: "TOTAL RETURN MERITA"
+  return_b: "TOTAL RETURN NORDBANKEN"
+  fx: "FIN. MARK. (€)/ SWED. KR."
+  index_a: "HELSINKI HEX"
+  index_b: "Stockholmborsen allshare"
+  exclude_dates: []

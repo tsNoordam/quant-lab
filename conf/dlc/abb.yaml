@@ -13,3 +13,12 @@ source:
     a: {sheet: ABB AG, price: 922924(P), total_return: 922924(RI), fx_per_b: "# CHF per SEK"}
     b: {sheet: ABB AB, price: 929515(P), total_return: 929515(RI)}
   ratio: {sheet: Ratio, theoretical_ratio: THEORETICAL RATIO, deviation: LOG DEVIATIONS FROM PARITY}
+# Table III inputs. Indices as named on paper p. 501 (research/reports/dejong_table3.md).
+regression:
+  sheet: Regression data
+  return_a: "TOTAL RETURN ABB AG"
+  return_b: "TOTAL RETURN ABB AB"
+  fx: "SWISS FR./ SWED. KR."
+  index_a: "SWISS PERFORMANCE INDEX"
+  index_b: "Stockholmborsen allshare"
+  exclude_dates: []

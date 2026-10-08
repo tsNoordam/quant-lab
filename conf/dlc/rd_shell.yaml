@@ -13,3 +13,16 @@ source:
     a: {sheet: Royal Dutch, price: 902178(P), total_return: 902178(RI), fx_per_b: "# NLG(€) per £"}
     b: {sheet: Shell, price: 900998(P), total_return: 900998(RI), price_scale: 0.01}   # pence -> £
   ratio: {sheet: Ratio, theoretical_ratio: THEORETICAL RATIO, deviation: LOG DEVIATIONS FROM PARITY}
+# Table III inputs. Indices as named on paper p. 501 (research/reports/dejong_table3.md).
+regression:
+  sheet: Regression data
+  return_a: "TOTAL RETURN ROYAL DUTCH"
+  return_b: "TOTAL RETURN SHELL"
+  fx: "GUILDER (€)/ BRITISH £"
+  # [PAPER-DERIVED, identified from Table III, D14] the CBS Allshare without Royal
+  # Dutch itself (a workbook column); it reproduces every Table III value, the
+  # plain CBS Allshare named on p. 501 does not.
+  index_a: "CBS Allshare ex. Royal Dutch"
+  index_b: "FTSE Allshare"
+  exclude_dates: []
+  as_stated: {index_a: "CBS ALLSHARE PRICE INDEX"}

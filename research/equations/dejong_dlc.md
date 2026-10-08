@@ -30,6 +30,11 @@ Journal page numbers. A is the first part of the twin, in the earlier time zone
 - Reported: R², Durbin-Watson, degrees of freedom, and the coefficient sums
   (lagged dependent variable; index 1; index 2; exchange rate), with Wald tests
   that each sum is zero, using Newey-West standard errors.
+- Identified in step 15 from the paper's numbers (D13-D18 in
+  `research/assumptions/dejong_dlc.md`):
+  - er is the log change of B's currency per unit of A's;
+  - the reported R² is unadjusted;
+  - leads and lags read the rows next to the window.
 
 ## E3 Arbitrage position [PAPER-DERIVED, pp. 503-506]
 

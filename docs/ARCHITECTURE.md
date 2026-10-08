@@ -96,7 +96,7 @@ flowchart LR
     GEN["quant_lab.data.synthetic<br/>(one-off generator)"] -->|writes once| SYN
 
     ZIP -->|"stage: ingest@pair<br/>quant_lab.data.datastream"| INT["data/interim/{pair}/*.csv<br/>+ {pair}.ingest.json"]
-    ZIP -->|"stage: dlc_ingest@twin<br/>quant_lab.data.dlc"| DLC["data/interim/dlc/{twin}.parquet<br/>+ .ingest.json"]
+    ZIP -->|"stage: dlc_ingest@twin<br/>quant_lab.data.dlc"| DLC["data/interim/dlc/{twin}.parquet<br/>+ .regression.parquet + .ingest.json"]
     INT -->|"stage: preprocess@pair<br/>loaders + validation + synchronization"| PANEL["data/processed/{pair}/panel.parquet<br/>+ validation.json"]
     SYN -->|"stage: preprocess@synthetic_twin"| PANEL
 
@@ -299,7 +299,7 @@ and Markdown. There are no services, queues or network APIs at runtime.
 | Module | Responsibility | Inputs | Outputs | Communicates via |
 |---|---|---|---|---|
 | `datastream` | Read the legacy `.xls` inside the zips without extracting them. Repair the dd/mm vs mm/dd dates. Locate columns by exact header label. Build the lab's per-leg raw schema (GBP, shares, total-return `adj_close`, holiday rows dropped) | `data/raw/datastream_dlc/*.zip`, `conf/data/<pair>.yaml` | `data/interim/<pair>/<SYMBOL>.csv`, `data/interim/<pair>.ingest.json` | DVC stage `ingest`; `read_sheet` and `Sheet.column` reused by `dlc` |
-| `dlc` | Paper-convention twin panel for de Jong et al.: all workbook rows in the paper's window, d_t rebuilt and checked against the authors' column (1e-9) | zips, `conf/dlc/<twin>.yaml` | `data/interim/dlc/<twin>.parquet`, `.ingest.json` | DVC stage `dlc_ingest`; read by `models.dejong` |
+| `dlc` | Paper-convention twin panel for de Jong et al.: all workbook rows in the paper's window, d_t rebuilt and checked against the authors' column (1e-9); the regression sheet's Table III inputs, returns checked against the panel (1e-9) | zips, `conf/dlc/<twin>.yaml` | `data/interim/dlc/<twin>.parquet`, `<twin>.regression.parquet`, `.ingest.json` | DVC stage `dlc_ingest`; read by `models.dejong` |
 | `loaders` | Load one `<SYMBOL>.csv`, enforce required columns, no silent fixing | raw CSV | DataFrame | called by `preprocess` |
 | `validation` | Deterministic data checks: OHLC consistency, dates, gaps, jumps, quotes, turnover plausibility, pair coverage | per-leg frames | `Issue` list; raises `DataValidationError` | called by `preprocess`; asserted in `tests/data/` |
 | `synchronization` | Align two legs on common dates (`drop` or `ffill` with limit), stale flags | two frames | pair panel | called by `preprocess` |
@@ -339,7 +339,7 @@ applied once, in `backtest.run`.
 | Module | Responsibility | Inputs | Outputs | Communicates via |
 |---|---|---|---|---|
 | `models.silta` | Maymin's price-volume regressions, Newey-West (R `sandwich` defaults), the chi > 0 check, lag sensitivity; development windows only | cfg, panel | MLflow `<data>.silta` + CSV artifacts | Hydra CLI; imports guards from `backtest.run` |
-| `models.dejong` | de Jong et al. Table II: deviation statistics vs the paper's values from the evidence CSV | `conf/dlc/*`, DLC panels, `research/evidence/dejong_dlc_evidence.csv` | MLflow `dejong.replication/table2` + CSV | plain CLI (reads `conf/config.yaml` for MLflow settings) |
+| `models.dejong` | de Jong et al. Table II (deviation statistics) and Table III (comovement regression E2, EViews-style Newey-West; variants `identified` and `as_stated`) vs the paper's values from the evidence CSV | `conf/dlc/*`, DLC panels and regression data, `research/evidence/dejong_dlc_evidence.csv` | MLflow `dejong.replication/table2`, `/table3` + CSV | plain CLI (reads `conf/config.yaml` for MLflow settings) |
 | `reproduce` | Recompute 10 headline development numbers without logging; compare with `research/reports/headlines.yaml` | panels, configs | exit code 0/1, printed table | CLI; used in `tests/integration/test_reproduce.py` |
 | `tracking.mlflow_utils` | `git_state`, `file_md5`, `dvc_locked_md5`, `data_provenance`, `flatten`, `set_experiment` | repo root, `dvc.lock` | tag dicts | imported by every logging module |
 
@@ -373,7 +373,7 @@ writes only the paths listed.
 | E9 | `uv run python -m quant_lab.backtest.robustness data=<pair>` | `run_walk_forward` + `run_backtest` per case; `count_trials`; `stats.*` | MLflow runs + `<pair>.robustness` |
 | E10 | `uv run python -m quant_lab.backtest.oos +unlock_oos=true` | `check_ready` (tag, clean tree) → `run_backtest` × 24 → Holm, DSR, verdicts | MLflow `oos.evaluation`. **Spent**: run once at `ff1e9eb` (run `c5a6c503`) |
 | E11 | `uv run python -m quant_lab.models.silta data=<pair>` | `analyse` → `regressions` (`ols_nw`) → `chi_condition`, `lag_sensitivity` | MLflow `<pair>.silta` |
-| E12 | `uv run python -m quant_lab.models.dejong` | `table2` → `deviation_stats` per twin vs `paper_table2` | MLflow `dejong.replication` |
+| E12 | `uv run python -m quant_lab.models.dejong [--table 2\|3]` | `table2` → `deviation_stats` per twin vs `paper_table2`; `table3` → `comovement_design` → `comovement` per twin and variant vs `paper_table3` | MLflow `dejong.replication` |
 | E13 | `uv run python -m quant_lab.reproduce [<dataset>]` | `measure` → `silta.analyse` / `backtest_pair` / `walk_forward` | stdout only; exit code |
 | E14 | `uv run mlflow ui --backend-store-uri sqlite:///mlflow.db` | MLflow web UI | none (read) |
 | E15 | `uv run pytest` / `uv run ruff check . && uv run ruff format --check .` | test tiers / lint | `.pytest_cache`, `.ruff_cache` |
@@ -395,6 +395,7 @@ writes only the paths listed.
 | Every run records git commit, dirty flag and data md5 vs `dvc.lock` | `run_tags`, `data_provenance` | `test_run_logs_metrics_tags_and_artifacts` |
 | Raw data immutable; locks edited only by tools | `.claude/settings.json` deny, guard hook | `test_bash_guard.py`, `test_claude_config.py` |
 | Paper-2 panels reproduce the authors' deviation | `dlc.assemble` (raises) | `test_dlc.py`, `test_dejong_real.py` |
+| Paper-2 regression data equals the panels' returns | `dlc.regression_panel` (raises) | `test_dejong_table3.py`, `test_dejong_real.py` |
 | Headline numbers are stable | `reproduce` | `test_reproduce.py` (real data) |
 
 ## 7. Data and record contracts

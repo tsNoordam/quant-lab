@@ -71,12 +71,11 @@ a numerical replication is possible. Branch: work on `claude/sharp-bohr-snz350`
 | Step | What | Commit |
 |---|---|---|
 | 13 | Paper extraction: `research/{extraction,equations,methodology,assumptions}/dejong_dlc.md`, evidence CSV (539 rows: Tables II-VI, sensitivity, unifications); ambiguities D1-D12; review | 947f8a9 |
-| 14 | All 12 DLCs: paper-convention panels (`quant_lab.data.dlc`, `conf/dlc/`, DVC stage `dlc_ingest`) reproducing the authors' deviation column on every row; Table II replicated (`quant_lab.models.dejong`): 58/72 statistics within rounding, differences documented (Rio sign, ABB st. dev., Dexia and Fortis data versions); user approved the full 1980-2002 windows. `research/reports/dejong_table2.md` | (this step) |
+| 14 | All 12 DLCs: paper-convention panels (`quant_lab.data.dlc`, `conf/dlc/`, DVC stage `dlc_ingest`) reproducing the authors' deviation column on every row; Table II replicated (`quant_lab.models.dejong`): 58/72 statistics within rounding, differences documented (Rio sign, ABB st. dev., Dexia and Fortis data versions); user approved the full 1980-2002 windows. `research/reports/dejong_table2.md` | a847032 |
+| 15 | Table III comovement regressions (E2, EViews-style Newey-West) from each workbook's regression sheet (`<twin>.regression.parquet`, checked against the step-14 panels): 77/84 statistics within rounding, 48/48 significance marks; conventions D13-D18 identified from the paper's numbers, the literal reading kept as variant `as_stated`. `research/reports/dejong_table3.md` | (this step) |
 
 Planned, in order:
 
-15. **Comovement (Table III).** Regression E2 with Newey-West errors from the
-    workbooks' `Regression data`; compare with the paper per twin.
 16. **Paper-convention arbitrage engine (Tables IV-V).** Threshold strategy
     with Reg T margin account, maintenance calls, fixed interest, flat costs
     and the T-bill padding convention; resolve D2-D11 against the per-twin

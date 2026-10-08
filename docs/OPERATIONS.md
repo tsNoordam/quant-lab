@@ -117,8 +117,8 @@ uv run python -m quant_lab.backtest.run data=rd_shell strategy=silta_parity back
 uv run python -m quant_lab.backtest.walkforward data=rd_shell strategy=parity_zscore
 uv run python -m quant_lab.backtest.robustness data=rd_shell          # ~35 min, 19 cases x 2 strategies
 
-# C. Paper 2 (de Jong et al.): Table II replication
-uv run python -m quant_lab.models.dejong      # expect "58/72 statistics within rounding"
+# C. Paper 2 (de Jong et al.): Table II and III replications
+uv run python -m quant_lab.models.dejong      # expect "58/72" (Table II), then "77/84" and "48/48" (Table III, identified)
 
 # D. Check that the recorded headline numbers still reproduce
 uv run python -m quant_lab.reproduce          # expect "10/10 headline numbers reproduced"
@@ -690,8 +690,8 @@ git_dirty=false: run_id, period, sharpe, total_return, git_commit. Aggregates on
 ```
 
 ```text
-/replicate-table Replicate Table III of research/extraction/dejong_dlc.md for all 12 twins
-(ROADMAP step 15). Follow research/methodology/dejong_dlc.md; never adjust data to match.
+/replicate-table Replicate Table IV of research/extraction/dejong_dlc.md for all 12 twins
+(ROADMAP step 16). Follow research/methodology/dejong_dlc.md; never adjust data to match.
 ```
 
 ---

@@ -19,6 +19,13 @@ Validation (deterministic, the stage fails otherwise): our d_t must equal the
 authors' "LOG DEVIATIONS FROM PARITY" column to 1e-9 on every row where both
 exist, dates must be strictly increasing weekdays, and the window must lie
 inside the workbook.
+
+The stage also writes ``<twin>.regression.parquet``: the inputs of the Table III
+comovement regression from the workbook's regression sheet (local-currency log
+returns of both legs, the exchange-rate log change, the index log returns), on
+every row of that sheet, since the regression's leads and lags read the rows
+next to the window. Both legs' returns must equal the panel's total-return log
+differences to 1e-9 on every panel date where those are defined.
 """
 
 import argparse
@@ -31,9 +38,12 @@ import pandas as pd
 import xlrd
 from omegaconf import DictConfig, OmegaConf
 
-from quant_lab.data.datastream import DatastreamFormatError, read_sheet
+from quant_lab.data.datastream import DatastreamFormatError, Sheet, read_sheet
 
 TOLERANCE = 1e-9
+# The regression sheet holds each leg's total return twice (local and foreign
+# currency, same top label); the paper's regression uses the local one.
+FOREIGN_CURRENCY = "foreign currency"
 COLUMNS = [
     "price_a",  # leg A, local currency (x price_scale)
     "price_b",  # leg B, local currency (x price_scale)
@@ -125,6 +135,60 @@ def assemble(
     return frame[COLUMNS], report
 
 
+def regression_path(cfg: DictConfig) -> Path:
+    return Path(cfg.interim_path).with_suffix(".regression.parquet")
+
+
+def regression_indices(spec: DictConfig) -> list[str]:
+    """Index labels used by the regression spec and its as-stated variant."""
+    labels = [spec.index_a, spec.index_b]
+    for key in ("index_a", "index_b"):
+        alt = spec.get("as_stated", {}).get(key)
+        if alt and alt not in labels:
+            labels.append(alt)
+    return labels
+
+
+def regression_panel(
+    sheet: Sheet, spec: DictConfig, panel: pd.DataFrame
+) -> tuple[pd.DataFrame, dict]:
+    """Table III inputs from the regression sheet, checked against the twin panel.
+
+    Columns: r_a, r_b (local-currency log returns), fx (log change of A's currency
+    per unit of B's, as in the workbook) and ``index:<label>`` per index.
+    """
+    frame = pd.DataFrame(
+        {
+            "r_a": sheet.column(spec.return_a, exclude=FOREIGN_CURRENCY),
+            "r_b": sheet.column(spec.return_b, exclude=FOREIGN_CURRENCY),
+            "fx": sheet.column(spec.fx),
+            **{f"index:{label}": sheet.column(label) for label in regression_indices(spec)},
+        }
+    )
+    frame.index.name = "date"
+    checked, worst = 0, 0.0
+    for leg in ("a", "b"):
+        ours = np.log(panel[f"tr_{leg}"]).diff().dropna()
+        theirs = frame[f"r_{leg}"].reindex(ours.index)
+        err = (ours - theirs).abs()
+        if err.isna().any() or err.max() > TOLERANCE:
+            bad = err[err.isna() | (err > TOLERANCE)].index[0]
+            raise DatastreamFormatError(
+                f"regression sheet return r_{leg} does not match the panel on {bad.date()}"
+            )
+        checked += len(err)
+        worst = max(worst, float(err.max()))
+    report = {
+        "sheet": sheet.name,
+        "rows": len(frame),
+        "start": str(frame.index.min().date()),
+        "end": str(frame.index.max().date()),
+        "returns_checked_against_panel": checked,
+        "max_abs_error_vs_panel": worst,
+    }
+    return frame, report
+
+
 def convert(cfg: DictConfig, root: Path) -> dict:
     src = cfg.source
     with zipfile.ZipFile(root / src.archive) as archive:
@@ -154,6 +218,10 @@ def convert(cfg: DictConfig, root: Path) -> dict:
     out = root / cfg.interim_path
     out.parent.mkdir(parents=True, exist_ok=True)
     panel.to_parquet(out)
+    regression, report["regression"] = regression_panel(
+        read_sheet(book, cfg.regression.sheet), cfg.regression, panel
+    )
+    regression.to_parquet(root / regression_path(cfg))
     report = {"twin": cfg.name, "archive": src.archive, "workbook": src.workbook, **report}
     out.with_suffix(".ingest.json").write_text(json.dumps(report, indent=2) + "\n")
     return report

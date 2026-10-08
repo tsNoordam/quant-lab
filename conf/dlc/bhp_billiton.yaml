@@ -13,3 +13,12 @@ source:
     a: {sheet: BHP Billiton Ltd, price: 906169(P), total_return: 906169(RI), fx_per_b: "# AUS$ per £"}
     b: {sheet: BHP Billiton PLC, price: 899188(P), total_return: 899188(RI), price_scale: 0.01}
   ratio: {sheet: Ratio, theoretical_ratio: THEORETICAL RATIO, deviation: LOG DEVIATIONS FROM PARITY}
+# Table III inputs. Indices as named on paper p. 501 (research/reports/dejong_table3.md).
+regression:
+  sheet: Regression data
+  return_a: "TOTAL RETURN BHP Ltd"
+  return_b: "TOTAL RETURN BHP PLC"
+  fx: "AUS$/ BRITISH £"
+  index_a: "ASX ALL ORD"
+  index_b: "FTSE Allshare"
+  exclude_dates: []
