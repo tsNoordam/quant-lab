@@ -106,12 +106,27 @@ def test_table5_position_counts_within_four_of_the_paper(placeholder):
     assert (counts.difference.abs() <= 4).all()
 
 
+# Weighted mean % p.m. per strategy, primary configuration, FRED DTB3 md5
+# 7edbf7612395ad04c5f850a742743705 (MLflow run 1d9f0b53, 2026-10-09).
+PINNED_WEIGHTED_MEAN = {
+    "5/1/1m": -0.140,
+    "5/1/3m": 0.497,
+    "5/1/12m": 0.689,
+    "5/1/inf": 0.639,
+    "10/5/1m": 0.484,
+    "10/5/3m": 1.043,
+    "10/5/12m": 1.158,
+    "10/5/inf": 1.131,
+}
+
+
 @pytest.mark.skipif(not TBILL.exists(), reason="FRED DTB3 not present (data/raw/fred_tbill)")
-def test_benchmark_returns_with_the_real_tbill(lab):
+def test_returns_with_the_real_tbill(lab):
     shutil.copytree(ROOT / "data" / "raw" / "fred_tbill", lab / "data" / "raw" / "fred_tbill")
     cfg = variant_config(load_config(lab), None)
     out = evaluate(lab, cfg, load_tbill(lab / cfg.tbill.path, cfg.tbill.series))
     t5 = out["table5"].set_index(["strategy", "statistic"])
-    # provisional bounds until the step-16 report pins the numbers of the user's run
-    assert abs(t5.loc[("10/5/12m", "weighted_mean_return"), "difference"]) < 0.1
-    assert abs(t5.loc[("10/5/12m", "median_return"), "difference"]) < 0.1
+    for strategy, value in PINNED_WEIGHTED_MEAN.items():
+        ours = t5.loc[(strategy, "weighted_mean_return"), "ours"]
+        assert ours == pytest.approx(value, abs=6e-4), strategy
+    assert t5.loc[("10/5/12m", "median_return"), "ours"] == pytest.approx(3.697, abs=6e-4)

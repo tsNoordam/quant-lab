@@ -1,6 +1,6 @@
 # de Jong et al. (2009), Tables IV-V replication: the arbitrage strategies (step 16)
 
-Date: 2026-10-08.
+Date: 2026-10-08; final figures 2026-10-09 (the user's run `1d9f0b53bcb749a7a260e1a6b61fdeba`, FRED DTB3 md5 `7edbf7612395ad04c5f850a742743705`).
 
 - **Code:**
   - `quant_lab.backtest.dejong` is the paper-convention engine: positions,
@@ -11,8 +11,7 @@ Date: 2026-10-08.
     `dlc_ingest`).
 - **Data:**
   - the 12 DLC workbooks over the user-approved 1980-2002 windows;
-  - the 3-month T-bill (FRED DTB3, `data/raw/fred_tbill/`, to be added by the
-    user).
+  - the 3-month T-bill (FRED DTB3, `data/raw/fred_tbill/`, DVC).
 - **Aggregates only** (licensed data).
 
 Reproduce:
@@ -20,15 +19,16 @@ Reproduce:
     uv run dvc repro dlc_ingest
     uv run python -m quant_lab.backtest.dejong
 
-> **Status: return statistics are provisional.** FRED is not reachable from the
-> cloud session, so the return figures below were computed with a stand-in
-> T-bill: statsmodels' quarterly FRED average (`macrodata.tbilrate`).
+> **The T-bill.** FRED is not reachable from the cloud session. The
+> conventions were therefore identified with a stand-in T-bill: statsmodels'
+> quarterly FRED average (`macrodata.tbilrate`).
 >
-> The T-bill only pads positions shorter than a month. Holding statistics
-> (positions, days, cut-offs) do not depend on it and are final.
+> All figures below come from the user's run on the daily DTB3 series. Against
+> the stand-in, no return moved by more than 0.05% per month (the largest was
+> BHP's max, 7.098 → 7.054). The benchmark weighted mean is 1.158 with both.
 >
-> The return figures are replaced by the user's run on DTB3 before this step
-> closes.
+> The T-bill only pads positions shorter than a month. Holding statistics do
+> not depend on it at all.
 
 ## 1. What the paper specifies and what we had to identify
 
@@ -90,33 +90,34 @@ The median convention is inconsistent, so it was not adjusted.
 Positions and cut-offs are within 4 of the paper in every strategy, for
 example 10%/5%/1 month: 109/181 vs 107/181 positions, 214 vs 215 cut-offs.
 
-## 3. Returns (provisional: stand-in T-bill)
+## 3. Returns
 
 ### Table IV, ours / paper (% per month)
 
 | Twin | Weighted mean | Median | Min | Max | # < 0 | # margin calls |
 |---|---|---|---|---|---|---|
-| Royal Dutch/Shell | 0.403 / 0.492 | 1.372 / 1.460 | -0.593 / -0.728 | 5.542 / 5.393 | 3 / 2 | 3 / 3 |
-| Unilever | 1.188 / 1.134 | 4.499 / 4.346 | -1.445 / -1.374 | 14.280 / 13.044 | 4 / 4 | 9 / 6 |
-| ABB | 0.739 / 0.920 | 2.403 / 3.607 | -0.416 / -0.393 | 7.073 / 6.960 | 2 / 1 | 3 / 1 |
-| Smithkline Beecham | 0.321 / 0.147 | 0.417 / 0.680 | -0.090 / -0.464 | 4.106 / 3.976 | 1 / 2 | 2 / 2 |
-| Fortis | 3.577 / 3.760 | 4.518 / 4.677 | 0.748 / 0.805 | 9.705 / 9.589 | 0 / 0 | 2 / 0 |
-| Elsevier/Reed | 0.817 / 0.694 | 1.577 / 1.095 | -0.295 / -0.573 | 10.230 / 9.552 | 2 / 1 | 4 / 1 |
-| Rio Tinto | 5.392 / 5.054 | 4.846 / 5.140 | 3.383 / 2.539 | 8.763 / 8.250 | 0 / 0 | 0 / 0 |
-| Dexia | 0.336 / 0.917 | 3.296 / 1.179 | -1.734 / -0.318 | 5.720 / 5.385 | 1 / 1 | 1 / 1 |
-| Merita/Nordbanken | 1.880 / 2.150 | 4.546 / 2.885 | -0.065 / 0.513 | 9.298 / 8.627 | 1 / 0 | 1 / 0 |
-| Zürich Allied | 0.691 / 1.062 | 0.715 / 1.249 | 0.373 / 0.712 | 4.221 / 4.058 | 0 / 0 | 2 / 0 |
-| BHP Billiton | 4.190 / 4.238 | 3.717 / 3.703 | 2.782 / 2.930 | 7.098 / 6.705 | 0 / 0 | 0 / 0 |
-| Brambles | 3.813 / 3.106 | 4.733 / 3.830 | 1.538 / 0.764 | 8.437 / 6.056 | 0 / 0 | 0 / 0 |
-| **Total** | **1.158 / 1.180** | **3.696 / 3.703** | -1.734 / -1.374 | 14.280 / 13.044 | 14 / 11 | 27 / 14 |
+| Royal Dutch/Shell | 0.403 / 0.492 | 1.372 / 1.460 | -0.593 / -0.728 | 5.538 / 5.393 | 3 / 2 | 3 / 3 |
+| Unilever | 1.188 / 1.134 | 4.497 / 4.346 | -1.445 / -1.374 | 14.266 / 13.044 | 4 / 4 | 9 / 6 |
+| ABB | 0.739 / 0.920 | 2.403 / 3.607 | -0.416 / -0.393 | 7.102 / 6.960 | 2 / 1 | 3 / 1 |
+| Smithkline Beecham | 0.320 / 0.147 | 0.417 / 0.680 | -0.090 / -0.464 | 4.094 / 3.976 | 1 / 2 | 2 / 2 |
+| Fortis | 3.578 / 3.760 | 4.529 / 4.677 | 0.748 / 0.805 | 9.711 / 9.589 | 0 / 0 | 2 / 0 |
+| Elsevier/Reed | 0.817 / 0.694 | 1.577 / 1.095 | -0.295 / -0.573 | 10.225 / 9.552 | 2 / 1 | 4 / 1 |
+| Rio Tinto | 5.394 / 5.054 | 4.857 / 5.140 | 3.393 / 2.539 | 8.769 / 8.250 | 0 / 0 | 0 / 0 |
+| Dexia | 0.336 / 0.917 | 3.296 / 1.179 | -1.734 / -0.318 | 5.713 / 5.385 | 1 / 1 | 1 / 1 |
+| Merita/Nordbanken | 1.881 / 2.150 | 4.546 / 2.885 | -0.065 / 0.513 | 9.310 / 8.627 | 1 / 0 | 1 / 0 |
+| Zürich Allied | 0.691 / 1.062 | 0.715 / 1.249 | 0.373 / 0.712 | 4.216 / 4.058 | 0 / 0 | 2 / 0 |
+| BHP Billiton | 4.182 / 4.238 | 3.719 / 3.703 | 2.782 / 2.930 | 7.054 / 6.705 | 0 / 0 | 0 / 0 |
+| Brambles | 3.821 / 3.106 | 4.782 / 3.830 | 1.538 / 0.764 | 8.442 / 6.056 | 0 / 0 | 0 / 0 |
+| **Total** | **1.158 / 1.180** | **3.697 / 3.703** | -1.734 / -1.374 | 14.266 / 13.044 | 14 / 11 | 27 / 14 |
 
 **The benchmark total is reproduced:**
 
 - weighted mean 1.158 vs 1.180% per month;
-- median 3.696 vs 3.703.
+- median 3.697 vs 3.703.
 
-Per twin, the returns are close but rarely within rounding (7 of 65
-statistics).
+Per twin, the returns are close but none of the 52 return values is within
+rounding. Negative-position counts are exact for 7 of 13 rows. Table IV as a
+whole: 91 of 169 statistics within rounding; Table V: 29 of 104.
 
 ### Table V, weighted mean % per month, ours / paper
 
@@ -126,10 +127,10 @@ statistics).
 | 5%/1%/3 months | 0.497 / 0.558 | 0.497 | 0.575 | 0.467 | 0.096 |
 | 5%/1%/12 months | 0.689 / 0.892 | 0.717 | 0.803 | 0.671 | 0.390 |
 | 5%/1%/unlimited | 0.639 / 0.780 | 0.663 | 0.801 | 0.625 | 0.402 |
-| 10%/5%/1 month | 0.483 / 0.432 | 0.535 | 0.527 | 0.480 | -0.625 |
-| 10%/5%/3 months | 1.042 / 1.064 | 1.082 | 1.094 | 1.057 | 0.195 |
+| 10%/5%/1 month | 0.484 / 0.432 | 0.536 | 0.527 | 0.480 | -0.625 |
+| 10%/5%/3 months | 1.043 / 1.064 | 1.082 | 1.094 | 1.057 | 0.195 |
 | 10%/5%/12 months | 1.158 / 1.180 | 1.201 | 1.271 | 1.135 | 0.489 |
-| 10%/5%/unlimited | 1.131 / 1.238 | 1.174 | 1.369 | 1.110 | 0.510 |
+| 10%/5%/unlimited | 1.131 / 1.238 | 1.174 | 1.369 | 1.110 | 0.511 |
 
 The paper's pattern is reproduced:
 
@@ -152,10 +153,9 @@ of 11.704 (the same position in all four horizons) is not reached: ours is
    - The returns of the two rules bracket the paper's in most strategies.
 2. **5%/1% returns** are lower than the paper's (above).
 3. **Per-twin returns:**
-   - Brambles is too high (3.81 vs 3.11).
+   - Brambles is too high (3.82 vs 3.11).
    - Zürich, Dexia and ABB are too low.
-   - Brambles and BHP fall in the low-rate period 2001-02, where the stand-in
-     T-bill is coarsest; rerun with DTB3.
+   - The daily DTB3 changed none of this: the T-bill is not the cause.
 4. **Smithkline** is traded on the step-14 panel (Bloomberg dates). The authors
    converted it to Datastream dates for the simulations.
 
@@ -191,4 +191,5 @@ of 11.704 (the same position in all four horizons) is not reached: ours is
   - position counts for 11 twins;
   - Table V counts within 4;
   - every forced close on the first trading day after the announcement;
-  - with DTB3 present, a provisional bound on the benchmark returns.
+  - with DTB3 present, the weighted mean of all eight strategies (primary) at
+    the values of the user's run.

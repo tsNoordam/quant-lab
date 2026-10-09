@@ -5,7 +5,7 @@
   "license": "Public domain US government data; FRED terms of use apply. Versioned with DVC like all raw data.",
   "layout": "data/raw/fred_tbill/DTB3.csv, FRED's CSV export, unmodified",
   "files": {
-    "DTB3.csv": {"md5": "recorded at dvc add (data/raw/fred_tbill.dvc); copy it here when the file is added"}
+    "DTB3.csv": {"md5": "7edbf7612395ad04c5f850a742743705", "downloaded": "2026-10-09"}
   },
   "calendar": "US business days; FRED marks holidays with '.' (missing)",
   "timezone": "naive US dates",
