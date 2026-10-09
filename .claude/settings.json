@@ -21,6 +21,10 @@
       "Write(./.claude/settings.json)",
       "Edit(./.claude/hooks/**)",
       "Write(./.claude/hooks/**)"
+    ],
+    "allow": [
+      "WebFetch(domain:mba.tuck.dartmouth.edu)",
+      "WebFetch(domain:fred.stlouisfed.org)"
     ]
   },
   "env": {
