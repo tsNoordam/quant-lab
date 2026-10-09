@@ -1,0 +1,17 @@
+{
+  "dataset": "french_ff",
+  "description": "Fama/French 3 Factors, daily (Mkt-RF, SMB, HML, RF), percent per day, from Kenneth R. French's data library. de Jong et al. (2009) Table VI uses SMB and HML; the market factor is the S&P 500 excess return (from the RD/Shell workbook).",
+  "source": "https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/ftp/F-F_Research_Data_Factors_daily_CSV.zip",
+  "license": "Free for research use with attribution (Kenneth R. French data library). Versioned with DVC like all raw data.",
+  "layout": "data/raw/french_ff/F-F_Research_Data_Factors_daily_CSV.zip, the library's zip, unmodified",
+  "files": {
+    "F-F_Research_Data_Factors_daily_CSV.zip": {"md5": "recorded at dvc add (data/raw/french_ff.dvc); copy it here when the file is added"}
+  },
+  "calendar": "US trading days (NYSE)",
+  "timezone": "naive US dates",
+  "known_issues": [
+    "The library revises history when CRSP is updated: the factors differ slightly from those the paper used (2006-07 vintage). The md5 pins the version used here.",
+    "Not reachable from the cloud sessions' network policy (2026-10-09): downloaded by the user and added with dvc add."
+  ],
+  "used_by": ["conf/dejong/default.yaml (table6.factors), quant_lab.models.dejong_risk"]
+}

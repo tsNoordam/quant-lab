@@ -189,6 +189,18 @@ uv run python -m quant_lab.backtest.dejong  # MLflow run dejong.replication/tabl
 
 Results: `research/reports/dejong_tables45.md`.
 
+Table VI (abnormal returns and risk) also needs Kenneth French's daily factors:
+
+```bash
+mkdir -p data/raw/french_ff
+curl -L -o data/raw/french_ff/F-F_Research_Data_Factors_daily_CSV.zip \
+  "https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/ftp/F-F_Research_Data_Factors_daily_CSV.zip"
+uv run dvc add data/raw/french_ff               # metadata: data/metadata/french_ff.json
+uv run python -m quant_lab.models.dejong_risk   # MLflow run dejong.replication/table6
+```
+
+Results: `research/reports/dejong_table6.md`.
+
 ## Robustness (step 9)
 
 Every case in `conf/robustness/default.yaml` (costs, dividends, capital and

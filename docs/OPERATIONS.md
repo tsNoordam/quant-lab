@@ -120,6 +120,7 @@ uv run python -m quant_lab.backtest.robustness data=rd_shell          # ~35 min,
 # C. Paper 2 (de Jong et al.): Table II and III replications, then Tables IV-V
 uv run python -m quant_lab.models.dejong      # expect "58/72" (Table II), then "77/84" and "48/48" (Table III, identified)
 uv run python -m quant_lab.backtest.dejong    # needs data/raw/fred_tbill (README); research/reports/dejong_tables45.md
+uv run python -m quant_lab.models.dejong_risk # needs data/raw/french_ff too; research/reports/dejong_table6.md
 
 # D. Check that the recorded headline numbers still reproduce
 uv run python -m quant_lab.reproduce          # expect "10/10 headline numbers reproduced"

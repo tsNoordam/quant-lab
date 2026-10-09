@@ -161,12 +161,16 @@ def trading_path(cfg: DictConfig) -> Path:
 
 
 def regression_indices(spec: DictConfig) -> list[str]:
-    """Index labels used by the regression spec and its as-stated variant."""
+    """Index labels used by the regression spec, its as-stated variant and
+    ``extra_indices`` (e.g. the S&P 500 that Table VI uses)."""
     labels = [spec.index_a, spec.index_b]
     for key in ("index_a", "index_b"):
         alt = spec.get("as_stated", {}).get(key)
         if alt and alt not in labels:
             labels.append(alt)
+    for label in spec.get("extra_indices", []):
+        if label not in labels:
+            labels.append(label)
     return labels
 
 

@@ -107,7 +107,9 @@ def run_account(r_long: np.ndarray, r_short: np.ndarray, account: DictConfig, co
     fraction of both legs that restores it, paying commission. Exit pays
     commission (and the half spread if ``spread_at_exit``) on both legs.
 
-    Returns the total return on capital and the number of margin calls.
+    Returns the total return on capital, the number of margin calls and the
+    daily returns on equity (day 1 includes the entry costs, the last day the
+    exit costs).
     """
     dt = 1 / account.days_per_year
     im = account.initial_margin
@@ -120,6 +122,7 @@ def run_account(r_long: np.ndarray, r_short: np.ndarray, account: DictConfig, co
     deposit_rate = account.cash_rate if account.short_deposit_earns else 0.0
     calls = 0
     n = len(r_long)
+    equity_path = np.empty(n)
     for k in range(n):
         long_v *= 1 + r_long[k]
         short_v *= 1 + r_short[k]
@@ -127,6 +130,7 @@ def run_account(r_long: np.ndarray, r_short: np.ndarray, account: DictConfig, co
         loan *= 1 + account.loan_rate * dt
         proceeds *= 1 + account.rebate_rate * dt
         deposit *= 1 + deposit_rate * dt
+        equity_path[k] = cash + deposit + long_v - loan + proceeds - short_v
         if k == n - 1:
             break  # the position is closed today
         f = liquidation_fraction(long_v, short_v, loan, proceeds, deposit, cash, account, costs)
@@ -139,10 +143,15 @@ def run_account(r_long: np.ndarray, r_short: np.ndarray, account: DictConfig, co
             short_v *= 1 - f
             if loan < 0:
                 cash, loan = cash - loan, 0.0
+            equity_path[k] = cash + deposit + long_v - loan + proceeds - short_v
     exit_rate = costs.commission + (costs.half_spread if costs.spread_at_exit else 0.0)
     equity = cash + deposit + long_v - loan + proceeds - short_v
     equity -= exit_rate * (long_v + short_v)
-    return {"total_return": equity - 1.0, "margin_calls": calls}
+    equity_path[-1] = equity
+    daily = np.diff(np.concatenate([[1.0], equity_path])) / np.concatenate(
+        [[1.0], equity_path[:-1]]
+    )
+    return {"total_return": equity - 1.0, "margin_calls": calls, "daily_returns": daily}
 
 
 def liquidation_fraction(long_v, short_v, loan, proceeds, deposit, cash, account, costs) -> float:
@@ -190,9 +199,24 @@ def leg_returns(panel: pd.DataFrame, returns: DictConfig) -> tuple[np.ndarray, n
     return a.pct_change().to_numpy(), b.pct_change().to_numpy()
 
 
+def padding_dates(panel: pd.DataFrame, exit_row: int, count: int) -> pd.DatetimeIndex:
+    """The ``count`` trading days after an exit: the twin's next rows, then weekdays."""
+    dates = panel.index[exit_row + 1 : exit_row + 1 + count]
+    missing = count - len(dates)
+    if missing:
+        after = pd.bdate_range(panel.index[-1] + pd.offsets.BDay(1), periods=missing)
+        dates = dates.append(after)
+    return dates
+
+
 def twin_positions(
     panel: pd.DataFrame, spec: DictConfig, cfg: DictConfig, tbill: pd.Series, twin: str
-) -> pd.DataFrame:
+) -> tuple[pd.DataFrame, pd.DataFrame]:
+    """The positions of one twin and strategy, and their daily returns.
+
+    Daily rows cover each position's days and, for a position shorter than a
+    month, the padding days that earn the T-bill (Table VI pools these rows).
+    """
     in_window = panel["in_window"].to_numpy()
     positions = find_positions(
         panel["deviation"].to_numpy(),
@@ -205,20 +229,38 @@ def twin_positions(
         delay=cfg.rules.delay,
     )
     ra, rb = leg_returns(panel, cfg.returns)
-    rows = []
-    for p in positions:
+    rows, daily = [], []
+    for number, p in enumerate(positions):
         days = slice(p.entry + 1, p.exit + 1)
         r_long, r_short = (ra[days], rb[days]) if p.direction > 0 else (rb[days], ra[days])
         if np.isnan(r_long).any() or np.isnan(r_short).any():
             raise ValueError(f"{twin}: missing price inside a position ({panel.index[p.entry]})")
         acct = run_account(r_long, r_short, cfg.account, cfg.costs)
         exit_date = panel.index[p.exit]
+        exit_tbill = rate_on(tbill, exit_date)
         counted, monthly = monthly_return(
             acct["total_return"],
             p.exit - p.entry,
-            rate_on(tbill, exit_date),
+            exit_tbill,
             cfg.rules.month_days,
             cfg.account.days_per_year,
+        )
+        pad = counted - (p.exit - p.entry)
+        daily.append(
+            pd.DataFrame(
+                {
+                    "twin": twin,
+                    "position": number,
+                    "date": panel.index[days].append(padding_dates(panel, p.exit, pad)),
+                    "return": np.concatenate(
+                        [
+                            acct["daily_returns"],
+                            np.full(pad, exit_tbill / cfg.account.days_per_year),
+                        ]
+                    ),
+                    "padding": np.r_[np.zeros(p.exit - p.entry, bool), np.ones(pad, bool)],
+                }
+            )
         )
         rows.append(
             {
@@ -235,7 +277,8 @@ def twin_positions(
                 "monthly_return": monthly,
             }
         )
-    return pd.DataFrame(rows)
+    days_frame = pd.concat(daily, ignore_index=True) if daily else pd.DataFrame()
+    return pd.DataFrame(rows), days_frame
 
 
 def load_trading(root: Path, twin: str, exclude: list[str]) -> pd.DataFrame:
@@ -243,14 +286,18 @@ def load_trading(root: Path, twin: str, exclude: list[str]) -> pd.DataFrame:
     return panel.drop(index=pd.to_datetime(list(exclude)))  # KeyError if a date is absent
 
 
-def all_positions(root: Path, cfg: DictConfig, tbill: pd.Series) -> pd.DataFrame:
-    frames = []
+def all_positions(
+    root: Path, cfg: DictConfig, tbill: pd.Series
+) -> tuple[pd.DataFrame, pd.DataFrame]:
+    """Positions and their daily returns, every twin and strategy."""
+    frames, daily = [], []
     for twin in twins(root):
         panel = load_trading(root, twin, cfg.exclude_dates.get(twin, []))
         for name, spec in cfg.strategies.items():
-            pos = twin_positions(panel, spec, cfg, tbill, twin)
+            pos, days = twin_positions(panel, spec, cfg, tbill, twin)
             frames.append(pos.assign(strategy=name))
-    return pd.concat(frames, ignore_index=True)
+            daily.append(days.assign(strategy=name))
+    return pd.concat(frames, ignore_index=True), pd.concat(daily, ignore_index=True)
 
 
 # ---------------------------------------------------------------- tables
@@ -365,9 +412,10 @@ def variant_config(cfg: DictConfig, variant: str | None) -> DictConfig:
 
 
 def evaluate(root: Path, cfg: DictConfig, tbill: pd.Series) -> dict:
-    pos = all_positions(root, cfg, tbill)
+    pos, days = all_positions(root, cfg, tbill)
     return {
         "positions": pos,
+        "days": days,
         "table4": table4(root, pos, cfg.benchmark),
         "table5": table5(root, pos, cfg),
     }

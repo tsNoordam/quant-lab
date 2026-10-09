@@ -106,6 +106,40 @@ def test_table5_position_counts_within_four_of_the_paper(placeholder):
     assert (counts.difference.abs() <= 4).all()
 
 
+def test_table6_position_days_within_one_and_a_half_percent(lab, placeholder):
+    from quant_lab.backtest.dejong import evidence_label
+    from quant_lab.models.dejong_risk import paper_table6
+
+    paper = paper_table6(lab)
+    days = placeholder["days"].groupby("strategy").size()
+    for strategy, count in days.items():
+        expected = paper[evidence_label(strategy)]["position_days"]
+        assert abs(count / expected - 1) < 0.015, strategy
+
+
+FACTORS = ROOT / "data" / "raw" / "french_ff" / "F-F_Research_Data_Factors_daily_CSV.zip"
+
+
+@pytest.mark.skipif(
+    not (TBILL.exists() and FACTORS.exists()), reason="FRED DTB3 or French factors not present"
+)
+def test_table6_sp500_volatility_matches_the_paper_convention(lab):
+    from quant_lab.models.dejong_risk import load_inputs, table6
+
+    for name in ("fred_tbill", "french_ff"):
+        shutil.copytree(
+            ROOT / "data" / "raw" / name, lab / "data" / "raw" / name, dirs_exist_ok=True
+        )
+    cfg = load_config(lab)
+    inputs = load_inputs(lab, cfg)
+    result = evaluate(lab, variant_config(cfg, None), inputs["tbill"])
+    t = table6(lab, result, inputs, cfg.table6).set_index(["strategy", "statistic"])
+    for strategy in cfg.strategies:
+        ours = t.loc[(strategy, "sigma_sp500"), "ours"]
+        paper = t.loc[(strategy, "sigma_sp500"), "paper"]
+        assert abs(ours / paper - 1) < 0.025, strategy  # sigma = daily sd x 22 (D23)
+
+
 # Weighted mean % p.m. per strategy, primary configuration, FRED DTB3 md5
 # 7edbf7612395ad04c5f850a742743705 (MLflow run 1d9f0b53, 2026-10-09).
 PINNED_WEIGHTED_MEAN = {
@@ -122,7 +156,11 @@ PINNED_WEIGHTED_MEAN = {
 
 @pytest.mark.skipif(not TBILL.exists(), reason="FRED DTB3 not present (data/raw/fred_tbill)")
 def test_returns_with_the_real_tbill(lab):
-    shutil.copytree(ROOT / "data" / "raw" / "fred_tbill", lab / "data" / "raw" / "fred_tbill")
+    shutil.copytree(
+        ROOT / "data" / "raw" / "fred_tbill",
+        lab / "data" / "raw" / "fred_tbill",
+        dirs_exist_ok=True,
+    )
     cfg = variant_config(load_config(lab), None)
     out = evaluate(lab, cfg, load_tbill(lab / cfg.tbill.path, cfg.tbill.series))
     t5 = out["table5"].set_index(["strategy", "statistic"])

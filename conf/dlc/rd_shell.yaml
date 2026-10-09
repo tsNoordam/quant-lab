@@ -27,3 +27,6 @@ regression:
   index_b: "FTSE Allshare"
   exclude_dates: []
   as_stated: {index_a: "CBS ALLSHARE PRICE INDEX"}
+  # Table VI's market factor (quant_lab.models.dejong_risk): this sheet covers
+  # every Datastream business day of 1980-2002.
+  extra_indices: ["S&P 500"]

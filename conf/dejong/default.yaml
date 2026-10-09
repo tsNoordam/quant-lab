@@ -74,6 +74,28 @@ tbill:
 
 exclude_dates: {}                     # per twin, rows dropped from the trading panel
 
+# Table VI (quant_lab.models.dejong_risk, step 17).
+table6:
+  # [PAPER-DERIVED] FF 3-F with the S&P 500 excess return as the market factor;
+  # the S&P 500 log returns of the RD/Shell workbook's regression sheet
+  # (every Datastream business day of 1980-2002), SMB and HML from French.
+  market: {twin: rd_shell, column: "S&P 500"}
+  factors: {path: data/raw/french_ff/F-F_Research_Data_Factors_daily_CSV.zip}
+  month_days: 22                      # [PAPER-DERIVED] % per month = daily x 22; annualized x 12
+  days_per_year: 260                  # [IMPLEMENTATION-ASSUMPTION] rf = DTB3 / 260, as in the engine
+  # [PAPER-DERIVED, identified, D23] the paper's sigma columns are the standard
+  # deviation of daily returns "expressed in % per month" (x 22), not x sqrt(260):
+  # its S&P 500 sigma is our daily one x 21.7-21.9 in every strategy.
+  volatility_scale: 22
+  # Table VI is computed for the primary configuration and every step-16 variant.
+  # The paper's p. 515 cases: benchmark (10%/5%/12 months) FF3 alpha (evidence S53).
+  sensitivities:
+    benchmark: {paper_item: "benchmark 10%/5%/12m", overrides: {}}
+    commission_50bps: {paper_item: "commission 50 bps", overrides: {costs: {commission: 0.005}}}
+    spread_80bps: {paper_item: "spread 80 bps", overrides: {costs: {half_spread: 0.004}}}
+    rebate_1pct: {paper_item: "short rebate 1%", overrides: {account: {rebate_rate: 0.01}}}
+    one_day_delay: {paper_item: "one extra trading day delay", overrides: {rules: {delay: 1}}}
+
 # Sensitivity cases: overrides of the settings above, each run on all strategies.
 variants:
   dexia_spike_removed: {exclude_dates: {dexia: ["1997-12-19"]}}   # D15: the 1997-12-19 spike

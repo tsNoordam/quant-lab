@@ -68,6 +68,16 @@ report. "Identified" means the paper's Table IV-V numbers single it out.
 | D20 | Open positions in unified twins | Closed on the first trading day after the unification announcement, not discarded | PAPER-DERIVED (identified) |
 | D21 | Interest on the short sale's margin deposit | None: it is collateral; only free cash earns 5% | PAPER-DERIVED (identified) |
 
+## Table VI conventions (step 17, `research/reports/dejong_table6.md`)
+
+| # | Question | Answer | Tag |
+|---|---|---|---|
+| D11 | How are overlapping positions pooled? | Stacked: one row per position and day, padding days included (their excess return is about 0); "# Days" = 6,798 = 309 × 22 for 5%/1%/1 month | PAPER-DERIVED (identified) |
+| D22 | Market factor and calendar | S&P 500 (workbook) excess over DTB3/260; every position-day kept, SMB/HML 0 on US holidays (the position-day counts match only then) | PAPER-DERIVED (identified) |
+| D23 | Units of sigma | Standard deviation of daily returns "expressed in % per month": daily sd × 22, although the text calls it annualized; the paper's S&P 500 sigma is our daily sd × 21.7-21.9 in every strategy | PAPER-DERIVED (identified) |
+| D24 | Alpha units and test | Daily alpha × 22 = % per month, × 12 annualized (0.718 → 8.6%); OLS p-values, clustered-by-date reported alongside | IMPLEMENTATION-ASSUMPTION |
+| D25 | IAPM | Needs Datastream's World Market Index, which is not in the archives and not public: not replicated | open |
+
 ## Lab rules that conflict with the paper's design (flag, do not silently change)
 
 | Lab rule (CLAUDE.md) | Paper | Resolution proposed for step 14 |
