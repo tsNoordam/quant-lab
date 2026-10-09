@@ -468,8 +468,8 @@ stages:
       size: 9394
     - path: src/quant_lab/data/dlc.py
       hash: md5
-      md5: 781d2c57242ea70e5305861c557f08f8
-      size: 11078
+      md5: 64d6f0d18eb3f6def5bf1dfa9cc7b09d
+      size: 11252
     params:
       conf/dlc/abb.yaml:
         interim_path: data/interim/dlc/abb.parquet
@@ -534,8 +534,8 @@ stages:
       size: 9394
     - path: src/quant_lab/data/dlc.py
       hash: md5
-      md5: 781d2c57242ea70e5305861c557f08f8
-      size: 11078
+      md5: 64d6f0d18eb3f6def5bf1dfa9cc7b09d
+      size: 11252
     params:
       conf/dlc/bhp_billiton.yaml:
         interim_path: data/interim/dlc/bhp_billiton.parquet
@@ -601,8 +601,8 @@ stages:
       size: 9394
     - path: src/quant_lab/data/dlc.py
       hash: md5
-      md5: 781d2c57242ea70e5305861c557f08f8
-      size: 11078
+      md5: 64d6f0d18eb3f6def5bf1dfa9cc7b09d
+      size: 11252
     params:
       conf/dlc/brambles.yaml:
         interim_path: data/interim/dlc/brambles.parquet
@@ -668,8 +668,8 @@ stages:
       size: 9394
     - path: src/quant_lab/data/dlc.py
       hash: md5
-      md5: 781d2c57242ea70e5305861c557f08f8
-      size: 11078
+      md5: 64d6f0d18eb3f6def5bf1dfa9cc7b09d
+      size: 11252
     params:
       conf/dlc/dexia.yaml:
         interim_path: data/interim/dlc/dexia.parquet
@@ -738,8 +738,8 @@ stages:
       size: 9394
     - path: src/quant_lab/data/dlc.py
       hash: md5
-      md5: 781d2c57242ea70e5305861c557f08f8
-      size: 11078
+      md5: 64d6f0d18eb3f6def5bf1dfa9cc7b09d
+      size: 11252
     params:
       conf/dlc/fortis.yaml:
         interim_path: data/interim/dlc/fortis.parquet
@@ -804,8 +804,8 @@ stages:
       size: 9394
     - path: src/quant_lab/data/dlc.py
       hash: md5
-      md5: 781d2c57242ea70e5305861c557f08f8
-      size: 11078
+      md5: 64d6f0d18eb3f6def5bf1dfa9cc7b09d
+      size: 11252
     params:
       conf/dlc/merita_nordbanken.yaml:
         interim_path: data/interim/dlc/merita_nordbanken.parquet
@@ -870,8 +870,8 @@ stages:
       size: 9394
     - path: src/quant_lab/data/dlc.py
       hash: md5
-      md5: 781d2c57242ea70e5305861c557f08f8
-      size: 11078
+      md5: 64d6f0d18eb3f6def5bf1dfa9cc7b09d
+      size: 11252
     params:
       conf/dlc/rd_shell.yaml:
         interim_path: data/interim/dlc/rd_shell.parquet
@@ -885,6 +885,8 @@ stages:
           exclude_dates: []
           as_stated:
             index_a: CBS ALLSHARE PRICE INDEX
+          extra_indices:
+          - S&P 500
         source:
           archive: data/raw/datastream_dlc/RoyalDutchShell.zip
           workbook: RD Shell data.xls
@@ -919,8 +921,8 @@ stages:
       size: 396523
     - path: data/interim/dlc/rd_shell.regression.parquet
       hash: md5
-      md5: 40f947109dd1f599ea300e5b92719717
-      size: 367214
+      md5: 69b84669e2bdd4ce32174b0ab748de0e
+      size: 423432
     - path: data/interim/dlc/rd_shell.trading.parquet
       hash: md5
       md5: 5ee1a267ba43db2bac1935368bbdcdc7
@@ -939,8 +941,8 @@ stages:
       size: 9394
     - path: src/quant_lab/data/dlc.py
       hash: md5
-      md5: 781d2c57242ea70e5305861c557f08f8
-      size: 11078
+      md5: 64d6f0d18eb3f6def5bf1dfa9cc7b09d
+      size: 11252
     params:
       conf/dlc/reed_elsevier.yaml:
         interim_path: data/interim/dlc/reed_elsevier.parquet
@@ -1006,8 +1008,8 @@ stages:
       size: 9394
     - path: src/quant_lab/data/dlc.py
       hash: md5
-      md5: 781d2c57242ea70e5305861c557f08f8
-      size: 11078
+      md5: 64d6f0d18eb3f6def5bf1dfa9cc7b09d
+      size: 11252
     params:
       conf/dlc/rio_tinto.yaml:
         interim_path: data/interim/dlc/rio_tinto.parquet
@@ -1072,8 +1074,8 @@ stages:
       size: 9394
     - path: src/quant_lab/data/dlc.py
       hash: md5
-      md5: 781d2c57242ea70e5305861c557f08f8
-      size: 11078
+      md5: 64d6f0d18eb3f6def5bf1dfa9cc7b09d
+      size: 11252
     params:
       conf/dlc/smithkline.yaml:
         interim_path: data/interim/dlc/smithkline.parquet
@@ -1142,8 +1144,8 @@ stages:
       size: 9394
     - path: src/quant_lab/data/dlc.py
       hash: md5
-      md5: 781d2c57242ea70e5305861c557f08f8
-      size: 11078
+      md5: 64d6f0d18eb3f6def5bf1dfa9cc7b09d
+      size: 11252
     params:
       conf/dlc/unilever.yaml:
         interim_path: data/interim/dlc/unilever.parquet
@@ -1210,8 +1212,8 @@ stages:
       size: 9394
     - path: src/quant_lab/data/dlc.py
       hash: md5
-      md5: 781d2c57242ea70e5305861c557f08f8
-      size: 11078
+      md5: 64d6f0d18eb3f6def5bf1dfa9cc7b09d
+      size: 11252
     params:
       conf/dlc/zurich_allied.yaml:
         interim_path: data/interim/dlc/zurich_allied.parquet

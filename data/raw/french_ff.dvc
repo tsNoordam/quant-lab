@@ -1,0 +1,6 @@
+outs:
+- md5: 1400c3dfb62697fa9366e80218fc7058.dir
+  size: 178184
+  nfiles: 1
+  hash: md5
+  path: french_ff
