@@ -58,7 +58,7 @@ def test_no_new_entry_within_a_month_of_the_previous_entry():
     d[[30, 31]] = 0.11  # crossing at 30: taken
     entries = [p.entry for p in _find(d)]
     assert entries == [1, 30]
-    assert [p.entry for p in _find(d, month_days=5)] == [1, 10, 30]
+    assert [p.entry for p in _find(d, entry_gap=5)] == [1, 10, 30]
 
 
 def test_open_position_at_the_end_is_discarded_or_closed():

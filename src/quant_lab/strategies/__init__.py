@@ -11,13 +11,14 @@ from collections.abc import Callable
 import pandas as pd
 from omegaconf import DictConfig
 
-from quant_lab.strategies import parity_zscore, silta_parity
+from quant_lab.strategies import dejong_threshold, parity_zscore, silta_parity
 
 Decide = Callable[[pd.DataFrame, DictConfig, DictConfig], tuple[pd.Series, pd.Series]]
 
 STRATEGIES: dict[str, Decide] = {
     "parity_zscore": parity_zscore.decide,
     "silta_parity": silta_parity.decide,
+    "dejong_threshold": dejong_threshold.decide,
 }
 
 

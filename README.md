@@ -155,6 +155,7 @@ Strategies (`strategy=<name>`; specs in `research/specs/`):
 |---|---|---|
 | `parity_zscore` (default) | baseline: trailing z-score of the relative price | `baseline/parity_zscore.md` |
 | `silta_parity` | the SILTA arbitrageur: deviation from parity, 180 bps entry, exit at parity | `extensions/silta_parity.md` |
+| `dejong_threshold` | de Jong et al.'s benchmark rule: cross 10% to enter, 5% or 260 days to exit | `replication/dejong_threshold.md` |
 
 ```bash
 uv run python -m quant_lab.backtest.run data=rd_shell strategy=silta_parity
@@ -200,6 +201,16 @@ uv run python -m quant_lab.models.dejong_risk   # MLflow run dejong.replication/
 ```
 
 Results: `research/reports/dejong_table6.md`.
+
+Under the lab's standard (step 18): a waterfall from the paper's conventions to
+ours over all twins, and the paper's rule as lab strategy `dejong_threshold`:
+
+```bash
+uv run python -m quant_lab.models.dejong_standard   # MLflow run dejong.replication/standard
+uv run python -m quant_lab.backtest.run data=rd_shell strategy=dejong_threshold backtest.period=train
+```
+
+Results: `research/reports/dejong_standard.md`.
 
 ## Robustness (step 9)
 

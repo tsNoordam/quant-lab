@@ -1,0 +1,26 @@
+# de Jong et al. (2009): the paper's threshold rule through the lab's engine
+# (ROADMAP step 18). Spec: research/specs/replication/dejong_threshold.md
+#
+#   uv run python -m quant_lab.backtest.run data=rd_shell strategy=dejong_threshold
+#
+# Parity itself is data.parity_ratio (conf/data/<pair>.yaml): the lab's
+# point-in-time ratio, not the workbook's (audit A1).
+
+name: dejong_threshold
+
+# [PAPER-DERIVED] the benchmark of Table IV: open beyond 10%, close within 5%,
+# at most one year (260 trading days).
+buy: 0.10
+sell: 0.05
+horizon: 260
+
+# [IMPLEMENTATION-ASSUMPTION] closes between entries. The paper's 22 is a
+# by-product of its T-bill padding (D5); the lab frees the capital at the exit.
+entry_gap: 0
+
+# [IMPLEMENTATION-ASSUMPTION] |target weight| per leg, as for the other strategies.
+leg_weight: 0.5
+
+# The paper's own horizons (Table V); not used to choose anything in step 18.
+grid:
+  horizon: [22, 65, 260]

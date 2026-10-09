@@ -29,6 +29,7 @@ def test_decisions_ignore_future_prices(panel):
 STRATEGY_CONFIGS = {
     "parity_zscore": {"window": 20, "entry_z": 1.0, "exit_z": 0.2},
     "silta_parity": {"entry_bound": 0.01, "exit_bound": 0.0},
+    "dejong_threshold": {"buy": 0.02, "sell": 0.005, "horizon": 30, "entry_gap": 0},
 }
 
 

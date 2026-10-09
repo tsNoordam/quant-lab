@@ -56,7 +56,7 @@ def find_positions(
     horizon: int | None,
     last_entry: int,
     close_at_end: bool,
-    month_days: int = 22,
+    entry_gap: int = 22,
     delay: int = 0,
 ) -> list[Position]:
     """The paper's positions on one twin (E3 and conf/dejong rules).
@@ -66,7 +66,8 @@ def find_positions(
     close v with |d_v| <= sell, or v = s + horizon (a cut-off). Trades happen
     ``delay`` closes after their signal. A position still open on the last row
     is closed there if ``close_at_end``, otherwise discarded. The next entry
-    signal can come at max(v + 1, s + month_days) at the earliest.
+    signal can come at max(v + 1, s + entry_gap) at the earliest (the paper:
+    22, the month its proceeds stay in the T-bill).
     """
     a = np.abs(deviation)
     last = len(a) - 1
@@ -86,11 +87,11 @@ def find_positions(
                 break
         direction = 1 if deviation[s] < 0 else -1
         if exit_signal is None:
-            if close_at_end:
+            if close_at_end and last > s + delay:
                 positions.append(Position(s + delay, last, direction, False, True))
             break
         positions.append(Position(s + delay, exit_signal + delay, direction, cut, False))
-        s = max(exit_signal + 1, s + month_days)
+        s = max(exit_signal + 1, s + entry_gap)
     return positions
 
 
@@ -177,8 +178,13 @@ def liquidation_fraction(long_v, short_v, loan, proceeds, deposit, cash, account
     raise ValueError(f"unknown margin_rule {account.margin_rule!r}")
 
 
-def monthly_return(total: float, days: int, tbill: float, month_days: int, per_year: int):
-    """(days counted, % per month): short positions earn the T-bill to a full month."""
+def monthly_return(
+    total: float, days: int, tbill: float, month_days: int, per_year: int, padding: bool = True
+):
+    """(days counted, % per month): with ``padding`` (the paper), positions shorter
+    than a month earn the T-bill to a full month; without it they count their own days."""
+    if not padding:
+        return days, 100 * total * month_days / days
     if days < month_days:
         total = (1 + total) * (1 + tbill * (month_days - days) / per_year) - 1
     counted = max(days, month_days)
@@ -216,7 +222,15 @@ def twin_positions(
 
     Daily rows cover each position's days and, for a position shorter than a
     month, the padding days that earn the T-bill (Table VI pools these rows).
+
+    End of the sample (``rules``): ``hold_after_window`` keeps the rows after a
+    unified twin's window, where the paper closes open positions;
+    ``open_at_end: mark`` closes a position still open on the last row at that
+    close instead of discarding it.
     """
+    rules = cfg.rules
+    if not rules.hold_after_window:
+        panel = panel[panel["in_window"]]
     in_window = panel["in_window"].to_numpy()
     positions = find_positions(
         panel["deviation"].to_numpy(),
@@ -224,9 +238,9 @@ def twin_positions(
         sell=spec.sell,
         horizon=spec.horizon,
         last_entry=int(np.flatnonzero(in_window)[-1]),
-        close_at_end=not in_window[-1],
-        month_days=cfg.rules.month_days,
-        delay=cfg.rules.delay,
+        close_at_end=(not in_window[-1]) or rules.open_at_end == "mark",
+        entry_gap=rules.lockout_days,
+        delay=rules.delay,
     )
     ra, rb = leg_returns(panel, cfg.returns)
     rows, daily = [], []
@@ -244,6 +258,7 @@ def twin_positions(
             exit_tbill,
             cfg.rules.month_days,
             cfg.account.days_per_year,
+            padding=cfg.returns.padding,
         )
         pad = counted - (p.exit - p.entry)
         daily.append(
@@ -411,14 +426,15 @@ def variant_config(cfg: DictConfig, variant: str | None) -> DictConfig:
     return base if variant is None else OmegaConf.merge(base, cfg.variants[variant])
 
 
-def evaluate(root: Path, cfg: DictConfig, tbill: pd.Series) -> dict:
+def evaluate(root: Path, cfg: DictConfig, tbill: pd.Series, tables: bool = True) -> dict:
+    """Positions and daily returns; with ``tables`` also Tables IV and V vs the paper
+    (Table IV needs the benchmark strategy among ``cfg.strategies``)."""
     pos, days = all_positions(root, cfg, tbill)
-    return {
-        "positions": pos,
-        "days": days,
-        "table4": table4(root, pos, cfg.benchmark),
-        "table5": table5(root, pos, cfg),
-    }
+    out = {"positions": pos, "days": days}
+    if tables:
+        out["table4"] = table4(root, pos, cfg.benchmark)
+        out["table5"] = table5(root, pos, cfg)
+    return out
 
 
 def run_tables45(root: Path) -> dict:

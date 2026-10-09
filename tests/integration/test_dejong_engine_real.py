@@ -184,3 +184,28 @@ def test_returns_with_the_real_tbill(lab):
         ours = t5.loc[(strategy, "weighted_mean_return"), "ours"]
         assert ours == pytest.approx(value, abs=6e-4), strategy
     assert t5.loc[("10/5/12m", "median_return"), "ours"] == pytest.approx(3.697, abs=6e-4)
+
+
+@pytest.mark.skipif(not TBILL.exists(), reason="FRED DTB3 not present (data/raw/fred_tbill)")
+def test_waterfall_starts_at_the_paper_conventions(lab):
+    from quant_lab.models.dejong_standard import waterfall
+
+    shutil.copytree(
+        ROOT / "data" / "raw" / "fred_tbill",
+        lab / "data" / "raw" / "fred_tbill",
+        dirs_exist_ok=True,
+    )
+    cfg = load_config(lab)
+    t = waterfall(lab, cfg, load_tbill(lab / cfg.tbill.path, cfg.tbill.series), "10/5/12m")
+    t = t[t.group == "all"].set_index("step")
+    assert t.loc["paper", "weighted_mean_pm"] == pytest.approx(
+        PINNED_WEIGHTED_MEAN["10/5/12m"], abs=6e-4
+    )
+    assert t.loc["paper", "positions"] == 128
+    # trading one close later is the largest single change (report: dejong_standard.md)
+    steps = list(t.index)
+    drops = {
+        s: t.loc[a, "weighted_mean_pm"] - t.loc[s, "weighted_mean_pm"]
+        for a, s in zip(steps[:-1], steps[1:], strict=True)
+    }
+    assert max(drops, key=drops.get) == "next_close"

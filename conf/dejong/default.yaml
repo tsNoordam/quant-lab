@@ -22,14 +22,17 @@ rules:
   # [PAPER-DERIVED, identified, D4] trades at the close on which the signal is
   # observed (delay 0). The paper's "one extra day" sensitivity is delay 1.
   delay: 0
+  month_days: 22                     # [PAPER-DERIVED] one month = 22 trading days
   # [PAPER-DERIVED] at most one position per twin; [identified, D5] the proceeds of
   # a position shorter than a month stay in the T-bill until the month is over, so
   # the next position can start 22 trading days after the previous entry at the earliest.
-  month_days: 22
+  lockout_days: 22
   # [PAPER-DERIVED] open positions at the sample end are discarded; [identified, D20]
   # for twins unified in the sample they are closed on the trading panel's last
   # row, the first trading day after the unification announcement
   # (conf/dlc/<twin>.yaml trading.rows_after_window).
+  hold_after_window: true
+  open_at_end: discard               # discard | mark (close at the last close)
 
 account:
   # [PAPER-DERIVED] Regulation T: 50% initial margin on each leg, maintenance 25%
@@ -67,6 +70,7 @@ returns:
   # positions shorter than a month earn the 3-month T-bill (rate at the exit date,
   # D11) for the rest of the month.
   monthly: arithmetic
+  padding: true
 
 tbill:
   path: data/raw/fred_tbill/DTB3.csv
@@ -95,6 +99,23 @@ table6:
     spread_80bps: {paper_item: "spread 80 bps", overrides: {costs: {half_spread: 0.004}}}
     rebate_1pct: {paper_item: "short rebate 1%", overrides: {account: {rebate_rate: 0.01}}}
     one_day_delay: {paper_item: "one extra trading day delay", overrides: {rules: {delay: 1}}}
+
+# Step 18 (quant_lab.models.dejong_standard): from the paper's conventions to the
+# lab's, one cumulative change at a time; every step keeps the paper's trading
+# rule (thresholds, horizon), so nothing is chosen here.
+standard:
+  steps:
+    - {name: paper, overrides: {}}
+    # D15: the authors cleaned the 1997-12-19 spike (Tables III and VI)
+    - {name: dexia_cleaned, overrides: {exclude_dates: {dexia: ["1997-12-19"]}}}
+    # the lab's execution: decide on close t, trade on close t+1
+    - {name: next_close, overrides: {rules: {delay: 1}}}
+    # no position held into a unification announcement; open positions at the end
+    # are marked at the last close instead of discarded
+    - {name: marked_at_end, overrides: {rules: {hold_after_window: false, open_at_end: mark}}}
+    # no T-bill padding and no month-long lockout after a short position
+    - {name: no_padding, overrides: {rules: {lockout_days: 0}, returns: {padding: false}}}
+  # time-zone gap groups follow conf/dlc/<twin>.yaml table_i.time_diff_hours
 
 # Sensitivity cases: overrides of the settings above, each run on all strategies.
 variants:
