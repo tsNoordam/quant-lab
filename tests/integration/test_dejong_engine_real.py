@@ -138,6 +138,22 @@ def test_table6_sp500_volatility_matches_the_paper_convention(lab):
         ours = t.loc[(strategy, "sigma_sp500"), "ours"]
         paper = t.loc[(strategy, "sigma_sp500"), "paper"]
         assert abs(ours / paper - 1) < 0.025, strategy  # sigma = daily sd x 22 (D23)
+        alpha = t.loc[(strategy, "alpha"), "ours"]
+        assert alpha == pytest.approx(PINNED_ALPHA[strategy], abs=6e-4), strategy
+
+
+# FF3 alpha % p.m. per strategy, primary configuration: French factors md5
+# 95ef09e3ae6feb0733058de5c78c22a0, DTB3 md5 7edbf761... (MLflow run 4d73e5e3).
+PINNED_ALPHA = {
+    "5/1/1m": -0.353,
+    "5/1/3m": 0.280,
+    "5/1/12m": 0.419,
+    "5/1/inf": 0.284,
+    "10/5/1m": 0.157,
+    "10/5/3m": 0.693,
+    "10/5/12m": 0.794,
+    "10/5/inf": 0.705,
+}
 
 
 # Weighted mean % p.m. per strategy, primary configuration, FRED DTB3 md5

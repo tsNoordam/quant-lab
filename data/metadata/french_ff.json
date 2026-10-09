@@ -5,13 +5,13 @@
   "license": "Free for research use with attribution (Kenneth R. French data library). Versioned with DVC like all raw data.",
   "layout": "data/raw/french_ff/F-F_Research_Data_Factors_daily_CSV.zip, the library's zip, unmodified",
   "files": {
-    "F-F_Research_Data_Factors_daily_CSV.zip": {"md5": "recorded at dvc add (data/raw/french_ff.dvc); copy it here when the file is added"}
+    "F-F_Research_Data_Factors_daily_CSV.zip": {"md5": "95ef09e3ae6feb0733058de5c78c22a0", "downloaded": "2026-10-09"}
   },
   "calendar": "US trading days (NYSE)",
   "timezone": "naive US dates",
   "known_issues": [
     "The library revises history when CRSP is updated: the factors differ slightly from those the paper used (2006-07 vintage). The md5 pins the version used here.",
-    "Not reachable from the cloud sessions' network policy (2026-10-09): downloaded by the user and added with dvc add."
+    "Downloaded by the user and added with dvc add; the cloud session later downloaded the identical file (same md5)."
   ],
   "used_by": ["conf/dejong/default.yaml (table6.factors), quant_lab.models.dejong_risk"]
 }
