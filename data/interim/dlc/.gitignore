@@ -22,3 +22,15 @@
 /smithkline.regression.parquet
 /unilever.regression.parquet
 /zurich_allied.regression.parquet
+/abb.trading.parquet
+/bhp_billiton.trading.parquet
+/brambles.trading.parquet
+/dexia.trading.parquet
+/fortis.trading.parquet
+/merita_nordbanken.trading.parquet
+/rd_shell.trading.parquet
+/reed_elsevier.trading.parquet
+/rio_tinto.trading.parquet
+/smithkline.trading.parquet
+/unilever.trading.parquet
+/zurich_allied.trading.parquet

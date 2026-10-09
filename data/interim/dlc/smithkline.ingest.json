@@ -10,7 +10,7 @@
   "start": "1989-07-26",
   "end": "1996-01-22",
   "rows_dropped_no_price": 0,
-  "rows_checked_against_workbook": 1642,
+  "rows_checked_against_workbook": 1663,
   "max_abs_error_vs_workbook": 2.7755575615628914e-17,
   "ratio_constant": true,
   "ratio": 1.0,
@@ -18,6 +18,7 @@
     "a": 0,
     "b": 0
   },
+  "rows_after_window": 21,
   "regression": {
     "sheet": "Regression data DS dates",
     "rows": 1753,

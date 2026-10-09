@@ -1,0 +1,6 @@
+outs:
+- md5: 7b4f8c9427ad0226120d3603848e6951.dir
+  size: 301285
+  nfiles: 1
+  hash: md5
+  path: fred_tbill

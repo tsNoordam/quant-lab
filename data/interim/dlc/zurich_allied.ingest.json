@@ -10,7 +10,7 @@
   "start": "1998-09-07",
   "end": "2000-03-20",
   "rows_dropped_no_price": 0,
-  "rows_checked_against_workbook": 401,
+  "rows_checked_against_workbook": 422,
   "max_abs_error_vs_workbook": 4.440892098500626e-16,
   "ratio_constant": true,
   "ratio": 42.928,
@@ -18,6 +18,7 @@
     "a": 0,
     "b": 0
   },
+  "rows_after_window": 21,
   "regression": {
     "sheet": "Regression data",
     "rows": 550,

@@ -468,8 +468,8 @@ stages:
       size: 9394
     - path: src/quant_lab/data/dlc.py
       hash: md5
-      md5: e3bc4497b9351723639cd87c21653695
-      size: 9846
+      md5: 781d2c57242ea70e5305861c557f08f8
+      size: 11078
     params:
       conf/dlc/abb.yaml:
         interim_path: data/interim/dlc/abb.parquet
@@ -498,14 +498,16 @@ stages:
             sheet: Ratio
             theoretical_ratio: THEORETICAL RATIO
             deviation: LOG DEVIATIONS FROM PARITY
+        trading:
+          rows_after_window: 21
         window:
           start: '1991-07-08'
           end: '1999-01-07'
     outs:
     - path: data/interim/dlc/abb.ingest.json
       hash: md5
-      md5: f68e442675b2a86753d6bf6000d2cc9d
-      size: 676
+      md5: 7b601118f2d63b921c16bdd352e44643
+      size: 703
     - path: data/interim/dlc/abb.parquet
       hash: md5
       md5: 7c08879418c447c1c74557afa4593238
@@ -514,6 +516,10 @@ stages:
       hash: md5
       md5: d9947e32ee152dd5b6ed495b6fbbe0d0
       size: 110491
+    - path: data/interim/dlc/abb.trading.parquet
+      hash: md5
+      md5: 5ac5d01072ac59df7e89e6cacc932030
+      size: 133240
   dlc_ingest@bhp_billiton:
     cmd: python -m quant_lab.data.dlc --twin bhp_billiton
     deps:
@@ -528,8 +534,8 @@ stages:
       size: 9394
     - path: src/quant_lab/data/dlc.py
       hash: md5
-      md5: e3bc4497b9351723639cd87c21653695
-      size: 9846
+      md5: 781d2c57242ea70e5305861c557f08f8
+      size: 11078
     params:
       conf/dlc/bhp_billiton.yaml:
         interim_path: data/interim/dlc/bhp_billiton.parquet
@@ -559,6 +565,8 @@ stages:
             sheet: Ratio
             theoretical_ratio: THEORETICAL RATIO
             deviation: LOG DEVIATIONS FROM PARITY
+        trading:
+          rows_after_window: 0
         window:
           start: '2001-06-29'
           end: '2002-10-03'
@@ -575,6 +583,10 @@ stages:
       hash: md5
       md5: f034b13b8422bf27307af2c418c215a2
       size: 21506
+    - path: data/interim/dlc/bhp_billiton.trading.parquet
+      hash: md5
+      md5: 0a7b0437fba6a8ae44dd86fc9413abae
+      size: 33025
   dlc_ingest@brambles:
     cmd: python -m quant_lab.data.dlc --twin brambles
     deps:
@@ -589,8 +601,8 @@ stages:
       size: 9394
     - path: src/quant_lab/data/dlc.py
       hash: md5
-      md5: e3bc4497b9351723639cd87c21653695
-      size: 9846
+      md5: 781d2c57242ea70e5305861c557f08f8
+      size: 11078
     params:
       conf/dlc/brambles.yaml:
         interim_path: data/interim/dlc/brambles.parquet
@@ -620,6 +632,8 @@ stages:
             sheet: Ratio
             theoretical_ratio: THEORETICAL RATIO
             deviation: LOG DEVIATIONS FROM PARITY
+        trading:
+          rows_after_window: 0
         window:
           start: '2001-08-07'
           end: '2002-10-03'
@@ -636,6 +650,10 @@ stages:
       hash: md5
       md5: 655b8e8b6ae7d1f34457e38e68fb0a3d
       size: 20043
+    - path: data/interim/dlc/brambles.trading.parquet
+      hash: md5
+      md5: 03cccd355dace18ebafe3851ebe8f22a
+      size: 29065
   dlc_ingest@dexia:
     cmd: python -m quant_lab.data.dlc --twin dexia
     deps:
@@ -650,8 +668,8 @@ stages:
       size: 9394
     - path: src/quant_lab/data/dlc.py
       hash: md5
-      md5: e3bc4497b9351723639cd87c21653695
-      size: 9846
+      md5: 781d2c57242ea70e5305861c557f08f8
+      size: 11078
     params:
       conf/dlc/dexia.yaml:
         interim_path: data/interim/dlc/dexia.parquet
@@ -684,14 +702,16 @@ stages:
             sheet: Ratio
             theoretical_ratio: THEORETICAL RATIO
             deviation: LOG DEVIATIONS FROM PARITY
+        trading:
+          rows_after_window: 21
         window:
           start: '1996-11-19'
           end: '1999-08-20'
     outs:
     - path: data/interim/dlc/dexia.ingest.json
       hash: md5
-      md5: 68a47061326f45542887aa1e64b64a8d
-      size: 663
+      md5: 63407e0db28c3c7385f71644c6611204
+      size: 690
     - path: data/interim/dlc/dexia.parquet
       hash: md5
       md5: 86b37fc761b12a179b5ce61bdd7ef4eb
@@ -700,6 +720,10 @@ stages:
       hash: md5
       md5: 630f213b96ba1ecd7265207732b969bf
       size: 42644
+    - path: data/interim/dlc/dexia.trading.parquet
+      hash: md5
+      md5: 0037a3190acb7fd01cd03d92e7109afd
+      size: 51928
   dlc_ingest@fortis:
     cmd: python -m quant_lab.data.dlc --twin fortis
     deps:
@@ -714,8 +738,8 @@ stages:
       size: 9394
     - path: src/quant_lab/data/dlc.py
       hash: md5
-      md5: e3bc4497b9351723639cd87c21653695
-      size: 9846
+      md5: 781d2c57242ea70e5305861c557f08f8
+      size: 11078
     params:
       conf/dlc/fortis.yaml:
         interim_path: data/interim/dlc/fortis.parquet
@@ -744,14 +768,16 @@ stages:
             sheet: Ratio
             theoretical_ratio: THEORETICAL RATIO
             deviation: LOG DEVIATIONS FROM PARITY
+        trading:
+          rows_after_window: 21
         window:
           start: '1990-12-12'
           end: '2000-07-31'
     outs:
     - path: data/interim/dlc/fortis.ingest.json
       hash: md5
-      md5: ab22f06e6afbd7d7e1977b6e10ed8b7f
-      size: 670
+      md5: a9cfe29b9a26ece236a37ab474625ea2
+      size: 697
     - path: data/interim/dlc/fortis.parquet
       hash: md5
       md5: 8cd3a15c010d0dc9562182dc3252f64e
@@ -760,6 +786,10 @@ stages:
       hash: md5
       md5: 599f840bce688097f59fbb6da13246d5
       size: 146908
+    - path: data/interim/dlc/fortis.trading.parquet
+      hash: md5
+      md5: efe776ae98b440dcd320fa5d55949a71
+      size: 170002
   dlc_ingest@merita_nordbanken:
     cmd: python -m quant_lab.data.dlc --twin merita_nordbanken
     deps:
@@ -774,8 +804,8 @@ stages:
       size: 9394
     - path: src/quant_lab/data/dlc.py
       hash: md5
-      md5: e3bc4497b9351723639cd87c21653695
-      size: 9846
+      md5: 781d2c57242ea70e5305861c557f08f8
+      size: 11078
     params:
       conf/dlc/merita_nordbanken.yaml:
         interim_path: data/interim/dlc/merita_nordbanken.parquet
@@ -804,14 +834,16 @@ stages:
             sheet: Ratio
             theoretical_ratio: THEORETICAL RATIO
             deviation: LOG DEVIATIONS FROM PARITY
+        trading:
+          rows_after_window: 21
         window:
           start: '1997-12-15'
           end: '1999-08-23'
     outs:
     - path: data/interim/dlc/merita_nordbanken.ingest.json
       hash: md5
-      md5: 865e1bbdde60995733b47cdfc22041f7
-      size: 676
+      md5: 3727abfffdc0a6985d54525a58c647c0
+      size: 703
     - path: data/interim/dlc/merita_nordbanken.parquet
       hash: md5
       md5: f546293e9e73f9b1c0f4747fe1f7d400
@@ -820,6 +852,10 @@ stages:
       hash: md5
       md5: 02a6f9bdbed871d21ffa11f613a88d4d
       size: 33727
+    - path: data/interim/dlc/merita_nordbanken.trading.parquet
+      hash: md5
+      md5: a381d6d99674fb57c48a87bb98f82914
+      size: 34052
   dlc_ingest@rd_shell:
     cmd: python -m quant_lab.data.dlc --twin rd_shell
     deps:
@@ -834,8 +870,8 @@ stages:
       size: 9394
     - path: src/quant_lab/data/dlc.py
       hash: md5
-      md5: e3bc4497b9351723639cd87c21653695
-      size: 9846
+      md5: 781d2c57242ea70e5305861c557f08f8
+      size: 11078
     params:
       conf/dlc/rd_shell.yaml:
         interim_path: data/interim/dlc/rd_shell.parquet
@@ -867,6 +903,8 @@ stages:
             sheet: Ratio
             theoretical_ratio: THEORETICAL RATIO
             deviation: LOG DEVIATIONS FROM PARITY
+        trading:
+          rows_after_window: 0
         window:
           start: '1980-01-01'
           end: '2002-10-03'
@@ -883,6 +921,10 @@ stages:
       hash: md5
       md5: 40f947109dd1f599ea300e5b92719717
       size: 367214
+    - path: data/interim/dlc/rd_shell.trading.parquet
+      hash: md5
+      md5: 5ee1a267ba43db2bac1935368bbdcdc7
+      size: 397027
   dlc_ingest@reed_elsevier:
     cmd: python -m quant_lab.data.dlc --twin reed_elsevier
     deps:
@@ -897,8 +939,8 @@ stages:
       size: 9394
     - path: src/quant_lab/data/dlc.py
       hash: md5
-      md5: e3bc4497b9351723639cd87c21653695
-      size: 9846
+      md5: 781d2c57242ea70e5305861c557f08f8
+      size: 11078
     params:
       conf/dlc/reed_elsevier.yaml:
         interim_path: data/interim/dlc/reed_elsevier.parquet
@@ -928,6 +970,8 @@ stages:
             sheet: Ratio
             theoretical_ratio: THEORETICAL RATIO
             deviation: LOG DEVIATIONS FROM PARITY
+        trading:
+          rows_after_window: 0
         window:
           start: '1993-01-01'
           end: '2002-10-03'
@@ -944,6 +988,10 @@ stages:
       hash: md5
       md5: 5ee68df48dbf07b6b4467d9f61b42af7
       size: 137874
+    - path: data/interim/dlc/reed_elsevier.trading.parquet
+      hash: md5
+      md5: 31f8662016194231349319bdca91ca41
+      size: 173736
   dlc_ingest@rio_tinto:
     cmd: python -m quant_lab.data.dlc --twin rio_tinto
     deps:
@@ -958,8 +1006,8 @@ stages:
       size: 9394
     - path: src/quant_lab/data/dlc.py
       hash: md5
-      md5: e3bc4497b9351723639cd87c21653695
-      size: 9846
+      md5: 781d2c57242ea70e5305861c557f08f8
+      size: 11078
     params:
       conf/dlc/rio_tinto.yaml:
         interim_path: data/interim/dlc/rio_tinto.parquet
@@ -988,6 +1036,8 @@ stages:
             sheet: Ratio
             theoretical_ratio: THEORETICAL RATIO
             deviation: LOG DEVIATIONS FROM PARITY
+        trading:
+          rows_after_window: 0
         window:
           start: '1995-12-21'
           end: '2002-10-03'
@@ -1004,6 +1054,10 @@ stages:
       hash: md5
       md5: d5e05a0f06df1fdc05d054bfda842689
       size: 98411
+    - path: data/interim/dlc/rio_tinto.trading.parquet
+      hash: md5
+      md5: c646d8bc994344b9d4a7d5caffa52217
+      size: 135307
   dlc_ingest@smithkline:
     cmd: python -m quant_lab.data.dlc --twin smithkline
     deps:
@@ -1018,8 +1072,8 @@ stages:
       size: 9394
     - path: src/quant_lab/data/dlc.py
       hash: md5
-      md5: e3bc4497b9351723639cd87c21653695
-      size: 9846
+      md5: 781d2c57242ea70e5305861c557f08f8
+      size: 11078
     params:
       conf/dlc/smithkline.yaml:
         interim_path: data/interim/dlc/smithkline.parquet
@@ -1052,14 +1106,16 @@ stages:
             sheet: Ratio
             theoretical_ratio: THEORETICAL RATIO
             deviation: LOG DEVIATIONS FROM PARITY
+        trading:
+          rows_after_window: 21
         window:
           start: '1989-07-26'
           end: '1996-01-22'
     outs:
     - path: data/interim/dlc/smithkline.ingest.json
       hash: md5
-      md5: f94ee4351673f3028a03166b8cf1d1d2
-      size: 690
+      md5: 136ed17d0ff99968cef328f67c2b5cea
+      size: 717
     - path: data/interim/dlc/smithkline.parquet
       hash: md5
       md5: af916bdd73818a5f2694f6e4bff94508
@@ -1068,6 +1124,10 @@ stages:
       hash: md5
       md5: 366e78b4892627d27d1e677d9388ecb0
       size: 107936
+    - path: data/interim/dlc/smithkline.trading.parquet
+      hash: md5
+      md5: 81efdae08c314d0c46299011c5837679
+      size: 84248
   dlc_ingest@unilever:
     cmd: python -m quant_lab.data.dlc --twin unilever
     deps:
@@ -1082,8 +1142,8 @@ stages:
       size: 9394
     - path: src/quant_lab/data/dlc.py
       hash: md5
-      md5: e3bc4497b9351723639cd87c21653695
-      size: 9846
+      md5: 781d2c57242ea70e5305861c557f08f8
+      size: 11078
     params:
       conf/dlc/unilever.yaml:
         interim_path: data/interim/dlc/unilever.parquet
@@ -1114,6 +1174,8 @@ stages:
             theoretical_ratio: THEORETICAL RATIO
             deviation: LOG DEVIATIONS FROM PARITY
             deviation_exclude: absolute value
+        trading:
+          rows_after_window: 0
         window:
           start: '1980-01-01'
           end: '2002-10-03'
@@ -1130,6 +1192,10 @@ stages:
       hash: md5
       md5: 4f1167696fabee5a6f056222712dcd9b
       size: 306144
+    - path: data/interim/dlc/unilever.trading.parquet
+      hash: md5
+      md5: ca453659d22598a069fc357e259f70a9
+      size: 378984
   dlc_ingest@zurich_allied:
     cmd: python -m quant_lab.data.dlc --twin zurich_allied
     deps:
@@ -1144,8 +1210,8 @@ stages:
       size: 9394
     - path: src/quant_lab/data/dlc.py
       hash: md5
-      md5: e3bc4497b9351723639cd87c21653695
-      size: 9846
+      md5: 781d2c57242ea70e5305861c557f08f8
+      size: 11078
     params:
       conf/dlc/zurich_allied.yaml:
         interim_path: data/interim/dlc/zurich_allied.parquet
@@ -1176,14 +1242,16 @@ stages:
             theoretical_ratio: THEORETICAL RATIO
             deviation: LOG DEVIATIONS FROM PARITY
             deviation_exclude: absolute value
+        trading:
+          rows_after_window: 21
         window:
           start: '1998-09-07'
           end: '2000-03-20'
     outs:
     - path: data/interim/dlc/zurich_allied.ingest.json
       hash: md5
-      md5: 60118be5e361e6e5a25ad5c0df522d44
-      size: 687
+      md5: b7651f75d83495f60a36449ad6b8e61e
+      size: 714
     - path: data/interim/dlc/zurich_allied.parquet
       hash: md5
       md5: eb3bb7480ea94beba45cb52f89f96b73
@@ -1192,3 +1260,7 @@ stages:
       hash: md5
       md5: 76a3281ad580cbce94da725e543df71a
       size: 32817
+    - path: data/interim/dlc/zurich_allied.trading.parquet
+      hash: md5
+      md5: 6c4444374562adf63f337c143e5f7a75
+      size: 35733
