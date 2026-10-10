@@ -209,3 +209,9 @@ def test_waterfall_starts_at_the_paper_conventions(lab):
         for a, s in zip(steps[:-1], steps[1:], strict=True)
     }
     assert max(drops, key=drops.get) == "next_close"
+    # the user's run 8b36f314 (DTB3 md5 7edbf761...), all twins
+    pinned = {"paper": 1.158, "dexia_cleaned": 1.201, "next_close": 0.530,
+              "marked_at_end": 0.471, "no_padding": 0.662}  # fmt: skip
+    for step, value in pinned.items():
+        assert t.loc[step, "weighted_mean_pm"] == pytest.approx(value, abs=6e-4), step
+    assert t.loc["no_padding", "sharpe"] == pytest.approx(0.162, abs=6e-4)

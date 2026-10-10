@@ -212,6 +212,15 @@ uv run python -m quant_lab.backtest.run data=rd_shell strategy=dejong_threshold 
 
 Results: `research/reports/dejong_standard.md`.
 
+Final report of paper 2 (step 19): `research/reports/dejong_final_report.md`,
+with a standalone HTML version (charts, table views, light/dark) and a PDF
+for forwarding, both rendered from the Markdown and
+`research/reports/dejong_final/report_data.yaml` (no data needed):
+
+```bash
+uv run python -m quant_lab.reporting.dejong_final   # --no-pdf without Chromium
+```
+
 ## Robustness (step 9)
 
 Every case in `conf/robustness/default.yaml` (costs, dividends, capital and

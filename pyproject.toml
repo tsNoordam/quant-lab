@@ -7,6 +7,7 @@ readme = "README.md"
 requires-python = "==3.12.*"
 dependencies = [
     "hydra-core>=1.3.7",
+    "markdown>=3.11",
     "matplotlib>=3.11.2",
     "mlflow>=3.16.1",
     "numpy>=2.5.3",
@@ -48,3 +49,7 @@ src = ["src", "tests"]
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "B", "UP", "NPY", "PD", "SIM"]
+
+[tool.ruff.lint.per-file-ignores]
+# HTML/SVG generators: inline CSS, script and markup strings are not wrapped
+"src/quant_lab/reporting/*" = ["E501"]

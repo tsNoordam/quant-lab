@@ -20,14 +20,14 @@ The same command runs `backtest.period=validation`, `data=reed_elsevier`, and
 the zero-cost case `costs=flat_bps costs.fee_bps=0 costs.slippage_bps=0
 run_label=step18_zero_cost`.
 
-> **Status:** the waterfall figures below were computed in the cloud session
-> with a stand-in T-bill (FRED unreachable). The T-bill only pads short
-> positions and sets the excess-return benchmark. They are replaced by the
-> user's run on DTB3 before this step closes; the "paper" column already
-> equals step 16's DTB3 value (1.158).
+> **Records:**
 >
-> The lab-engine figures are final. The panels are byte-identical to the
-> user's `dvc.lock`, and the lab engine uses no T-bill.
+> - The waterfall figures are the user's run on DTB3,
+>   `8b36f314afa448319bbe23d897531b56`. A cloud-session run with a stand-in
+>   T-bill agreed to within 0.003 in every cell.
+> - The lab-engine figures are the user's runs, `run_label=step18` and
+>   `step18_zero_cost`: 8 runs, git clean. They are identical to the cloud
+>   session's runs on byte-identical panels.
 
 ## 1. The waterfall (benchmark 10%/5%/12 months)
 
@@ -47,11 +47,11 @@ Costs, margins and rates stay the paper's in every step: part 2 handles costs.
 
 | Time-zone gap | paper | dexia_cleaned | next_close | marked_at_end | no_padding |
 |---|---|---|---|---|---|
-| All 12 twins | 1.158 | 1.201 | 0.530 | 0.470 | **0.662** |
-| 0 h (ABB, Dexia, Fortis) | 1.457 | 1.675 | 1.074 | 0.913 | 1.225 |
+| All 12 twins | 1.158 | 1.201 | 0.530 | 0.471 | **0.662** |
+| 0 h (ABB, Dexia, Fortis) | 1.458 | 1.675 | 1.075 | 0.914 | 1.225 |
 | 1 h (RD/Shell, Unilever, Reed, Merita, Zürich) | 0.879 | 0.879 | 0.404 | 0.376 | 0.433 |
-| 5 h (Smithkline) | 0.321 | 0.321 | 0.172 | 0.172 | 0.171 |
-| 10 h (Rio Tinto, BHP, Brambles) | 4.748 | 4.748 | 0.696 | 0.544 | 2.433 |
+| 5 h (Smithkline) | 0.320 | 0.320 | 0.172 | 0.172 | 0.171 |
+| 10 h (Rio Tinto, BHP, Brambles) | 4.750 | 4.750 | 0.698 | 0.547 | 2.433 |
 
 ### Calendar time: one daily portfolio
 
@@ -59,9 +59,9 @@ Excess return over the T-bill in % per year, Sharpe ratio in brackets:
 
 | Time-zone gap | paper | dexia_cleaned | next_close | marked_at_end | no_padding |
 |---|---|---|---|---|---|
-| All 12 twins | 5.8 (0.38) | 6.0 (0.40) | 0.5 (0.03) | 0.1 (0.01) | **2.8 (0.16)** |
+| All 12 twins | 5.8 (0.38) | 6.0 (0.40) | 0.5 (0.03) | 0.1 (0.01) | **2.7 (0.16)** |
 | 0 h | 8.2 (0.48) | 10.5 (0.69) | 7.0 (0.45) | 5.3 (0.35) | 7.2 (0.45) |
-| 1 h | 3.0 (0.20) | 3.0 (0.20) | -0.7 (-0.04) | -0.8 (-0.05) | 0.4 (0.03) |
+| 1 h | 3.0 (0.20) | 3.0 (0.20) | -0.7 (-0.05) | -0.8 (-0.05) | 0.4 (0.02) |
 | 5 h | -0.1 (-0.01) | -0.1 (-0.01) | -1.1 (-0.10) | -1.1 (-0.10) | -1.1 (-0.10) |
 | 10 h | 15.2 (0.93) | 15.2 (0.93) | 2.3 (0.13) | 2.0 (0.11) | 7.0 (0.29) |
 
@@ -96,18 +96,18 @@ Positions (all twins): 128, 128, 128, 130 and 144.
    - It is concentrated in the same-time-zone twins (0.45).
    - The 1-hour twins, the paper's largest group by positions and the only
      ones in the lab's data, earn 0.4% per year over the T-bill (Sharpe
-     0.03).
+     0.02).
 
 ### All eight strategies, all twins
 
 | Strategy | Weighted mean % p.m., paper → ours | Calendar-time Sharpe ratio, paper → ours |
 |---|---|---|
-| 5%/1%/1 month | -0.140 → -0.746 | -0.21 → -0.32 |
+| 5%/1%/1 month | -0.140 → -0.746 | -0.21 → -0.33 |
 | 5%/1%/3 months | 0.497 → 0.110 | 0.20 → 0.01 |
-| 5%/1%/12 months | 0.689 → 0.399 | 0.36 → 0.15 |
-| 5%/1%/unlimited | 0.639 → 0.401 | 0.28 → 0.14 |
-| 10%/5%/1 month | 0.483 → -0.569 | 0.00 → -0.30 |
-| 10%/5%/3 months | 1.042 → 0.389 | 0.33 → 0.10 |
+| 5%/1%/12 months | 0.689 → 0.399 | 0.35 → 0.15 |
+| 5%/1%/unlimited | 0.639 → 0.401 | 0.28 → 0.13 |
+| 10%/5%/1 month | 0.484 → -0.569 | 0.00 → -0.30 |
+| 10%/5%/3 months | 1.043 → 0.389 | 0.33 → 0.10 |
 | 10%/5%/12 months | 1.158 → 0.662 | 0.38 → 0.16 |
 | 10%/5%/unlimited | 1.131 → 0.642 | 0.46 → 0.15 |
 
@@ -152,7 +152,7 @@ superseded zero-cost runs per pair, with 5 bps slippage.
 | Question | Answer |
 |---|---|
 | Is the paper reproducible? | Yes. Tables II, III and the holding statistics of IV-V reproduce closely; returns and alphas within about 0.15% per month; every difference documented (steps 14-17) |
-| Is its return robust to its own conventions? | No. About 55% of the benchmark return disappears when trades happen one close after the signal, and 85% for the non-synchronous Australian twins |
+| Is its return robust to its own conventions? | No. 56% of the benchmark return (1.20 → 0.53) disappears when trades happen one close after the signal, and 85% for the non-synchronous Australian twins |
 | What survives under our standard? | A calendar-time Sharpe ratio of about 0.16 before realistic costs, concentrated in same-time-zone twins; on the lab pairs, Sharpe ratios of -0.07 to 0.10 after costs |
 | Agreement with paper 1 (Maymin, steps 1-12)? | Yes: in both, the gross edge in RD/Shell-type pairs is small and costs or execution remove it |
 
