@@ -99,9 +99,10 @@ tested once, with rules frozen on 2010-2020.
 
 | ID | Rule | Origin |
 |---|---|---|
-| R1 | ORB: range = high/low of the first N minutes of RTH, N ∈ {15, 30, 60}. Enter on the first 5-minute close beyond the range, at the next bar's open; stop at the opposite side of the range; exit at the RTH close. One trade per day | [PAPER-DERIVED] from lessons 4 and 6, with the stop and exit [IMPLEMENTATION-ASSUMPTION] (A-ambiguities) |
-| R1b | R1 with a target at 1R, 2R, and the range-height extensions of 50% and 100% (Session Imbalance indicator) | [PAPER-DERIVED] levels, their use as targets [IMPLEMENTATION-ASSUMPTION] |
-| R2 | RTH gap fill: gap = RTH open vs. previous RTH close. Measure the fill probability by gap size, and test a fade with a fixed stop | [PAPER-DERIVED] statistic; the trade [IMPLEMENTATION-ASSUMPTION] |
+| R1 | ORB: range = high/low of the first N minutes of RTH, N ∈ {15, 30, 60}. Enter on the first 5-minute close beyond the range, at the next 1-minute bar's open; stop at the range midpoint or the opposite side; exit at the RTH close. One trade per day | [PAPER-DERIVED] window, trigger and midpoint stop; opposite-side stop [EXTERNAL-RESEARCH]; entry price and exit [IMPLEMENTATION-ASSUMPTION] (O1-O8) |
+| R1b | R1 with a target at 1R, 2R or 3R, and with the 50%/100% range extensions (Session Imbalance indicator) | [PAPER-DERIVED] levels; their use as targets [IMPLEMENTATION-ASSUMPTION] |
+| R1c | R1 plus one re-entry in the opposite direction after a stop-out | [PAPER-DERIVED] (O9) |
+| R2 | RTH gap fill: gap = RTH open vs. previous RTH close. Measure the full and midline fill probability by gap size, and test a fade toward the prior close with a fixed stop | [PAPER-DERIVED] statistic; the trade [IMPLEMENTATION-ASSUMPTION] (O11-O13) |
 | R3 | R1 restricted to days where the breakout points toward an unfilled gap | [PAPER-DERIVED] combination (lesson 5 [04:23]) |
 | R4 | IVB proxy: targets at percentiles of the post-breakout excursion, estimated on the training window only | [PROPOSED-EXTENSION]: the proprietary model is not available |
 
@@ -115,7 +116,13 @@ opened.
 - P(price exceeds the range by at least x ticks after the first breakout),
   for x as a grid; the course's "70%" without x is compared with the whole
   curve.
-- P(gap fill within the RTH session), by gap size; compared with 68%.
+- P(gap fill within the RTH session), by gap size; compared with 68-71%
+  (full) and about 80% (midline).
+- P(protection-level-like target hit): not reproducible (proprietary); C2
+  and C3 are compared with the excursion curve instead.
+- P(price stays inside the 15-minute range all session) vs. about 15%;
+  P(single breakout) vs. 48-49%; P(at least one side of the 60-minute IB
+  taken out) vs. about 98%.
 
 ### Costs and execution
 

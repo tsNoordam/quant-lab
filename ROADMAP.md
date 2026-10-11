@@ -84,3 +84,32 @@ IAPM column of Table VI (needs a World index, D25); the paper's one-day-delay
 sensitivity (alpha falls 0.633 for us, 0.336 in the paper); `/audit-backtest` was not run on the
 paper-convention engine; the 2000+ periods and Rio Tinto stay locked.
 
+# Project 3: order flow (DeepCharts course), tracks A and B
+
+Source: the user's course material (`tsNoordam/order-data`, commit `ee2c839`;
+copyrighted, kept out of this repository). Market: CME index futures (ES,
+MES). Paper 2 is preserved on the user's branch `Paper2`.
+
+- **Track A** tests the course's mechanical session edges in the lab.
+- **Track B** then measures whether the user's own discretionary order-flow
+  decisions add to that base: a replay journal that records each decision
+  with the market state at that moment, no look-ahead, scored by the lab.
+
+| Step | What | Commit |
+|---|---|---|
+| 20 | Extraction and test plan (track A): `research/{extraction,assumptions,methodology}/deepcharts_orb.md`, claims in `research/evidence/deepcharts_orb_evidence.csv`. The mechanical core is consistent (5-minute close beyond the RTH opening range); window, stop (eight versions) and targets (proprietary IVB levels) vary by session; no claim states a sample, period or costs. Ambiguities O1-O18 fixed before any data; sample 2010-17 / 2018-20 / 2021+ locked (the period of the course's evidence) | (this step) |
+
+Planned, in order:
+
+21. **ES 1-minute data.** The user downloads ES front-month `ohlcv-1m`
+    (Databento `GLBX.MDP3`, from 2010) after checking the cost; ingest stage,
+    RTH session calendar, roll, and validation tests, as for the DLC data.
+22. **Reproduce the course's statistics** (C1-C5, C8-C10, G1-G3) on the
+    development period: excursion curves, range and gap-fill probabilities.
+23. **Backtest R1-R4** on 2010-2020 with costs, small grid, robustness and
+    deflated Sharpe; audit (`/audit-backtest`, red team) before any freeze.
+24. **Freeze and one-shot OOS** on 2021 onward, only if step 23 passes the
+    pre-registered kill criteria.
+25. **Track B design**: the decision journal (what is recorded, how it is
+    scored against the track-A base), on trades data.
+

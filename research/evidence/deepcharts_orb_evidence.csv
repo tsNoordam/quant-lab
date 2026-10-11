@@ -1,0 +1,21 @@
+claim_id,source,item,statistic,value,unit,tag,note
+C1,L4 [02:41]; D2L [14:39],ORB any window,P(some excursion after opening-range breakout),70,%,CLAIM,excursion size undefined (O15)
+C2,L6 [08:54],IVB 30 min,P(protection level reached after breakout),65-70,%,CLAIM,level formula proprietary
+C2,J4P [33:25],IVB,P(protection zone reached after breakout),68-75,%,CLAIM,
+C2,A2L [21:21]; A3L [44:39],IVB,P(protection level reached),60-70,%,CLAIM,
+C3,D2L [01:27:19],IVB 15 min,P(exit average reached),50-60,%,CLAIM,stated from memory
+C4,D2L [28:06],ORB 15 min,P(price stays inside range all session),15,%,CLAIM,
+C5,D2L [01:26:52]; A1L [17:53]; A3L [52:22],IVB,P(single breakout),48-49,%,CLAIM,indicator readout; meaning unclear
+C6,L4 [01:51]-[02:22],ORB 15 min ES,Sharpe vs buy-and-hold S&P 500 since 2021,higher,,CLAIM,screenshot; 2% risk per trade; no costs shown
+C7,F3L [42:24]; A3L [06:41]; A4L [15:01],ORB,outperformed S&P 500 over decades,yes,,CLAIM,screenshot; method not shown
+C8,M3L [17:37]; A2L [39:18]; F4L [40:28],ORB 30 vs 15 min,win rate 30 min vs 15 min,higher / similar,,CLAIM,contradictory
+C9,F4L [25:49],ORB 5 min,P(target reached),60,%,CLAIM,"""maybe"""
+C10,A4D [01:46:01],IB 60 min,P(at least one IB side taken out),98,%,CLAIM,
+C11,M2L [14:22]; M3L [15:21]; M4L [13:17]; A3L [02:32],ORB,recent performance,poor / excellent,,CLAIM,contradictory
+C12,F2P [43:03],any,80-90% win rate at 1:2-1:3 R,does not exist,,CLAIM,presenter's counterpoint
+G1,L5 [00:33]; D2L [12:37],RTH gap ES/NQ,P(gap refilled),68-70,%,CLAIM,
+G2,A2L [08:22],RTH gap,P(full fill),69-71,%,CLAIM,
+G2,A2L [08:39],RTH gap,P(midline fill),80,%,CLAIM,"""slightly more"""
+G3,A2L [09:49],RTH gap ES/NQ,P(fill) over last 20 years,70,%,CLAIM,in-house research; method not shown
+E1,SSRN 4416622,5-min ORB QQQ 2016-2023,annual alpha net of commissions,33,%,EXTERNAL-RESEARCH,no spread/slippage; no OOS (per independent replication)
+E2,doi:10.1109/ACCESS.2019.2899177,ORB index futures 2003-2013 (1-min),traditional ORB significance,not significant,,EXTERNAL-RESEARCH,per secondary summary; unverified
