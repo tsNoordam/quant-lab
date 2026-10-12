@@ -1,0 +1,6 @@
+outs:
+- md5: 4d565e88d856db93a64bbcdb9a1ec5f1.dir
+  size: 104821256
+  nfiles: 2
+  hash: md5
+  path: databento_es

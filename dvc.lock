@@ -1266,3 +1266,61 @@ stages:
       hash: md5
       md5: 6c4444374562adf63f337c143e5f7a75
       size: 35733
+  es_ingest:
+    cmd: python -m quant_lab.data.es_futures --config conf/futures/es.yaml
+    deps:
+    - path: data/metadata/databento_es.json
+      hash: md5
+      md5: 93917edf5cfebfbb4bf724db2aaaafbb
+      size: 3806
+    - path: data/raw/databento_es
+      hash: md5
+      md5: 4d565e88d856db93a64bbcdb9a1ec5f1.dir
+      size: 104821256
+      nfiles: 2
+    - path: src/quant_lab/data/databento_fetch.py
+      hash: md5
+      md5: 792463ec128f5bfad0903a3f0c79adea
+      size: 7602
+    - path: src/quant_lab/data/es_futures.py
+      hash: md5
+      md5: 1ffc8f258b3d3e0329855c817d44681e
+      size: 14073
+    params:
+      conf/futures/es.yaml:
+        session:
+          calendar: XNYS
+          tz: America/New_York
+        source:
+          vendor: databento
+          dataset: GLBX.MDP3
+          schema: ohlcv-1m
+          stype_in: continuous
+          symbols:
+          - ES.v.0
+          - ES.v.1
+          start: '2010-06-06'
+          end: '2026-10-01'
+          raw_dir: data/raw/databento_es
+        validation:
+          min_minute_coverage: 0.98
+          max_gap_minutes: 5
+          warn_abs_log_return: 0.02
+          max_abs_log_return: 0.08
+    outs:
+    - path: data/interim/es/bars_1m.parquet
+      hash: md5
+      md5: 1381210916255267f35fc7490c4a974e
+      size: 113139432
+    - path: data/processed/es.ingest.json
+      hash: md5
+      md5: b3371569ed10c37a13ee37b18ea32543
+      size: 1772
+    - path: data/processed/es/rth_1m.parquet
+      hash: md5
+      md5: 69e6762dda5cf1ca0dbf2bad1eeb837b
+      size: 25465527
+    - path: data/processed/es/sessions.parquet
+      hash: md5
+      md5: 3b7859bddddf157ca4e99c73e03b9d3e
+      size: 183379

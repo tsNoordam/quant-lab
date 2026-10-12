@@ -1,0 +1,171 @@
+{
+  "dataset": "databento_es",
+  "description": "GLBX.MDP3 ohlcv-1m bars for ES.v.0, ES.v.1 (continuous symbology), 2010-06-06 to 2026-10-01 (end exclusive).",
+  "source": "Databento historical API (https://databento.com), quant_lab.data.databento_fetch",
+  "license": "Licensed vendor data: stays in DVC, never in git, notes or chat.",
+  "request": {
+    "vendor": "databento",
+    "dataset": "GLBX.MDP3",
+    "schema": "ohlcv-1m",
+    "stype_in": "continuous",
+    "symbols": [
+      "ES.v.0",
+      "ES.v.1"
+    ],
+    "start": "2010-06-06",
+    "end": "2026-10-01",
+    "raw_dir": "data/raw/databento_es"
+  },
+  "layout": "data/raw/databento_es/<symbol>.ohlcv-1m.<start>_<end>.dbn.zst, Databento DBN (zstd), unmodified",
+  "files": {
+    "ES.v.0.ohlcv-1m.2010-06-06_2026-10-01.dbn.zst": {
+      "md5": "451463b5e1b6509c4c2d24dda8b64128",
+      "bytes": 79463956,
+      "billable_bytes": 319477368,
+      "quoted_cost_usd": 20.8275539428,
+      "downloaded": "2026-10-12"
+    },
+    "ES.v.1.ohlcv-1m.2010-06-06_2026-10-01.dbn.zst": {
+      "md5": "6123c14d49709c4fba73b915dce944de",
+      "bytes": 25357300,
+      "billable_bytes": 110130888,
+      "quoted_cost_usd": 7.179716750979,
+      "downloaded": "2026-10-12"
+    }
+  },
+  "conditions": [
+    {
+      "date": "2014-06-11",
+      "condition": "degraded"
+    },
+    {
+      "date": "2014-06-12",
+      "condition": "degraded"
+    },
+    {
+      "date": "2014-06-13",
+      "condition": "degraded"
+    },
+    {
+      "date": "2014-06-15",
+      "condition": "degraded"
+    },
+    {
+      "date": "2014-09-22",
+      "condition": "degraded"
+    },
+    {
+      "date": "2014-09-23",
+      "condition": "degraded"
+    },
+    {
+      "date": "2014-09-24",
+      "condition": "degraded"
+    },
+    {
+      "date": "2014-09-25",
+      "condition": "degraded"
+    },
+    {
+      "date": "2017-11-13",
+      "condition": "degraded"
+    },
+    {
+      "date": "2018-10-21",
+      "condition": "degraded"
+    },
+    {
+      "date": "2019-01-15",
+      "condition": "degraded"
+    },
+    {
+      "date": "2019-02-22",
+      "condition": "degraded"
+    },
+    {
+      "date": "2019-03-13",
+      "condition": "degraded"
+    },
+    {
+      "date": "2019-03-26",
+      "condition": "degraded"
+    },
+    {
+      "date": "2020-02-27",
+      "condition": "degraded"
+    },
+    {
+      "date": "2020-02-28",
+      "condition": "degraded"
+    },
+    {
+      "date": "2020-05-05",
+      "condition": "degraded"
+    },
+    {
+      "date": "2020-06-30",
+      "condition": "degraded"
+    },
+    {
+      "date": "2020-07-01",
+      "condition": "degraded"
+    },
+    {
+      "date": "2021-12-05",
+      "condition": "degraded"
+    },
+    {
+      "date": "2022-01-02",
+      "condition": "degraded"
+    },
+    {
+      "date": "2024-09-18",
+      "condition": "degraded"
+    },
+    {
+      "date": "2025-09-17",
+      "condition": "degraded"
+    },
+    {
+      "date": "2025-09-24",
+      "condition": "degraded"
+    },
+    {
+      "date": "2025-11-28",
+      "condition": "degraded"
+    },
+    {
+      "date": "2026-01-31",
+      "condition": "degraded"
+    },
+    {
+      "date": "2026-03-15",
+      "condition": "degraded"
+    },
+    {
+      "date": "2026-03-16",
+      "condition": "degraded"
+    },
+    {
+      "date": "2026-03-21",
+      "condition": "degraded"
+    },
+    {
+      "date": "2026-04-10",
+      "condition": "degraded"
+    },
+    {
+      "date": "2026-05-24",
+      "condition": "degraded"
+    },
+    {
+      "date": "2026-08-29",
+      "condition": "degraded"
+    }
+  ],
+  "conditions_note": "Days Databento marks other than 'available' (metadata.get_dataset_condition); es_ingest marks their sessions unusable.",
+  "timezone": "UTC (ts_event, nanoseconds, start of the bar)",
+  "used_by": [
+    "quant_lab.data.es_futures (dvc stage es_ingest)"
+  ]
+}
