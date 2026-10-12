@@ -1284,8 +1284,8 @@ stages:
       size: 7602
     - path: src/quant_lab/data/es_futures.py
       hash: md5
-      md5: 1ffc8f258b3d3e0329855c817d44681e
-      size: 14073
+      md5: ebecf388cb84c39ecfec7fcc1fdf5105
+      size: 14714
     params:
       conf/futures/es.yaml:
         session:
@@ -1314,13 +1314,13 @@ stages:
       size: 113139432
     - path: data/processed/es.ingest.json
       hash: md5
-      md5: b3371569ed10c37a13ee37b18ea32543
-      size: 1772
+      md5: e27a34c8bbe856acd92715ed7dc73c12
+      size: 2411
     - path: data/processed/es/rth_1m.parquet
       hash: md5
       md5: 69e6762dda5cf1ca0dbf2bad1eeb837b
       size: 25465527
     - path: data/processed/es/sessions.parquet
       hash: md5
-      md5: 3b7859bddddf157ca4e99c73e03b9d3e
-      size: 183379
+      md5: b07fd5c1dac8c78567dbeccf941512eb
+      size: 184100
