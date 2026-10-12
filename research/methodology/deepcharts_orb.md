@@ -77,8 +77,10 @@ edges" on which one builds a "discretionary narrative"
   one contract).
 - **Sessions.** RTH 09:30-16:00 America/New_York, from the exchange calendar,
   including early closes; the ETH session is used only for the gap
-  definition. Days with missing minutes in the opening window are dropped and
-  counted.
+  definition. Sessions failing the coverage rule or flagged by the vendor are
+  not usable; every result is reported on usable sessions and, as a
+  sensitivity, on all sessions with bars (the March 2020 halt days are among
+  the excluded ones; `research/reports/data_decisions.md`).
 - **Validation** is deterministic code in `src/quant_lab/data/` with tests in
   `tests/data/` (timestamps, session boundaries, gaps, duplicates, roll
   jumps), as for the DLC data.
