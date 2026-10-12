@@ -101,6 +101,26 @@ def assign_sessions(bars: pd.DataFrame, schedule: pd.DataFrame) -> pd.DataFrame:
     return m.drop(columns=["rth_open", "rth_close"]).sort_values(["rank", "ts"], ignore_index=True)
 
 
+def _days(dates, limit: int = 10) -> str:
+    shown = [str(pd.Timestamp(d).date()) for d in list(dates)[:limit]]
+    more = f" (+{len(dates) - limit} more)" if len(dates) > limit else ""
+    return ", ".join(shown) + more
+
+
+def vendor_bad_days(cfg: DictConfig, root: Path) -> frozenset[pd.Timestamp]:
+    """Dates Databento marks degraded/pending/missing, from the provenance file."""
+    from quant_lab.data.databento_fetch import metadata_path
+
+    meta = json.loads(metadata_path(cfg, root).read_text())
+    if "conditions" not in meta:
+        raise ValueError(
+            "the provenance file has no dataset conditions: rerun "
+            "`python -m quant_lab.data.databento_fetch --config ... --download` "
+            "(present files are not bought again)"
+        )
+    return frozenset(pd.Timestamp(c["date"]) for c in meta["conditions"])
+
+
 def check_bars(bars: pd.DataFrame, vcfg: DictConfig) -> list[Issue]:
     issues: list[Issue] = []
     dup = bars.duplicated(["rank", "ts"]).sum()
@@ -126,16 +146,14 @@ def check_jumps(front: pd.DataFrame, vcfg: DictConfig) -> list[Issue]:
     )
     r = np.log(front["close"]).diff().where(same).abs()
     issues = []
-    hard = int((r > vcfg.max_abs_log_return).sum())
-    if hard:
-        issues.append(
-            Issue("bar_jump", "error", f"{hard} 1-minute moves above {vcfg.max_abs_log_return}")
-        )
-    soft = int(((r > vcfg.warn_abs_log_return) & (r <= vcfg.max_abs_log_return)).sum())
-    if soft:
-        issues.append(
-            Issue("bar_jump", "warning", f"{soft} 1-minute moves above {vcfg.warn_abs_log_return}")
-        )
+    hard = front.loc[r > vcfg.max_abs_log_return, "ts"]
+    if len(hard):
+        detail = f"{len(hard)} 1-minute moves above {vcfg.max_abs_log_return}: {_days(hard)}"
+        issues.append(Issue("bar_jump", "error", detail))
+    soft = front.loc[(r > vcfg.warn_abs_log_return) & (r <= vcfg.max_abs_log_return), "ts"]
+    if len(soft):
+        detail = f"{len(soft)} 1-minute moves above {vcfg.warn_abs_log_return}: {_days(soft)}"
+        issues.append(Issue("bar_jump", "warning", detail))
     return issues
 
 
@@ -147,9 +165,16 @@ def longest_missing_run(minutes: np.ndarray, expected: int) -> int:
 
 
 def build_sessions(
-    rth: pd.DataFrame, schedule: pd.DataFrame, vcfg: DictConfig
+    rth: pd.DataFrame,
+    schedule: pd.DataFrame,
+    vcfg: DictConfig,
+    bad_days: frozenset[pd.Timestamp] = frozenset(),
 ) -> tuple[pd.DataFrame, pd.DataFrame, list[Issue]]:
-    """Front-month RTH bars and the per-session table, with issues."""
+    """Front-month RTH bars and the per-session table, with issues.
+
+    ``bad_days`` are the dates the vendor marks degraded or missing; their
+    sessions are kept but not ``usable``.
+    """
     issues: list[Issue] = []
     front = rth.loc[rth["rank"] == 0].drop(columns="rank").reset_index(drop=True)
 
@@ -180,7 +205,7 @@ def build_sessions(
             Issue(
                 "session_without_bars",
                 "warning",
-                f"{len(missing)} NYSE sessions without front-month bars",
+                f"{len(missing)} NYSE sessions without front-month bars: {_days(missing)}",
             )
         )
     s["bars"] = s["bars"].fillna(0).astype(int)
@@ -200,7 +225,9 @@ def build_sessions(
     s["prev_close"] = [
         closes.get(k, np.nan) if pd.notna(k[0]) and pd.notna(k[1]) else np.nan for k in keys
     ]
-    prev_front = s["instrument_id"].shift()
+    # the front month of the last session that had bars (a session without
+    # bars must not hide a roll)
+    prev_front = s["instrument_id"].ffill().shift()
     s["roll"] = s["instrument_id"].notna() & prev_front.notna() & s["instrument_id"].ne(prev_front)
 
     late = []
@@ -225,10 +252,12 @@ def build_sessions(
             )
         )
 
+    s["vendor_flagged"] = s.index.isin(list(bad_days))
     s["usable"] = (
         (s["bars"] > 0)
         & (s["coverage"] >= vcfg.min_minute_coverage)
         & (s["max_gap"] <= vcfg.max_gap_minutes)
+        & ~s["vendor_flagged"]
     )
     s["instrument_id"] = s["instrument_id"].astype("Int64")
     issues += check_jumps(front, vcfg)
@@ -247,6 +276,14 @@ def report(bars: pd.DataFrame, sessions: pd.DataFrame, issues: list[Issue]) -> d
         "sessions_usable": int(len(used)),
         "sessions_early_close": int(sessions["early_close"].sum()),
         "sessions_without_bars": int((sessions["bars"] == 0).sum()),
+        "sessions_without_bars_dates": [
+            str(d.date()) for d in sessions.index[sessions["bars"] == 0]
+        ],
+        "sessions_vendor_flagged": int(sessions["vendor_flagged"].sum()),
+        "sessions_unusable_dates": [str(d.date()) for d in sessions.index[~sessions["usable"]]],
+        "rolls_per_year": {
+            int(y): int(n) for y, n in sessions["roll"].groupby(sessions.index.year).sum().items()
+        },
         "rolls": int(sessions["roll"].sum()),
         "first_session": str(sessions.index.min().date()),
         "last_session": str(sessions.index.max().date()),
@@ -260,7 +297,8 @@ def convert(cfg: DictConfig, root: Path) -> dict:
     issues = check_bars(bars, cfg.validation)
     schedule = rth_schedule(cfg.session.calendar, cfg.source.start, cfg.source.end)
     rth = assign_sessions(bars, schedule)
-    front, sessions, more = build_sessions(rth, schedule, cfg.validation)
+    bad = vendor_bad_days(cfg, root)
+    front, sessions, more = build_sessions(rth, schedule, cfg.validation, bad)
     issues += more
     rep = report(bars, sessions, issues)
     errors = [i for i in issues if i.severity == "error"]

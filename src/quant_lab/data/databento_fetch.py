@@ -7,8 +7,10 @@ Without ``--download`` nothing is bought: the script prints, per symbol, the
 billable size and the cost Databento quotes for the configured request.
 With ``--download`` it writes each symbol's records unmodified, as Databento's
 own DBN file (zstd), to the config's ``raw_dir``, and writes the provenance
-file ``data/metadata/databento_<name>.json`` (request, cost quote, md5). The
-raw directory then enters DVC with ``dvc add``; it is never edited.
+file ``data/metadata/databento_<name>.json`` (request, cost quote, md5, and
+the days Databento marks degraded or missing). The raw directory then enters
+DVC with ``dvc add``; it is never edited. Rerunning ``--download`` never buys
+a file that is already present: it only refreshes the provenance file.
 
 The API key is read from the environment variable ``DATABENTO_API_KEY``, or
 from a ``.env`` file in the repository root (git-ignored). It is never
@@ -88,31 +90,56 @@ def md5(path: Path) -> str:
     return h.hexdigest()
 
 
+def metadata_path(cfg: DictConfig, root: Path) -> Path:
+    return root / "data" / "metadata" / f"databento_{cfg.name}.json"
+
+
+def conditions(client, src: DictConfig) -> list[dict]:
+    """Days Databento does not mark ``available`` (degraded, pending, missing)."""
+    last = (dt.date.fromisoformat(src.end) - dt.timedelta(days=1)).isoformat()
+    rows = client.metadata.get_dataset_condition(src.dataset, start_date=src.start, end_date=last)
+    return [
+        {"date": str(r["date"]), "condition": str(r["condition"])}
+        for r in rows
+        if r.get("condition") != "available"
+    ]
+
+
 def download(client, cfg: DictConfig, root: Path, quotes: list[dict]) -> dict:
+    """Download missing files and (re)write the provenance file.
+
+    A file that already exists is raw data: it is kept, never bought again.
+    A new download goes to ``<name>.part`` and is renamed only when complete.
+    """
     src = cfg.source
     raw_dir = root / src.raw_dir
     raw_dir.mkdir(parents=True, exist_ok=True)
+    out = metadata_path(cfg, root)
+    known = json.loads(out.read_text())["files"] if out.exists() else {}
     files = {}
     for q in quotes:
         name = raw_filename(q["symbol"], src)
         path = raw_dir / name
         if path.exists():
-            raise SystemExit(f"{path} exists: raw data is immutable; remove it deliberately first")
-        client.timeseries.get_range(**request(src, q["symbol"]), path=path)
-        files[name] = {
-            "md5": md5(path),
-            "bytes": path.stat().st_size,
-            "billable_bytes": q["billable_bytes"],
-            "quoted_cost_usd": q["cost_usd"],
-            "downloaded": dt.date.today().isoformat(),
-        }
-    meta = metadata(cfg, files)
-    out = root / "data" / "metadata" / f"databento_{cfg.name}.json"
+            print(f"{name}: present, not downloaded again")
+            entry = dict(known.get(name, {}))
+        else:
+            part = path.with_name(name + ".part")
+            client.timeseries.get_range(**request(src, q["symbol"]), path=part)
+            part.rename(path)
+            entry = {"downloaded": dt.date.today().isoformat(), "quoted_cost_usd": q["cost_usd"]}
+        entry.setdefault("quoted_cost_usd", q["cost_usd"])
+        entry.setdefault("downloaded", "unknown")
+        entry.update(
+            {"md5": md5(path), "bytes": path.stat().st_size, "billable_bytes": q["billable_bytes"]}
+        )
+        files[name] = entry
+    meta = metadata(cfg, files, conditions(client, src))
     out.write_text(json.dumps(meta, indent=2) + "\n")
     return meta
 
 
-def metadata(cfg: DictConfig, files: dict) -> dict:
+def metadata(cfg: DictConfig, files: dict, conds: list[dict]) -> dict:
     src = cfg.source
     return {
         "dataset": f"databento_{cfg.name}",
@@ -127,6 +154,9 @@ def metadata(cfg: DictConfig, files: dict) -> dict:
         "layout": f"{src.raw_dir}/<symbol>.{src.schema}.<start>_<end>.dbn.zst, "
         "Databento DBN (zstd), unmodified",
         "files": files,
+        "conditions": conds,
+        "conditions_note": "Days Databento marks other than 'available' "
+        "(metadata.get_dataset_condition); es_ingest marks their sessions unusable.",
         "timezone": "UTC (ts_event, nanoseconds, start of the bar)",
         "used_by": ["quant_lab.data.es_futures (dvc stage es_ingest)"],
     }
@@ -144,10 +174,15 @@ def main(argv: list[str] | None = None) -> None:
     cfg = load_config(args.root / args.config)
     client = db.Historical(key=api_key(args.root))
     quotes = quote(client, cfg.source)
-    total = sum(q["cost_usd"] for q in quotes)
+    raw_dir = args.root / cfg.source.raw_dir
+    present = {
+        q["symbol"] for q in quotes if (raw_dir / raw_filename(q["symbol"], cfg.source)).exists()
+    }
+    total = sum(q["cost_usd"] for q in quotes if q["symbol"] not in present)
     for q in quotes:
-        print(f"{q['symbol']}: {q['billable_bytes'] / 1e6:,.1f} MB, ${q['cost_usd']:,.2f}")
-    print(f"total: ${total:,.2f}")
+        note = " (present: not bought again)" if q["symbol"] in present else ""
+        print(f"{q['symbol']}: {q['billable_bytes'] / 1e6:,.1f} MB, ${q['cost_usd']:,.2f}{note}")
+    print(f"total to buy: ${total:,.2f}")
     if not args.download:
         print("cost only; rerun with --download to buy and download")
         return

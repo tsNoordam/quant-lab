@@ -1,4 +1,4 @@
-"""Databento fetch: cost first, immutable raw files, key never written."""
+"""Databento fetch: cost first, raw files never bought twice, key never written."""
 
 import json
 from types import SimpleNamespace
@@ -28,8 +28,17 @@ CFG = OmegaConf.create(
 class FakeClient:
     def __init__(self):
         self.calls = []
-        self.metadata = SimpleNamespace(get_cost=self._cost, get_billable_size=self._size)
+        self.metadata = SimpleNamespace(
+            get_cost=self._cost, get_billable_size=self._size, get_dataset_condition=self._cond
+        )
         self.timeseries = SimpleNamespace(get_range=self._get_range)
+
+    def _cond(self, dataset, start_date, end_date):
+        self.calls.append(("condition", {"start": start_date, "end": end_date}))
+        return [
+            {"date": "2014-06-11", "condition": "degraded", "last_modified_date": "2024-01-01"},
+            {"date": "2014-06-16", "condition": "available", "last_modified_date": "2024-01-01"},
+        ]
 
     def _cost(self, **req):
         self.calls.append(("cost", req))
@@ -66,16 +75,28 @@ def test_download_writes_raw_files_and_metadata(tmp_path):
     assert written["files"][names[0]]["md5"] == f.md5(tmp_path / CFG.source.raw_dir / names[0])
     assert written["request"]["symbols"] == ["ES.v.0", "ES.v.1"]
     assert "key" not in json.dumps(written["request"]).lower()
+    assert written["conditions"] == [{"date": "2014-06-11", "condition": "degraded"}]
+    cond = next(c for kind, c in client.calls if kind == "condition")
+    assert cond["end"] == "2026-09-30"  # inclusive end = exclusive end - 1 day
+    assert not list((tmp_path / CFG.source.raw_dir).glob("*.part"))
 
 
-def test_download_refuses_to_overwrite_raw_data(tmp_path):
+def test_present_raw_files_are_never_bought_again(tmp_path):
     (tmp_path / "data" / "metadata").mkdir(parents=True)
     raw = tmp_path / CFG.source.raw_dir
     raw.mkdir(parents=True)
-    (raw / f.raw_filename("ES.v.0", CFG.source)).write_bytes(b"old")
+    name = f.raw_filename("ES.v.0", CFG.source)
+    (raw / name).write_bytes(b"old")
+    previous = {"files": {name: {"downloaded": "2026-10-12", "quoted_cost_usd": 20.83}}}
+    f.metadata_path(CFG, tmp_path).write_text(json.dumps(previous))
     client = FakeClient()
-    with pytest.raises(SystemExit, match="immutable"):
-        f.download(client, CFG, tmp_path, f.quote(client, CFG.source))
+    meta = f.download(client, CFG, tmp_path, f.quote(client, CFG.source))
+    bought = [c["symbols"][0] for kind, c in client.calls if kind == "get_range"]
+    assert bought == ["ES.v.1"]
+    assert (raw / name).read_bytes() == b"old"
+    assert meta["files"][name]["downloaded"] == "2026-10-12"
+    assert meta["files"][name]["quoted_cost_usd"] == 20.83
+    assert meta["files"][name]["md5"] == f.md5(raw / name)
 
 
 def test_api_key_from_dotenv_and_placeholder_rejected(tmp_path, monkeypatch):
@@ -98,6 +119,6 @@ def test_cost_only_cli_does_not_download(tmp_path, monkeypatch, capsys):
     monkeypatch.setenv(f.KEY_VAR, "db-test")
     f.main(["--config", "conf/es.yaml", "--root", str(tmp_path)])
     out = capsys.readouterr().out
-    assert "total: $2.50" in out and "db-test" not in out
+    assert "total to buy: $2.50" in out and "db-test" not in out
     assert not any(kind == "get_range" for kind, _ in client.calls)
     assert not (tmp_path / CFG.source.raw_dir).exists()

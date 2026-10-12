@@ -81,6 +81,7 @@ stages:
     cmd: python -m quant_lab.data.es_futures --config conf/futures/es.yaml
     deps:
       - data/raw/databento_es
+      - data/metadata/databento_es.json
       - src/quant_lab/data/es_futures.py
       - src/quant_lab/data/databento_fetch.py
     params:

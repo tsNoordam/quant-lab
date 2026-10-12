@@ -24,6 +24,11 @@ Fixed before any ES data was downloaded.
   days of mourning) have no RTH and are not traded.
 - **Usable sessions.** A session is usable when the front month trades in at
   least 98% of the RTH minutes and no run of missing minutes exceeds 5.
+- **Vendor-flagged days.** Days Databento marks other than "available"
+  (degraded, pending, missing; `metadata.get_dataset_condition`, recorded in
+  `data/metadata/databento_es.json`) are kept but not usable. Added
+  2026-10-12 after the download warned of degraded days from 2014-06-11,
+  before any statistic was computed.
 
 **Split** (`conf/split/es.yaml`, locked).
 

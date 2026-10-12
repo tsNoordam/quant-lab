@@ -47,10 +47,33 @@ def minute_bars(schedule, day, *, rank, instrument, base, eth=30, drop=(), volum
     )
 
 
-def run(bars, schedule, days):
+def run(bars, schedule, days, bad_days=frozenset()):
     sched = schedule.loc[[pd.Timestamp(d) for d in days]]
     rth = es.assign_sessions(bars, sched)
-    return es.build_sessions(rth, sched, VCFG)
+    return es.build_sessions(rth, sched, VCFG, bad_days)
+
+
+def test_roll_after_a_session_without_bars_is_detected(schedule):
+    """Real case (2014): a roll right after a vendor-degraded day without bars."""
+    days = ["2019-03-11", "2019-03-12", "2019-03-13"]
+    bars = pd.concat(
+        [
+            minute_bars(schedule, days[0], rank=0, instrument=A, base=2800),
+            minute_bars(schedule, days[2], rank=0, instrument=B, base=2820),
+        ]
+    )
+    _, s, _ = run(bars, schedule, days)
+    assert s["roll"].tolist() == [False, False, True]
+    assert np.isnan(s.loc[days[2], "prev_close"])  # previous session has no bars
+
+
+def test_vendor_flagged_days_are_not_usable(schedule):
+    days = ["2019-03-11", "2019-03-12"]
+    bars = pd.concat([minute_bars(schedule, d, rank=0, instrument=A, base=2800) for d in days])
+    _, s, _ = run(bars, schedule, days, frozenset({pd.Timestamp(days[1])}))
+    assert s["vendor_flagged"].tolist() == [False, True]
+    assert s["usable"].tolist() == [True, False]
+    assert s.loc[days[1], "coverage"] == 1.0  # complete bars, still excluded
 
 
 def test_schedule_follows_dst_and_early_closes(schedule):
@@ -254,8 +277,16 @@ def test_convert_end_to_end_from_dbn_files(schedule, tmp_path):
     for symbol, bars in (("ES.v.0", rank0), ("ES.v.1", rank1)):
         write_dbn(tmp_path / "raw" / raw_filename(symbol, cfg.source), bars)
 
+    meta = tmp_path / "data" / "metadata" / "databento_es.json"
+    meta.parent.mkdir(parents=True)
+    meta.write_text('{"files": {}}')
+    with pytest.raises(ValueError, match="no dataset conditions"):
+        es.convert(cfg, tmp_path)
+    meta.write_text('{"files": {}, "conditions": []}')
+
     rep = es.convert(cfg, tmp_path)
     assert rep["sessions"] == 2 and rep["sessions_usable"] == 2 and rep["rolls"] == 1
+    assert rep["rolls_per_year"] == {2019: 1} and rep["sessions_unusable_dates"] == []
     assert rep["bars"] == len(rank0) + len(rank1)
     s = pd.read_parquet(tmp_path / "processed/es/sessions.parquet")
     rth1 = pd.read_parquet(tmp_path / "processed/es/rth_1m.parquet")
