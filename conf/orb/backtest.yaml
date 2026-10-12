@@ -1,0 +1,79 @@
+# Step 23: track-A backtest of the course's session rules R1-R4 on ES,
+# development period only (train, validation; OOS refused).
+# Rules and their classification: research/methodology/deepcharts_orb.md;
+# open points O1-O18: research/assumptions/deepcharts_orb.md.
+# Fixed before the first run.
+#
+#   uv run python -m quant_lab.backtest.orb
+
+futures: conf/futures/es.yaml
+split: conf/split/es.yaml
+stats: conf/orb/default.yaml        # R4 targets come from step 22's excursion definition
+periods: [train, validation, development]
+universes: [usable, with_bars]
+
+execution:
+  trigger_minutes: 5                # O3
+  # O4: market order at the open of the first 1-minute bar after the decision.
+  # O10: a bar touching stop and target counts as stopped.
+  # A resting target (limit) fills only if price trades through it by
+  # target_trade_through ticks; a stop or time exit is a market order.
+  target_trade_through_ticks: 1
+  contracts: 1                      # O17: results per contract; no leverage modelled
+
+costs:
+  # [IMPLEMENTATION-ASSUMPTION] standard retail values (user decision 2026-10-12:
+  # "use standard values"); all-in per side = broker + CME exchange + NFA fees.
+  base:
+    commission_per_side_usd: 2.50   # ES; e.g. ~0.85-1.25 broker + ~1.38 CME + 0.02 NFA
+    slippage_ticks: 1               # entry, stop and time exits (market orders)
+    point_value: 50.0               # ES
+  # Square-root impact over lagged liquidity and volatility (CLAUDE.md), per side,
+  # in price: k * sigma_daily * price * sqrt(contracts / ADV); one ES contract is
+  # far below ES volume, so this term is near zero but kept for the standard.
+  impact:
+    coefficient: 1.0
+    vol_lookback_sessions: 60       # RTH close-to-close of the same contract
+    adv_lookback_sessions: 20       # front-month RTH volume
+    min_sessions: 20                # sessions before the first trade (warm-up)
+  # Sensitivities (not trials: same rules, different cost assumptions).
+  scenarios:
+    base: {}
+    no_slippage: {slippage_ticks: 0}
+    slippage_2: {slippage_ticks: 2}
+    low_commission: {commission_per_side_usd: 1.25}
+    high_commission: {commission_per_side_usd: 4.00}
+    mes: {commission_per_side_usd: 0.62, point_value: 5.0}
+    gross: {slippage_ticks: 0, commission_per_side_usd: 0.0, impact_off: true}
+
+rules:
+  R1:   # opening-range breakout [PAPER-DERIVED window/trigger/midpoint stop]
+    windows: [15, 30, 60]
+    stops: [midpoint, opposite]
+    # none = exit at the RTH close; kR = k x risk; ext50/ext100 = 50%/100% of
+    # the range height beyond the broken edge (Session Imbalance indicator)
+    targets: [none, 1R, 2R, 3R, ext50, ext100]
+  R1c:  # R1 plus one re-entry the other way after a stop-out [PAPER-DERIVED, O9]
+    windows: [15, 30, 60]
+    stops: [midpoint, opposite]
+    targets: [none, 2R]
+  R2:   # RTH gap fade toward the previous close [IMPLEMENTATION-ASSUMPTION trade]
+    stop_gap_multiples: [0.5, 1.0]  # stop beyond the entry, in units of |gap|
+    exit_minutes: [60, close]
+    min_gap_ticks: 1
+  R3:   # R1 only toward an unfilled gap, target = previous close [PAPER-DERIVED combination]
+    windows: [15, 30, 60]
+    stops: [midpoint, opposite]
+  R4:   # IVB proxy [PROPOSED-EXTENSION]: target at the excursion reached by
+        # (1 - q) of TRAIN breakouts, in range heights, from the trigger
+    windows: [15, 30, 60]
+    stops: [midpoint, opposite]
+    quantiles: [0.3, 0.5]
+
+# Pre-registered kill criterion (research/methodology/deepcharts_orb.md):
+# a rule family (fixed stop and target) survives only if, in the development
+# period on usable sessions after base costs, the mean net P&L per trade is
+# positive AND the deflated Sharpe ratio is above 0.5 in EVERY window.
+kill:
+  dsr_threshold: 0.5
+  annualization: 252

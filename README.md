@@ -246,6 +246,13 @@ The course's probability claims on the development period (step 22; MLflow
 uv run python -m quant_lab.models.orb_stats
 ```
 
+The course's rules as trades (step 23; MLflow `es.orb_backtest/track_a`,
+rules, costs and the pre-registered kill criterion in `conf/orb/backtest.yaml`):
+
+```bash
+uv run python -m quant_lab.backtest.orb
+```
+
 ## Robustness (step 9)
 
 Every case in `conf/robustness/default.yaml` (costs, dividends, capital and
