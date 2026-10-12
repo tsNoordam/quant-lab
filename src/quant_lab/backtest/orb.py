@@ -120,6 +120,12 @@ class Exec:
     target_first: bool = False  # a bar touching both counts as target
 
 
+def _on_grid(level: float, tick: float, away: int) -> float:
+    """Round a price to the tick grid: up when ``away`` > 0, down otherwise."""
+    x = level / tick
+    return float((np.ceil(x - 1e-9) if away > 0 else np.floor(x + 1e-9)) * tick)
+
+
 def simulate(
     minute: np.ndarray,
     o: np.ndarray,
@@ -145,10 +151,16 @@ def simulate(
         return None
     slip = ex.slippage_ticks * ex.tick
     entry = float(o[i0]) + d * slip
+    # resting orders sit on the tick grid, rounded away from the entry (audit A3)
+    stop = _on_grid(stop, ex.tick, -d)
     risk = d * (entry - stop)
-    if risk <= 0:
-        return None
-    tgt = target(entry, risk) if callable(target) else target
+    # the trade exists whatever the entry bar's open (audit A1): an open beyond
+    # the stop is a trade stopped at that open; k x risk needs a positive risk
+    tgt = target
+    if callable(target):
+        tgt = target(entry, risk) if risk > 0 else None
+    if tgt is not None:
+        tgt = _on_grid(tgt, ex.tick, d)
     hh, ll, oo = h[i0:end], lo[i0:end], o[i0:end]
     stop_hit = (ll <= stop) if d == 1 else (hh >= stop)
     js = orb_stats._first(stop_hit)
@@ -161,9 +173,8 @@ def simulate(
     stop_wins = js < jt or (both and not ex.target_first)
     if stop_wins and js < len(hh):
         j, reason = js, "stop"
+        # a stop is filled at its level, or at the open when the bar opens beyond it
         level = min(float(oo[j]), stop) if d == 1 else max(float(oo[j]), stop)
-        if j == 0:
-            level = stop
         fill = level - d * slip
     elif jt < len(hh):
         j, reason = jt, "target"
