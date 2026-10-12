@@ -3,6 +3,40 @@
 Decisions that shape what the lab can conclude, with the evidence behind them.
 Newest first. Each entry is fixed once a result depends on it.
 
+## 2026-10-12: ES futures data and sample design (project 3, track A, step 21)
+
+Fixed before any ES data was downloaded.
+
+**Data.**
+
+- **Source and symbols.** Databento `GLBX.MDP3`, `ohlcv-1m`, continuous
+  symbols `ES.v.0` (front month by volume) and `ES.v.1` (next month).
+- **Period.** 2010-06-06 to 2026-10-01 (end exclusive), fixed in
+  `conf/futures/es.yaml`.
+- **Prices.** Unadjusted: a range, its trade and its gap reference are
+  always on one contract.
+- **Licence.** The data is licensed: it stays in DVC.
+
+**Sessions.**
+
+- **RTH** is the NYSE schedule (`exchange-calendars` XNYS), including early
+  closes; days with an NYSE closure and a CME session (for example national
+  days of mourning) have no RTH and are not traded.
+- **Usable sessions.** A session is usable when the front month trades in at
+  least 98% of the RTH minutes and no run of missing minutes exceeds 5.
+
+**Split** (`conf/split/es.yaml`, locked).
+
+| Period | Dates |
+|---|---|
+| train | 2010-06-07 .. 2017-12-31 |
+| validation | 2018-01-01 .. 2020-12-31 |
+| out-of-sample | 2021-01-01 .. 2026-09-30 |
+
+The out-of-sample period is the period of the course's own evidence ("2021
+till today", `research/extraction/deepcharts_orb.md` C6). It is opened once,
+with rules frozen on 2010-2020, under `+unlock_oos=true`.
+
 ## 2026-10-07: Sample design for the de Jong et al. (2009) replication (paper 2, step 14)
 
 **User decision (2026-10-07).** The paper-2 replication uses the paper's own

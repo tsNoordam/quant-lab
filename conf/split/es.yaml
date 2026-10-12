@@ -1,0 +1,16 @@
+# LOCKED. ES futures, project 3 track A. Decided 2026-10-12 before any ES data
+# was downloaded; rationale in research/reports/data_decisions.md and
+# research/methodology/deepcharts_orb.md. Edit only in a commit that also
+# updates those files. The out-of-sample period is the period of the course's
+# own evidence ("2021 till today"); it is opened once, with frozen rules.
+
+name: es
+train:
+  start: "2010-06-07"
+  end: "2017-12-31"
+validation:
+  start: "2018-01-01"
+  end: "2020-12-31"
+oos:
+  start: "2021-01-01"
+  end: "2026-09-30"

@@ -221,6 +221,24 @@ for forwarding, both rendered from the Markdown and
 uv run python -m quant_lab.reporting.dejong_final   # --no-pdf without Chromium
 ```
 
+## Project 3: order flow on ES futures (steps 20+)
+
+Track A tests the mechanical session edges of the user's DeepCharts course
+(opening range breakout, RTH gap fill): `research/*/deepcharts_orb.md`.
+Data: ES 1-minute bars from Databento (licensed, DVC only). Put the API key
+in `.env` as `DATABENTO_API_KEY=...` (git-ignored), then:
+
+```bash
+uv run python -m quant_lab.data.databento_fetch --config conf/futures/es.yaml             # cost only
+uv run python -m quant_lab.data.databento_fetch --config conf/futures/es.yaml --download  # buys + writes data/raw/databento_es
+uv run dvc add data/raw/databento_es
+uv run dvc repro es_ingest      # -> data/processed/es/{rth_1m,sessions}.parquet, data/processed/es.ingest.json
+uv run pytest tests/data/test_es_sessions.py
+```
+
+RTH is the NYSE schedule (early closes included); the front month rolls by
+volume; the split is locked in `conf/split/es.yaml` (2021 on is out-of-sample).
+
 ## Robustness (step 9)
 
 Every case in `conf/robustness/default.yaml` (costs, dividends, capital and

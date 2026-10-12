@@ -97,13 +97,11 @@ MES). Paper 2 is preserved on the user's branch `Paper2`.
 
 | Step | What | Commit |
 |---|---|---|
-| 20 | Extraction and test plan (track A): `research/{extraction,assumptions,methodology}/deepcharts_orb.md`, claims in `research/evidence/deepcharts_orb_evidence.csv`. The mechanical core is consistent (5-minute close beyond the RTH opening range); window, stop (eight versions) and targets (proprietary IVB levels) vary by session; no claim states a sample, period or costs. Ambiguities O1-O18 fixed before any data; sample 2010-17 / 2018-20 / 2021+ locked (the period of the course's evidence) | (this step) |
+| 20 | Extraction and test plan (track A): `research/{extraction,assumptions,methodology}/deepcharts_orb.md`, claims in `research/evidence/deepcharts_orb_evidence.csv`. The mechanical core is consistent (5-minute close beyond the RTH opening range); window, stop (eight versions) and targets (proprietary IVB levels) vary by session; no claim states a sample, period or costs. Ambiguities O1-O18 fixed before any data; sample 2010-17 / 2018-20 / 2021+ locked (the period of the course's evidence) | cb7e9b9 |
+| 21 | ES 1-minute data pipeline: `quant_lab.data.databento_fetch` (cost quote first, `--download` writes the unmodified DBN files and `data/metadata/databento_es.json`; key from `.env`, never written) and DVC stage `es_ingest` (`quant_lab.data.es_futures`): NYSE-RTH sessions with early closes, volume-ranked front month (`ES.v.0`) plus `ES.v.1` for the same-contract previous close on roll days, usable-session rule (98% minute coverage, no gap over 5 minutes), point-in-time roll check, bad-print and OHLC checks. Split locked in `conf/split/es.yaml` (`data_decisions.md`). Unit tests on synthetic bars and synthetic DBN files; real-data checks in `tests/data/test_es_sessions.py` | (this step) |
 
 Planned, in order:
 
-21. **ES 1-minute data.** The user downloads ES front-month `ohlcv-1m`
-    (Databento `GLBX.MDP3`, from 2010) after checking the cost; ingest stage,
-    RTH session calendar, roll, and validation tests, as for the DLC data.
 22. **Reproduce the course's statistics** (C1-C5, C8-C10, G1-G3) on the
     development period: excursion curves, range and gap-fill probabilities.
 23. **Backtest R1-R4** on 2010-2020 with costs, small grid, robustness and

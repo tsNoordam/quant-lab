@@ -1,0 +1,48 @@
+# E-mini S&P 500 futures (CME Globex), 1-minute bars from Databento.
+# Project 3, track A (research/methodology/deepcharts_orb.md, ROADMAP step 21).
+#
+#   uv run python -m quant_lab.data.databento_fetch --config conf/futures/es.yaml           # cost only
+#   uv run python -m quant_lab.data.databento_fetch --config conf/futures/es.yaml --download
+#   uv run dvc add data/raw/databento_es
+#   uv run dvc repro es_ingest
+
+name: es
+source:
+  vendor: databento
+  dataset: GLBX.MDP3
+  schema: ohlcv-1m
+  stype_in: continuous
+  # Volume-ranked continuous contracts: rank 0 is the front month (the session's
+  # traded contract), rank 1 the next. Unadjusted prices; every record carries
+  # the real contract's instrument_id. Rank 1 is downloaded so that the previous
+  # RTH close of a new front month exists on a roll day (gap definition, O11).
+  symbols: [ES.v.0, ES.v.1]
+  # Fixed for reproducibility. GLBX.MDP3 history starts 2010-06-06; end is
+  # exclusive. Data from 2021 on is out-of-sample (conf/split/es.yaml).
+  start: "2010-06-06"
+  end: "2026-10-01"
+  raw_dir: data/raw/databento_es
+
+contract:
+  tick_size: 0.25
+  point_value: 50.0      # USD per index point (MES: 5.0)
+
+session:
+  # RTH = the NYSE cash session (O2): exchange-calendars XNYS, so early closes
+  # (13:00 ET) and NYSE-only closures follow the exchange's published schedule.
+  calendar: XNYS
+  tz: America/New_York
+
+validation:
+  # A session is used only if its front month has a bar in at least this share
+  # of the expected RTH minutes (a minute without trades has no bar) and no run
+  # of missing minutes longer than max_gap_minutes. Fixed before any data.
+  min_minute_coverage: 0.98
+  max_gap_minutes: 5
+  # Warn when a 1-minute close-to-close move exceeds this (log), error above
+  # the hard limit (a bad print, not a market move).
+  warn_abs_log_return: 0.02
+  max_abs_log_return: 0.08
+
+interim_path: data/interim/es/bars_1m.parquet
+processed_dir: data/processed/es

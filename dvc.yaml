@@ -74,6 +74,28 @@ stages:
         - data/interim/dlc/${item}.ingest.json:
             cache: false
 
+  # Project 3 (order flow), track A: ES futures 1-minute bars from Databento
+  # (data/raw/databento_es, dvc add after quant_lab.data.databento_fetch) to
+  # validated NYSE-RTH sessions of the front month.
+  es_ingest:
+    cmd: python -m quant_lab.data.es_futures --config conf/futures/es.yaml
+    deps:
+      - data/raw/databento_es
+      - src/quant_lab/data/es_futures.py
+      - src/quant_lab/data/databento_fetch.py
+    params:
+      - conf/futures/es.yaml:
+          - source
+          - session
+          - validation
+    outs:
+      - data/interim/es/bars_1m.parquet
+      - data/processed/es/rth_1m.parquet
+      - data/processed/es/sessions.parquet
+    metrics:
+      - data/processed/es.ingest.json:
+          cache: false
+
   preprocess:
     foreach:
       synthetic_twin:

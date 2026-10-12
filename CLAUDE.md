@@ -4,8 +4,11 @@
 
 This repository converts academic quantitative finance research papers into
 reproducible, testable trading strategies. Papers: Maymin, *Self-Imposed
-Limits to Arbitrage* (steps 1-12, done); current: de Jong, Rosenthal & van Dijk
-(2009), *The Risk and Return of Arbitrage in Dual-Listed Companies* (steps 13+).
+Limits to Arbitrage* (steps 1-12, done); de Jong, Rosenthal & van Dijk (2009),
+*The Risk and Return of Arbitrage in Dual-Listed Companies* (steps 13-19, done;
+branch `Paper2`). Current: project 3, order flow on ES futures from the user's
+DeepCharts course material (steps 20+; track A tests the course's mechanical
+session edges, track B the user's own order-flow decisions).
 
 The goal is NOT to maximize historical returns.
 
@@ -43,7 +46,7 @@ Git + DVC + MLflow record what happened.
 |---|---|---|
 | `papers/raw/` | Source PDFs (immutable) | DVC |
 | `research/` | Extraction notes, equations, methodology, assumptions, evidence, strategy specs (`specs/`), written reports (`reports/`) | Git |
-| `data/raw/` | Immutable vendor data (`datastream_dlc/` original zips, `synthetic_twin/`) | DVC (`dvc add`) |
+| `data/raw/` | Immutable vendor data (`datastream_dlc/` original zips, `databento_es/` DBN files, `synthetic_twin/`) | DVC (`dvc add`) |
 | `data/interim/` | Vendor formats converted to the per-leg raw CSV schema (`ingest` stage) | DVC (stage outs) |
 | `data/processed/` | Validated, aligned pair panels (`preprocess` stage), never edited by hand | DVC (stage outs) |
 | `data/metadata/` | Source/provenance JSON per dataset | Git |
@@ -82,7 +85,9 @@ Never use the out-of-sample period for strategy development.
   the raw file.
 - Every dataset in `data/raw/` has a metadata JSON in `data/metadata/`.
 - `data/interim/` and `data/processed/` are produced only by `uv run dvc repro`.
-- Datastream data is licensed: it stays in DVC and is never committed to Git
+- Datastream and Databento data are licensed, and so is the course material
+  (kept in `tsNoordam/order-data`, paraphrased only): data stays in DVC and is
+  never committed to Git
   or pasted into notes, issues or chat.
 - Real pairs are close-only (no open/high/low): backtest them with
   `backtest.execution=next_close`.
@@ -90,7 +95,10 @@ Never use the out-of-sample period for strategy development.
   used: no ADV-based costs, no relative-volume analysis.
 - Sample design (pair roles, splits, what is locked) is fixed in
   `research/reports/data_decisions.md`. Develop on `rd_shell` train+validation
-  only; `rio_tinto` and everything from 2000 on are out-of-sample.
+  only; `rio_tinto` and everything from 2000 on are out-of-sample. ES futures:
+  develop on 2010-06 to 2020 only; 2021 on is out-of-sample (`conf/split/es.yaml`).
+- The Databento API key lives in `.env` (git-ignored) as `DATABENTO_API_KEY`;
+  never print it, log it, or write it to a file.
 - Any rolling statistic used by a cost or signal model (volatility, ADV,
   spread) must be lagged so that it only uses information available before
   the decision time.
