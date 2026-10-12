@@ -32,7 +32,9 @@ def test_passed_target_fills_at_the_market_not_behind_the_entry(slip):
     rng = b.opening_range(m, h, lo, c, 15, 5)
     conf = {"rule": "R1", "window": 15, "stop": "midpoint", "target": "ext50"}  # ext50 = 101.5
     ex = b.Exec(TICK, slippage_ticks=slip, trade_through_ticks=1)
-    (t,) = b.session_trades((m, o, h, lo, c), {15: rng}, np.nan, conf, ex, step=5, min_gap_ticks=1, q_height=None)
+    (t,) = b.session_trades(
+        (m, o, h, lo, c), {15: rng}, np.nan, conf, ex, step=5, min_gap_ticks=1, q_height=None
+    )
     assert t["reason"] == "target" and t["exit_minute"] == t["entry_minute"]
     # entry at the open (101.75) + slip, exit at the same open - slip: only the slippage is lost
     assert t["fill_pts"] == pytest.approx(-2 * slip * TICK)

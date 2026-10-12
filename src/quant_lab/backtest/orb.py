@@ -162,7 +162,14 @@ def simulate(
         fill = level - d * slip
     elif jt < len(hh):
         j, reason = jt, "target"
-        fill = tgt if j == 0 else (max(float(oo[j]), tgt) if d == 1 else min(float(oo[j]), tgt))
+        if j == 0 and d * (tgt - float(oo[0])) <= 0:
+            # the target is already passed at entry: the limit is marketable and
+            # exits at the market on the entry bar's open (audit RT-1)
+            fill = float(oo[0]) - d * slip
+        elif j == 0:
+            fill = tgt
+        else:
+            fill = max(float(oo[j]), tgt) if d == 1 else min(float(oo[j]), tgt)
     else:
         j, reason = len(hh) - 1, "time"
         fill = float(c[i0 + j]) - d * slip
@@ -324,18 +331,19 @@ def _gap_fade(arrays, prev_close, conf, ex: Exec, min_gap_ticks: int) -> list[di
 
 def impact_points(sessions: pd.DataFrame, cfg: DictConfig) -> pd.Series:
     """Per-side square-root impact in index points for one contract, from
-    statistics lagged by one session; NaN during the warm-up (no trading)."""
+    statistics lagged by one session; NaN during the warm-up (no trading).
+
+    Computed over the sessions that have bars, so that a session without
+    bars does not blank the next ones through the rolling window (audit RT-8).
+    """
     ic = cfg.costs.impact
-    ret = np.log(sessions["close"] / sessions["prev_close"])
+    s = sessions[sessions["volume"].notna() & sessions["close"].notna()]
+    ret = np.log(s["close"] / s["prev_close"])
     sigma = ret.rolling(ic.vol_lookback_sessions, min_periods=ic.min_sessions).std().shift(1)
-    adv = (
-        sessions["volume"]
-        .rolling(ic.adv_lookback_sessions, min_periods=ic.min_sessions)
-        .mean()
-        .shift(1)
-    )
+    adv = s["volume"].rolling(ic.adv_lookback_sessions, min_periods=ic.min_sessions).mean().shift(1)
     q = float(cfg.execution.contracts)
-    return ic.coefficient * sigma * sessions["close"].shift(1) * np.sqrt(q / adv)
+    impact = ic.coefficient * sigma * s["close"].shift(1) * np.sqrt(q / adv)
+    return impact.reindex(sessions.index)
 
 
 def scenario_costs(cfg: DictConfig, name: str) -> dict:
