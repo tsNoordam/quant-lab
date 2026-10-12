@@ -115,6 +115,9 @@ class Exec:
     tick: float
     slippage_ticks: float
     trade_through_ticks: float
+    # sensitivities only (the base case is the conservative one):
+    time_exit_slippage_ticks: float | None = None  # None = slippage_ticks
+    target_first: bool = False  # a bar touching both counts as target
 
 
 def simulate(
@@ -154,7 +157,9 @@ def simulate(
         thru = ex.trade_through_ticks * ex.tick
         tgt_hit = (hh >= tgt + thru) if d == 1 else (ll <= tgt - thru)
         jt = orb_stats._first(tgt_hit)
-    if js <= jt and js < len(hh):
+    both = js == jt < len(hh)  # one bar touches stop and target (O10)
+    stop_wins = js < jt or (both and not ex.target_first)
+    if stop_wins and js < len(hh):
         j, reason = js, "stop"
         level = min(float(oo[j]), stop) if d == 1 else max(float(oo[j]), stop)
         if j == 0:
@@ -172,12 +177,16 @@ def simulate(
             fill = max(float(oo[j]), tgt) if d == 1 else min(float(oo[j]), tgt)
     else:
         j, reason = len(hh) - 1, "time"
-        fill = float(c[i0 + j]) - d * slip
+        t_slip = (
+            slip if ex.time_exit_slippage_ticks is None else ex.time_exit_slippage_ticks * ex.tick
+        )
+        fill = float(c[i0 + j]) - d * t_slip
     return {
         "direction": d,
         "entry_minute": int(minute[i0]),
         "exit_minute": int(minute[i0 + j]),
         "reason": reason,
+        "both_touch": bool(both),
         "risk_pts": risk,
         "fill_pts": d * (fill - entry),
     }
@@ -352,6 +361,22 @@ def scenario_costs(cfg: DictConfig, name: str) -> dict:
     return {**base, "impact_off": False, **over}
 
 
+def exec_key(cfg: DictConfig, costs: dict) -> tuple:
+    """The execution assumptions that change fills (each key is simulated once)."""
+    time_slip = costs.get("time_exit_slippage_ticks")
+    return (
+        float(costs["slippage_ticks"]),
+        None if time_slip is None else float(time_slip),
+        float(costs.get("target_trade_through_ticks", cfg.execution.target_trade_through_ticks)),
+        costs.get("same_bar", "stop_first") == "target_first",
+    )
+
+
+def make_exec(cfg: DictConfig, key: tuple) -> Exec:
+    slip, time_slip, thru, target_first = key
+    return Exec(float(cfg.futures_cfg.contract.tick_size), slip, thru, time_slip, target_first)
+
+
 # ------------------------------------------------------------- simulation
 
 
@@ -359,13 +384,11 @@ def run_trades(
     bars: pd.DataFrame,
     sessions: pd.DataFrame,
     cfg: DictConfig,
-    slippage_ticks: float,
+    ex: Exec,
     q_height: dict,
 ) -> pd.DataFrame:
-    """Every configuration's trades at one slippage level (fills before commission/impact)."""
-    tick = float(cfg.futures_cfg.contract.tick_size)
+    """Every configuration's trades under one execution model (fills before commission/impact)."""
     step = int(cfg.execution.trigger_minutes)
-    ex = Exec(tick, float(slippage_ticks), float(cfg.execution.target_trade_through_ticks))
     confs = configs(cfg)
     windows = sorted({c["window"] for c in confs if c["window"]})
     impact = impact_points(sessions, cfg)
@@ -426,13 +449,21 @@ def metrics(t: pd.DataFrame, days: pd.Index, ann: int) -> dict:
     )
     n = len(t)
     std = t["net_usd"].std(ddof=1) if n > 1 else np.nan
+    mean = float(t["net_usd"].mean()) if n else np.nan
+    se = float(std / np.sqrt(n)) if n > 1 else np.nan
     return {
         "trades": n,
         "sessions": len(days),
         "win_rate": float((t["net_usd"] > 0).mean()) if n else np.nan,
-        "mean_usd": float(t["net_usd"].mean()) if n else np.nan,
+        "mean_usd": mean,
+        "sd_usd": float(std) if n > 1 else np.nan,
+        "ci_lo_usd": mean - 1.96 * se,
+        "ci_hi_usd": mean + 1.96 * se,
+        "share_both_touch": float(t["both_touch"].mean()) if n else np.nan,
         "t_stat": float(t["net_usd"].mean() / std * np.sqrt(n)) if n > 1 and std > 0 else np.nan,
-        "mean_R": float((t["fill_pts"] / t["risk_pts"]).mean()) if n else np.nan,
+        "mean_R": float((t["fill_pts"] / t["risk_pts"]).where(t["risk_pts"] > 0).mean())
+        if n
+        else np.nan,
         "total_usd": float(t["net_usd"].sum()),
         "sharpe_ann": sharpe(daily) * np.sqrt(ann),
         "max_dd_usd": float((equity - equity.cummax()).min()) if len(equity) else 0.0,
@@ -443,15 +474,21 @@ def metrics(t: pd.DataFrame, days: pd.Index, ann: int) -> dict:
     }
 
 
-def evaluate(trades_by_slip: dict, sessions: pd.DataFrame, cfg: DictConfig) -> pd.DataFrame:
+def scenario_trades(trades_by_exec: dict, cfg: DictConfig, scenario: str) -> pd.DataFrame:
+    """The scenario's trades with net USD per contract."""
+    costs = scenario_costs(cfg, scenario)
+    trades = trades_by_exec[exec_key(cfg, costs)].copy()
+    trades["net_usd"] = net_usd(trades, costs)
+    return trades
+
+
+def evaluate(trades_by_exec: dict, sessions: pd.DataFrame, cfg: DictConfig) -> pd.DataFrame:
     confs = {c["id"]: c for c in configs(cfg)}
     universes = {"usable": sessions["usable"], "with_bars": sessions["bars"] > 0}
     ann = int(cfg.kill.annualization)
     rows = []
     for scn in cfg.costs.scenarios:
-        costs = scenario_costs(cfg, scn)
-        trades = trades_by_slip[float(costs["slippage_ticks"])].copy()
-        trades["net_usd"] = net_usd(trades, costs)
+        trades = scenario_trades(trades_by_exec, cfg, scn)
         by_id = dict(tuple(trades.groupby("id")))
         for period in cfg.periods:
             start, stop = orb_stats.period_bounds(cfg, period)
@@ -472,12 +509,10 @@ def evaluate(trades_by_slip: dict, sessions: pd.DataFrame, cfg: DictConfig) -> p
     return pd.DataFrame(rows)
 
 
-def deflate(trades_by_slip: dict, sessions: pd.DataFrame, cfg: DictConfig) -> pd.DataFrame:
+def deflate(trades_by_exec: dict, sessions: pd.DataFrame, cfg: DictConfig) -> pd.DataFrame:
     """Deflated Sharpe ratio per configuration: development, usable, base costs,
     against all configurations as trials (variance of their daily SRs)."""
-    costs = scenario_costs(cfg, "base")
-    trades = trades_by_slip[float(costs["slippage_ticks"])].copy()
-    trades["net_usd"] = net_usd(trades, costs)
+    trades = scenario_trades(trades_by_exec, cfg, "base")
     start, stop = orb_stats.period_bounds(cfg, "development")
     days = sessions.index[sessions["usable"] & (sessions.index >= start) & (sessions.index <= stop)]
     trades = trades[trades["session"].isin(days)]
@@ -492,6 +527,27 @@ def deflate(trades_by_slip: dict, sessions: pd.DataFrame, cfg: DictConfig) -> pd
     var_sr = float(np.var(srs, ddof=1)) if len(srs) > 1 else 0.0
     rows = [{"id": cid, **deflated_sharpe_ratio(s, len(daily), var_sr)} for cid, s in daily.items()]
     return pd.DataFrame(rows)
+
+
+def yearly(trades_by_exec: dict, sessions: pd.DataFrame, cfg: DictConfig) -> pd.DataFrame:
+    """Mean USD and R per trade by calendar year (development, usable), per
+    configuration, for the base, no-cost and optimistic scenarios (red team RT-4)."""
+    start, stop = orb_stats.period_bounds(cfg, "development")
+    days = sessions.index[sessions["usable"] & (sessions.index >= start) & (sessions.index <= stop)]
+    rows = []
+    for scn in [s for s in ("base", "gross", "optimistic") if s in cfg.costs.scenarios]:
+        t = scenario_trades(trades_by_exec, cfg, scn)
+        t = t[t["session"].isin(days) & (t["risk_pts"] > 0)]
+        t = t.assign(year=pd.DatetimeIndex(t["session"]).year, r=t["fill_pts"] / t["risk_pts"])
+        g = t.groupby(["id", "year"])
+        rows.append(
+            pd.DataFrame(
+                {"trades": g.size(), "mean_usd": g["net_usd"].mean(), "mean_R_gross": g["r"].mean()}
+            )
+            .reset_index()
+            .assign(scenario=scn)
+        )
+    return pd.concat(rows, ignore_index=True)
 
 
 def kill_verdicts(results: pd.DataFrame, dsr: pd.DataFrame, cfg: DictConfig) -> pd.DataFrame:
@@ -524,13 +580,14 @@ def compute(bars: pd.DataFrame, sessions: pd.DataFrame, cfg: DictConfig) -> dict
     if (sessions.index > end).any() or (bars["session"] > end).any():
         raise ValueError("out-of-sample sessions passed to the development backtest")
     q_height = train_excursion_quantiles(bars, sessions, cfg)
-    slips = sorted({float(scenario_costs(cfg, s)["slippage_ticks"]) for s in cfg.costs.scenarios})
-    trades_by_slip = {s: run_trades(bars, sessions, cfg, s, q_height) for s in slips}
-    results = evaluate(trades_by_slip, sessions, cfg)
-    dsr = deflate(trades_by_slip, sessions, cfg)
+    keys = {exec_key(cfg, scenario_costs(cfg, s)) for s in cfg.costs.scenarios}
+    trades_by_exec = {k: run_trades(bars, sessions, cfg, make_exec(cfg, k), q_height) for k in keys}
+    results = evaluate(trades_by_exec, sessions, cfg)
+    dsr = deflate(trades_by_exec, sessions, cfg)
     return {
         "results": results,
         "dsr": dsr,
+        "yearly": yearly(trades_by_exec, sessions, cfg),
         "verdicts": kill_verdicts(results, dsr, cfg),
         "q_height": q_height,
         "n_trials": len(configs(cfg)),
@@ -578,7 +635,7 @@ def run(root: Path) -> dict:
         mlflow.log_metric("trades_total_dev_usable_base", int(base["trades"].sum()))
         mlflow.log_metric("families_surviving", int(out["verdicts"]["survives"].sum()))
         with tempfile.TemporaryDirectory() as tmp:
-            for name in ("results", "dsr", "verdicts"):
+            for name in ("results", "dsr", "verdicts", "yearly"):
                 path = Path(tmp) / f"{name}.csv"
                 out[name].to_csv(path, index=False)
                 mlflow.log_artifact(str(path))
@@ -628,8 +685,38 @@ def _summary(out: dict) -> str:
     both = r.query("scenario == 'base' and period == 'development'").pivot_table(
         index="id", columns="universe", values="mean_usd", aggfunc="first"
     )
-    diff = (both["with_bars"] - both["usable"]).abs()
-    lines += [f"Both ways: max |mean USD/trade| difference usable vs with_bars: {diff.max():.2f}"]
+    diff = both["with_bars"] - both["usable"]
+    worst = diff.abs().idxmax()
+    wb = r.query("scenario == 'base' and period == 'development' and universe == 'with_bars'")
+    fam_pos = wb.groupby("family")["mean_usd"].apply(lambda s: bool((s > 0).all()))
+    flips = both[(both["usable"] <= 0) & (both["with_bars"] > 0)].index.tolist()
+    lines += [
+        "Both ways (audit A4): largest difference with_bars - usable: "
+        f"{diff[worst]:+.2f} USD/trade ({worst})",
+        f"  configurations positive only on with_bars: {flips or 'none'}",
+        f"  families positive in every window on with_bars: {int(fam_pos.sum())} of {len(fam_pos)}",
+        "",
+    ]
+    y = out["yearly"]
+    yt = y.pivot_table(index="year", columns="scenario", values="mean_usd", aggfunc="median")
+    yp = y.assign(pos=(y["mean_usd"] > 0).astype(float)).pivot_table(
+        index="year", columns="scenario", values="pos", aggfunc="mean"
+    )
+    lines += ["Median over configurations of mean USD/trade by year (development, usable):"]
+    lines += [yt.round(1).to_string(), ""]
+    lines += ["Share of configurations with positive mean by year:", yp.round(2).to_string(), ""]
+    dsr = out["dsr"]
+    lines += [
+        f"DSR hurdle: SR0 per day {dsr['sr0_per_period'].iloc[0]:.4f} "
+        f"(var_sr {dsr['var_sr_per_period'].iloc[0]:.2e}, {out['n_trials']} trials)"
+    ]
+    best = r.query("scenario == 'base' and period == 'development' and universe == 'usable'")
+    best = best.sort_values("mean_usd").iloc[-1]
+    lines += [
+        f"Best base configuration {best['id']}: {best['mean_usd']:.1f} USD/trade, 95% CI "
+        f"[{best['ci_lo_usd']:.1f}, {best['ci_hi_usd']:.1f}], sd {best['sd_usd']:.0f}, "
+        f"{int(best['trades'])} trades; same-bar stop+target share {best['share_both_touch']:.4f}"
+    ]
     return "\n".join(lines)
 
 

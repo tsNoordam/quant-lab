@@ -44,7 +44,21 @@ costs:
     low_commission: {commission_per_side_usd: 1.25}
     high_commission: {commission_per_side_usd: 4.00}
     mes: {commission_per_side_usd: 0.62, point_value: 5.0}
+    # "gross" = no fees, slippage or impact, but the base fill conventions
+    # (target trade-through, stop first). Its null on a driftless random walk
+    # is about -7 USD per trade, not 0 (audit A6; tests/integration/test_orb_audit.py).
     gross: {slippage_ticks: 0, commission_per_side_usd: 0.0, impact_off: true}
+    # Optimistic bracket (red team RT-2), a sensitivity, not a trial: half a tick
+    # of expected slippage, touch fills on targets, target first on a bar that
+    # touches both, no slippage on the time exit (trade at settlement), low
+    # all-in commission, no impact. Its random-walk null is about 0.
+    optimistic:
+      slippage_ticks: 0.5
+      time_exit_slippage_ticks: 0
+      target_trade_through_ticks: 0
+      same_bar: target_first
+      commission_per_side_usd: 1.90
+      impact_off: true
 
 rules:
   R1:   # opening-range breakout [PAPER-DERIVED window/trigger/midpoint stop]
@@ -58,7 +72,7 @@ rules:
     stops: [midpoint, opposite]
     targets: [none, 2R]
   R2:   # RTH gap fade toward the previous close [IMPLEMENTATION-ASSUMPTION trade]
-    stop_gap_multiples: [0.5, 1.0]  # stop beyond the entry, in units of |gap|
+    stop_gap_multiples: [0.5, 1.0]  # stop beyond the RTH open (minute 0), in units of |gap|
     exit_minutes: [60, close]
     min_gap_ticks: 1
   R3:   # R1 only toward an unfilled gap, target = previous close [PAPER-DERIVED combination]
