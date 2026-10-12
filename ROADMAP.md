@@ -100,10 +100,10 @@ MES). Paper 2 is preserved on the user's branch `Paper2`.
 | 20 | Extraction and test plan (track A): `research/{extraction,assumptions,methodology}/deepcharts_orb.md`, claims in `research/evidence/deepcharts_orb_evidence.csv`. The mechanical core is consistent (5-minute close beyond the RTH opening range); window, stop (eight versions) and targets (proprietary IVB levels) vary by session; no claim states a sample, period or costs. Ambiguities O1-O18 fixed before any data; sample 2010-17 / 2018-20 / 2021+ locked (the period of the course's evidence) | cb7e9b9 |
 | 21 | ES 1-minute data pipeline: `quant_lab.data.databento_fetch` (cost quote first, `--download` writes the unmodified DBN files and `data/metadata/databento_es.json`; key from `.env`, never written) and DVC stage `es_ingest` (`quant_lab.data.es_futures`): NYSE-RTH sessions with early closes, volume-ranked front month (`ES.v.0`) plus `ES.v.1` for the same-contract previous close on roll days, usable-session rule (98% minute coverage, no gap over 5 minutes), point-in-time roll check, bad-print and OHLC checks. Split locked in `conf/split/es.yaml` (`data_decisions.md`). Unit tests on synthetic bars and synthetic DBN files; real-data checks in `tests/data/test_es_sessions.py`. User's run (Databento quote $28.01, within the free credit): 7.67m bars, 4105 sessions, 4077 usable, 66 rolls (4 per full year), 34 early closes; the first run's missed 2014 roll fixed (rolls after bar-less sessions), vendor-degraded days excluded, unusable reasons recorded, results to be reported both ways | 2249b4e, f0a7bf0 + (this step) |
 
+| 22 | The course's statistics on ES 2010-2020 (`quant_lab.models.orb_stats`, `conf/orb/default.yaml`; user's run c71da631): C10 reproduced (97.5% vs 98%); C5 single breakout 54% vs 48-49%; C4 not reproduced (0.2% of days stay inside the 15-minute range, not 15%); gap fill 59.5% vs 69-71% (midline 76% vs 80%), from 91% for gaps under 0.1% to 19% over 1%. Target-before-stop shares at or below a driftless random walk's 1/(1+k) in every cell. `research/reports/orb_stats.md` | 8006745 + (this step) |
+
 Planned, in order:
 
-22. **Reproduce the course's statistics** (C1-C5, C8-C10, G1-G3) on the
-    development period: excursion curves, range and gap-fill probabilities.
 23. **Backtest R1-R4** on 2010-2020 with costs, small grid, robustness and
     deflated Sharpe; audit (`/audit-backtest`, red team) before any freeze.
 24. **Freeze and one-shot OOS** on 2021 onward, only if step 23 passes the

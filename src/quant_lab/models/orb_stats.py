@@ -296,8 +296,8 @@ def gap_table(gaps: pd.DataFrame, cfg: DictConfig, **keys) -> list[dict]:
 
 def claims_table(stats: pd.DataFrame, cfg: DictConfig) -> pd.DataFrame:
     rows = []
-    for c in cfg.claims:
-        sel = (stats["stat"] == c.stat) & (stats["universe"] == "usable")
+    for c, uni in ((c, u) for c in cfg.claims for u in cfg.universes):
+        sel = (stats["stat"] == c.stat) & (stats["universe"] == uni)
         if "window" in c:
             sel &= stats["window"] == c.window
         else:
@@ -316,8 +316,8 @@ def claims_table(stats: pd.DataFrame, cfg: DictConfig) -> pd.DataFrame:
                 verdict = "consistent"
             rows.append(
                 {
-                    "claim": c.id, "text": c.text, "period": period, "n": int(r["n"]),
-                    "ours": r["p"], "lo": r["lo"], "hi": r["hi"],
+                    "claim": c.id, "text": c.text, "universe": uni, "period": period,
+                    "n": int(r["n"]), "ours": r["p"], "lo": r["lo"], "hi": r["hi"],
                     "claimed": f"{lo_c:.2f}" if lo_c == hi_c else f"{lo_c:.2f}-{hi_c:.2f}",
                     "verdict": verdict,
                 }
@@ -383,7 +383,7 @@ def run(root: Path) -> dict:
         )
         mlflow.log_param("timeframe", "1m bars, 5m trigger")
         for r in out["claims"].itertuples():
-            mlflow.log_metric(f"{r.claim}.{r.period}", float(r.ours))
+            mlflow.log_metric(f"{r.claim}.{r.universe}.{r.period}", float(r.ours))
         with tempfile.TemporaryDirectory() as tmp:
             for name, frame in out.items():
                 path = Path(tmp) / f"{name}.csv"
@@ -409,7 +409,7 @@ def _summary(out: dict) -> str:
         out["counts"].to_string(index=False),
         "",
     ]
-    lines += ["Claims vs ours (usable sessions, 95% Wilson interval):"]
+    lines += ["Claims vs ours (both universes, 95% Wilson interval):"]
     lines += [out["claims"].round(3).to_string(index=False), ""]
     core = [
         "p_any_side_touch",

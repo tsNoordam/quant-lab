@@ -141,6 +141,8 @@ def test_compute_reports_both_universes_and_all_periods():
     assert counts[("train", "usable")] == 8
     assert set(out["claims"]["claim"]) == {"C4", "C5", "C10", "G1", "G2", "G2m"}
     assert set(out["claims"]["period"]) == {"train", "validation", "development"}
+    assert set(out["claims"]["universe"]) == {"usable", "with_bars"}
+    assert len(out["claims"]) == 6 * 2 * 3
     assert (
         out["claims"]["verdict"]
         .isin(["consistent", "lower than claimed", "higher than claimed"])
@@ -171,6 +173,8 @@ def test_claims_verdicts():
         ["p_full_fill", np.nan, "all", 0.70, 0.67, 0.73, 900],
     ]
     stats = pd.DataFrame(rows, columns=cols).assign(universe="usable", period="development")
-    claims = o.claims_table(stats, cfg).set_index("claim")
+    claims = o.claims_table(stats, cfg)
+    assert set(claims["universe"]) == {"usable"}  # no with_bars rows in this input
+    claims = claims.set_index("claim")
     assert claims.loc["C4", "verdict"] == "lower than claimed"
     assert claims.loc["G2", "verdict"] == "consistent"
