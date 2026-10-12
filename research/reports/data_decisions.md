@@ -29,6 +29,13 @@ Fixed before any ES data was downloaded.
   `data/metadata/databento_es.json`) are kept but not usable. Added
   2026-10-12 after the download warned of degraded days from 2014-06-11,
   before any statistic was computed.
+- **Both ways.** Unusable sessions are not random: they include the March
+  2020 days with market-wide trading halts, when a gap in the minutes is the
+  market, not a data error. Every track-A statistic and backtest (steps 22-23)
+  is therefore reported on the usable sessions (primary) and on all sessions
+  with bars (sensitivity). `sessions.parquet` records each session's
+  `unusable_reason` (no_bars, vendor_flagged, coverage, gap). Decided
+  2026-10-12 from the ingest report's dates only, before any statistic.
 
 **Split** (`conf/split/es.yaml`, locked).
 

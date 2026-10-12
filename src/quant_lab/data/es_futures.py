@@ -253,12 +253,18 @@ def build_sessions(
         )
 
     s["vendor_flagged"] = s.index.isin(list(bad_days))
-    s["usable"] = (
-        (s["bars"] > 0)
-        & (s["coverage"] >= vcfg.min_minute_coverage)
-        & (s["max_gap"] <= vcfg.max_gap_minutes)
-        & ~s["vendor_flagged"]
-    )
+    # every reason that applies, so that a market halt (a gap in an otherwise
+    # clean day) can be told apart from a vendor data problem
+    reasons = {
+        "no_bars": s["bars"] == 0,
+        "vendor_flagged": s["vendor_flagged"],
+        "coverage": (s["bars"] > 0) & (s["coverage"] < vcfg.min_minute_coverage),
+        "gap": (s["bars"] > 0) & (s["max_gap"] > vcfg.max_gap_minutes),
+    }
+    s["unusable_reason"] = [
+        "+".join(k for k, mask in reasons.items() if mask.loc[d]) for d in s.index
+    ]
+    s["usable"] = s["unusable_reason"] == ""
     s["instrument_id"] = s["instrument_id"].astype("Int64")
     issues += check_jumps(front, vcfg)
     return front, s.drop(columns="prev_session"), issues
@@ -280,7 +286,14 @@ def report(bars: pd.DataFrame, sessions: pd.DataFrame, issues: list[Issue]) -> d
             str(d.date()) for d in sessions.index[sessions["bars"] == 0]
         ],
         "sessions_vendor_flagged": int(sessions["vendor_flagged"].sum()),
-        "sessions_unusable_dates": [str(d.date()) for d in sessions.index[~sessions["usable"]]],
+        "sessions_unusable": {
+            str(d.date()): r
+            for d, r in sessions.loc[~sessions["usable"], "unusable_reason"].items()
+        },
+        "sessions_unusable_by_reason": {
+            k: int(sessions["unusable_reason"].str.contains(k, regex=False).sum())
+            for k in ("no_bars", "vendor_flagged", "coverage", "gap")
+        },
         "rolls_per_year": {
             int(y): int(n) for y, n in sessions["roll"].groupby(sessions.index.year).sum().items()
         },

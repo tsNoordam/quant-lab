@@ -74,6 +74,17 @@ def test_vendor_flagged_days_are_not_usable(schedule):
     assert s["vendor_flagged"].tolist() == [False, True]
     assert s["usable"].tolist() == [True, False]
     assert s.loc[days[1], "coverage"] == 1.0  # complete bars, still excluded
+    assert s["unusable_reason"].tolist() == ["", "vendor_flagged"]
+
+
+def test_unusable_reasons_separate_halts_from_vendor_problems(schedule):
+    days = ["2019-03-11", "2019-03-12", "2019-03-13"]
+    halt = minute_bars(schedule, days[0], rank=0, instrument=A, base=2800, drop=range(60, 75))
+    clean = minute_bars(schedule, days[2], rank=0, instrument=A, base=2800)
+    _, s, _ = run(pd.concat([halt, clean]), schedule, days, frozenset({pd.Timestamp(days[1])}))
+    # a 15-minute halt is a gap and also costs 3.8% of the minutes
+    assert s["unusable_reason"].tolist() == ["coverage+gap", "no_bars+vendor_flagged", ""]
+    assert s["usable"].tolist() == [False, False, True]
 
 
 def test_schedule_follows_dst_and_early_closes(schedule):
@@ -286,7 +297,7 @@ def test_convert_end_to_end_from_dbn_files(schedule, tmp_path):
 
     rep = es.convert(cfg, tmp_path)
     assert rep["sessions"] == 2 and rep["sessions_usable"] == 2 and rep["rolls"] == 1
-    assert rep["rolls_per_year"] == {2019: 1} and rep["sessions_unusable_dates"] == []
+    assert rep["rolls_per_year"] == {2019: 1} and rep["sessions_unusable"] == {}
     assert rep["bars"] == len(rank0) + len(rank1)
     s = pd.read_parquet(tmp_path / "processed/es/sessions.parquet")
     rth1 = pd.read_parquet(tmp_path / "processed/es/rth_1m.parquet")
