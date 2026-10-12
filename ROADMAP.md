@@ -100,14 +100,14 @@ MES). Paper 2 is preserved on the user's branch `Paper2`.
 | 20 | Extraction and test plan (track A): `research/{extraction,assumptions,methodology}/deepcharts_orb.md`, claims in `research/evidence/deepcharts_orb_evidence.csv`. The mechanical core is consistent (5-minute close beyond the RTH opening range); window, stop (eight versions) and targets (proprietary IVB levels) vary by session; no claim states a sample, period or costs. Ambiguities O1-O18 fixed before any data; sample 2010-17 / 2018-20 / 2021+ locked (the period of the course's evidence) | cb7e9b9 |
 | 21 | ES 1-minute data pipeline: `quant_lab.data.databento_fetch` (cost quote first, `--download` writes the unmodified DBN files and `data/metadata/databento_es.json`; key from `.env`, never written) and DVC stage `es_ingest` (`quant_lab.data.es_futures`): NYSE-RTH sessions with early closes, volume-ranked front month (`ES.v.0`) plus `ES.v.1` for the same-contract previous close on roll days, usable-session rule (98% minute coverage, no gap over 5 minutes), point-in-time roll check, bad-print and OHLC checks. Split locked in `conf/split/es.yaml` (`data_decisions.md`). Unit tests on synthetic bars and synthetic DBN files; real-data checks in `tests/data/test_es_sessions.py`. User's run (Databento quote $28.01, within the free credit): 7.67m bars, 4105 sessions, 4077 usable, 66 rolls (4 per full year), 34 early closes; the first run's missed 2014 roll fixed (rolls after bar-less sessions), vendor-degraded days excluded, unusable reasons recorded, results to be reported both ways | 2249b4e, f0a7bf0 + (this step) |
 
-| 22 | The course's statistics on ES 2010-2020 (`quant_lab.models.orb_stats`, `conf/orb/default.yaml`; user's run c71da631): C10 reproduced (97.5% vs 98%); C5 single breakout 54% vs 48-49%; C4 not reproduced (0.2% of days stay inside the 15-minute range, not 15%); gap fill 59.5% vs 69-71% (midline 76% vs 80%), from 91% for gaps under 0.1% to 19% over 1%. Target-before-stop shares at or below a driftless random walk's 1/(1+k) in every cell. `research/reports/orb_stats.md` | 8006745 + (this step) |
+| 22 | The course's statistics on ES 2010-2020 (`quant_lab.models.orb_stats`, `conf/orb/default.yaml`; user's run c71da631): C10 reproduced (97.5% vs 98%); C5 single breakout 54% vs 48-49%; C4 not reproduced (0.2% of days stay inside the 15-minute range, not 15%); gap fill 59.5% vs 69-71% (midline 76% vs 80%), from 91% for gaps under 0.1% to 19% over 1%. Target-before-stop shares at or below a driftless random walk's 1/(1+k) in every cell. `research/reports/orb_stats.md` | 8006745, 9f3684e |
+| 23 | Track-A backtest (`quant_lab.backtest.orb`, `conf/orb/backtest.yaml`): 70 configurations of R1/R1c/R2/R3/R4 on ES 2010-2020, one contract, standard retail costs (ES $2.50/side, 1 tick). User's audited run 8c5e84e4: **0 of 70 positive, 0 of 26 families survive the kill criterion**; median -$33.2/trade, best -$18.9 (95% CI up to +$0.5); gross indistinguishable from the engine's random-walk null; optimistic execution bracket 2/70 positive, best +$0.28; negative after costs in every year; unusable sessions change no verdict. Audit (auditor + red team): RT-1, RT-8, A1, A3 confirmed and fixed, the rest rejected or documented; PASS with WARNINGs. `research/reports/orb_backtest.md`, `research/reports/audits/2026-10-12-orb-track-a.md` | 7a65518, 07026cd-21b2762 + (this step) |
 
 Planned, in order:
 
-23. **Backtest R1-R4** on 2010-2020 with costs, small grid, robustness and
-    deflated Sharpe; audit (`/audit-backtest`, red team) before any freeze.
-24. **Freeze and one-shot OOS** on 2021 onward, only if step 23 passes the
-    pre-registered kill criteria.
+24. **Freeze and one-shot OOS: not run.** No family passed step 23's
+    pre-registered kill criterion, so nothing is frozen; 2021+ stays unspent
+    and locked.
 25. **Track B design**: the decision journal (what is recorded, how it is
     scored against the track-A base), on trades data.
 
