@@ -239,6 +239,13 @@ uv run pytest tests/data/test_es_sessions.py
 RTH is the NYSE schedule (early closes included); the front month rolls by
 volume; the split is locked in `conf/split/es.yaml` (2021 on is out-of-sample).
 
+The course's probability claims on the development period (step 22; MLflow
+`es.orb_stats/course_statistics`, definitions in `conf/orb/default.yaml`):
+
+```bash
+uv run python -m quant_lab.models.orb_stats
+```
+
 ## Robustness (step 9)
 
 Every case in `conf/robustness/default.yaml` (costs, dividends, capital and

@@ -1,0 +1,44 @@
+# Step 22: the course's opening-range and gap statistics, reproduced on the ES
+# development period (train + validation; out-of-sample refused).
+# Definitions: research/assumptions/deepcharts_orb.md (O1-O18) and
+# research/methodology/deepcharts_orb.md. Fixed before the first run.
+#
+#   uv run python -m quant_lab.models.orb_stats
+
+futures: conf/futures/es.yaml
+split: conf/split/es.yaml
+periods: [train, validation, development]   # development = train + validation
+universes: [usable, with_bars]               # data_decisions.md: report both ways
+
+range:
+  windows: [15, 30, 60]       # O1: minutes from the RTH open
+  trigger_minutes: 5          # O3: a 5-minute close beyond the range, bars aligned to 09:30
+
+excursion:
+  # Maximum favourable excursion from the trigger close to the RTH close,
+  # in multiples of the range height and in ticks (O15).
+  height_multiples: [0.25, 0.5, 0.75, 1.0, 1.5, 2.0, 3.0]
+  ticks: [4, 8, 16, 24, 40, 60, 80]
+  # "70% of breakouts reach X": the 30% quantile of the excursion.
+  quantile: 0.30
+
+targets:
+  r_multiples: [1, 2, 3]      # O7
+  stops: [midpoint, opposite] # O6
+  # A 1-minute bar touching both the stop and the target counts as stopped (O10).
+
+gap:
+  # |gap| in % of the previous RTH close of the same contract (O11, O12).
+  buckets_pct: [0.0, 0.1, 0.25, 0.5, 1.0, .inf]
+  early_minutes: 60
+  min_ticks: 1                # O12: open == previous close is no gap
+
+# The course's numbers (research/evidence/deepcharts_orb_evidence.csv), with
+# the statistic each is compared against.
+claims:
+  - {id: C4, window: 15, stat: p_inside_close, claimed: [0.15, 0.15], text: "price stays inside the 15-minute range all session"}
+  - {id: C5, window: 15, stat: p_single_close, claimed: [0.48, 0.49], text: "single breakout"}
+  - {id: C10, window: 60, stat: p_any_side_touch, claimed: [0.98, 0.98], text: "at least one side of the 60-minute IB taken out"}
+  - {id: G1, stat: p_full_fill, claimed: [0.68, 0.70], text: "RTH gap refilled"}
+  - {id: G2, stat: p_full_fill, claimed: [0.69, 0.71], text: "full gap fill"}
+  - {id: G2m, stat: p_mid_fill, claimed: [0.80, 0.80], text: "gap midline fill"}
