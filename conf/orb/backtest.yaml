@@ -51,7 +51,8 @@ costs:
     # Optimistic bracket (red team RT-2), a sensitivity, not a trial: half a tick
     # of expected slippage, touch fills on targets, target first on a bar that
     # touches both, no slippage on the time exit (trade at settlement), low
-    # all-in commission, no impact. Its random-walk null is about 0.
+    # all-in commission, no impact. Its fill conventions have a random-walk
+    # null of about 0 before costs; the half tick and commission remain.
     optimistic:
       slippage_ticks: 0.5
       time_exit_slippage_ticks: 0

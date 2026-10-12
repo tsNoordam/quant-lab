@@ -55,3 +55,74 @@ def test_entry_ignores_bars_from_the_entry_bar_on(seed, conf):
     assert pert[0]["direction"] == first["direction"]
     assert pert[0]["entry_minute"] == e
     assert pert[0]["risk_pts"] == pytest.approx(first["risk_pts"])
+
+
+# Audit A8: perturb the entry bar too (all but its open, which is the fill),
+# check every trade of a session (the R1c re-entry included), and cover R2/R3
+# with sessions that gap.
+@pytest.mark.parametrize("seed", range(40))
+@pytest.mark.parametrize("conf", CONFS, ids=lambda c: f"{c['rule']}-{c['window']}")
+def test_every_trade_ignores_the_entry_bar_after_its_open_and_later_bars(seed, conf):
+    m, o, h, lo, c = session(seed)
+    prev_close = float(o[0]) + (3.0 if seed % 2 else -3.0)
+    ranges = {w: b.opening_range(m, h, lo, c, w, 5) for w in (15, 30, 60)}
+    base = b.session_trades((m, o, h, lo, c), ranges, prev_close, conf, EX, **KW)
+    if not base:
+        pytest.skip("no trade on this path")
+    for k, trade in enumerate(base):
+        e = trade["entry_minute"]
+        so, sh, sl, sc = (x.copy() for x in (o, h, lo, c))
+        later, at = m > e, m == e
+        shift = 40.0 * -trade["direction"]
+        so[later] += shift
+        sc[later | at] += shift
+        sh[later | at] = np.maximum(
+            sh[later | at] + shift, np.maximum(so[later | at], sc[later | at])
+        )
+        sl[later | at] = np.minimum(
+            sl[later | at] + shift, np.minimum(so[later | at], sc[later | at])
+        )
+        r2 = {w: b.opening_range(m, sh, sl, sc, w, 5) for w in (15, 30, 60)}
+        pert = b.session_trades((m, so, sh, sl, sc), r2, prev_close, conf, EX, **KW)
+        assert len(pert) > k, "a trade disappeared when only its entry bar and later bars changed"
+        assert pert[k]["direction"] == trade["direction"]
+        assert pert[k]["entry_minute"] == e
+
+
+def test_r4_quantiles_ignore_validation_and_unusable_sessions():
+    import pandas as pd
+
+    from quant_lab.backtest.orb import load_config, train_excursion_quantiles
+
+    root = __import__("pathlib").Path(__file__).resolve().parents[2]
+    cfg = load_config(root)
+    rng = np.random.default_rng(3)
+    days = list(pd.bdate_range("2017-11-01", periods=40)) + list(
+        pd.bdate_range("2018-01-02", periods=20)
+    )
+    rows, sess = [], []
+    for i, d in enumerate(days):
+        c = (2000 + np.cumsum(rng.normal(0, 0.6, 390)) / TICK).round() * TICK
+        o = np.r_[c[0], c[:-1]]
+        hi, low = np.maximum(o, c) + TICK, np.minimum(o, c) - TICK
+        frame = {"open": o, "high": hi, "low": low, "close": c}
+        rows.append(pd.DataFrame({"session": d, "minute": np.arange(390), **frame}))
+        sess.append(
+            {
+                "session": d,
+                "usable": i % 7 != 0,
+                "bars": 390,
+                "close": c[-1],
+                "prev_close": c[0] - 1,
+                "volume": 1e6,
+            }
+        )
+    bars_ = pd.concat(rows, ignore_index=True)
+    s = pd.DataFrame(sess).set_index("session")
+    q0 = train_excursion_quantiles(bars_, s, cfg)
+    b2 = bars_.copy()
+    val = b2["session"] >= pd.Timestamp("2018-01-01")
+    for col in ("open", "high", "low", "close"):
+        b2.loc[val, col] *= 3
+    b2.loc[b2["session"].isin(s.index[~s["usable"]]), "high"] += 500
+    assert train_excursion_quantiles(b2, s, cfg) == q0
