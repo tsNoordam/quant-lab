@@ -5,6 +5,45 @@ backtest → audit → robustness → out-of-sample. Papers: Maymin, *Self-Impos
 Limits to Arbitrage* (steps 1-12, done); de Jong, Rosenthal & van Dijk (2009),
 *The Risk and Return of Arbitrage in Dual-Listed Companies* (steps 13+).
 
+## Idea funnel (project 4)
+
+A light pipeline next to the heavy lab: ideas come in, become cards with labelled
+evidence, pass or fail hard stops in code, and every idea and test is recorded in an
+append-only register. Spec: `research/specs/funnel/requirements.md`. Runs on Windows
+with uv (no DVC, MLflow or Hydra needed).
+
+```bash
+uv run python -m quant_lab.funnel status
+```
+
+```bash
+uv run python -m quant_lab.funnel list
+```
+
+```bash
+uv run python -m quant_lab.funnel show Q0005
+```
+
+New idea: create the card, fill in every field with its label and evidence, then screen it:
+
+```bash
+uv run python -m quant_lab.funnel new --title "..." --market cme_futures --source paper --ref "https://..."
+```
+
+```bash
+uv run python -m quant_lab.funnel screen Q0012
+```
+
+| Command | What |
+|---|---|
+| `new` | new card (status `inbox`) in `research/funnel/ideas/` |
+| `screen ID` | hard stops K1-K6; FAIL -> `rejected_screen`, UNKNOWN -> `needs_info`, PASS -> `hypothesis` |
+| `move ID STATUS` | human status change (`--reason` for rejections, `--override` with a reason to overrule a hard stop) |
+| `test ID --kind quick/full/demo --verdict ... --spec FILE` | record a test; the spec must exist before the test ran |
+| `note`, `list`, `show`, `status`, `check`, `index` | notes, overviews, validation, SQLite index |
+
+Your markets, default costs and budgets: `conf/funnel/profile.yaml`.
+
 Developer hand-over: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) (architecture,
 diagrams, entry points) and [docs/OPERATIONS.md](docs/OPERATIONS.md) (setup,
 operations, SOPs, AI tooling).

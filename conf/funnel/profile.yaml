@@ -1,0 +1,38 @@
+# User profile for the idea funnel's hard stops (quant_lab.funnel.kill).
+# Plain YAML, read by the funnel directly (not a Hydra group).
+# Answers of the user on 2026-11-24; costs are [IMPLEMENTATION-ASSUMPTION] retail estimates.
+
+markets:                       # market classes the user can trade (K3)
+  - fx_cfd                     # FX and CFDs via MT5
+  - cme_futures                # CME futures, including micros
+  - stocks_etfs
+  - crypto
+  - polymarket
+
+# Default round-trip cost (bps of notional) when an idea card gives none (K4).
+# [IMPLEMENTATION-ASSUMPTION] typical retail all-in costs: spread + commission + fees.
+default_cost_bps_round_trip:
+  fx_cfd: 1.5                  # majors: ~0.5-1 pip spread + ~0.7 bps commission
+  cme_futures: 1.5             # one tick (ZN ~1.4 bps, ES ~0.5 bps) + ~$4 per contract round trip
+  stocks_etfs: 5.0             # liquid large caps and ETFs: spread + commission
+  crypto: 10.0                 # taker fees ~5 bps per side on major venues
+  polymarket: 200.0            # ~1-2 cent spread on a ~50 cent contract
+  other: 10.0
+
+cost_multiple: 3.0             # K4: gross effect per trade must be >= this multiple of the cost
+min_events_per_year: 10        # K5
+data_budget_usd: 50.0          # K2: maximum data cost for one idea without asking
+
+# K6: benchmark prints the user can actually trade at.
+# [IMPLEMENTATION-ASSUMPTION] market-on-close orders give access to stock closing auctions;
+# FX benchmark fixes (WM/Reuters, Tokyo) are only available through a bank's fixing service.
+print_access:
+  - stock_closing_auction
+  - stock_opening_auction
+
+# Soft flags (never a stop)
+flag_publication_age_years: 5  # older ideas without post-publication evidence get a flag
+flag_min_sample_years: 5
+
+# Test budget: a new result must beat max(t_floor, Bonferroni t for the tests run so far).
+t_floor: 3.0

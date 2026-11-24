@@ -111,3 +111,30 @@ Planned, in order:
 25. **Track B design**: the decision journal (what is recorded, how it is
     scored against the track-A base), on trades data.
 
+# Project 4: idea funnel (steps F1+)
+
+Collect trading ideas from papers, feeds and tips; turn each into a testable
+hypothesis; kill the bad ones fast with hard stops in code; record every idea
+and every test, failures included, so the lab does not build its own
+survivorship bias. Spec: `research/specs/funnel/requirements.md`. Branch:
+`claude/cool-franklin-ln0skd` (from `claude/sharp-bohr-snz350`). User profile
+(2026-11-24): FX/CFDs via MT5, CME futures incl. micros, stocks and ETFs,
+crypto, Polymarket; Windows with uv; the Judge runs inside Claude Code.
+
+| Step | What | Commit |
+|---|---|---|
+| F1 | Register (`quant_lab.funnel`): idea cards with labelled evidence per field and a validator, append-only event log with transition and actor rules (the Judge can never change a status; promotions need a passed test with a pre-written spec; explicit human overrides are listed), hard stops K1-K6 (`kill.py`, profile `conf/funnel/profile.yaml`), soft flags, test budget (t-hurdle max(3, Bonferroni)), SQLite index, CLI. Seeded with 11 ideas judged before the funnel (Gotobi, London fix, Krohn fixings, Treasury intraday and multi-day, MSCI, GSCI, Maymin, de Jong, ORB, Treasury month-end post-hoc): 7 rejected at the screen, each on the rule that matches the research outcome; Treasury multi-day the only candidate | (this step) |
+
+Planned, in order:
+
+- F2. **Judge**: Claude Code skill + agent in two passes (neutral extraction into
+  a card with verbatim quotes, then adversarial review: survivorship bias, few
+  trades, curve fitting, no out-of-sample, costs, conflicts of interest), and a
+  golden-set test on the seeded ideas using source information only.
+- F3. **Event test** (`quant_lab.events`): calendar, windows, bid/ask costs,
+  control days, all-days benchmark, permutation, periods, cost sensitivity;
+  adapters for Dukascopy M1 bid/ask and Databento bbo-1m; planted-effect and
+  null validation; ported from the London and Treasury repositories.
+- F4. **Paper intake** (arXiv q-fin, SSRN, NBER, Fed/ECB working papers) with
+  deduplication, and the weekly shortlist digest.
+

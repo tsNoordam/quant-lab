@@ -8,7 +8,9 @@ Limits to Arbitrage* (steps 1-12, done); de Jong, Rosenthal & van Dijk (2009),
 *The Risk and Return of Arbitrage in Dual-Listed Companies* (steps 13-19, done;
 branch `Paper2`). Current: project 3, order flow on ES futures from the user's
 DeepCharts course material (steps 20+; track A tests the course's mechanical
-session edges, track B the user's own order-flow decisions).
+session edges, track B the user's own order-flow decisions). Project 4 (steps
+F1+): the idea funnel, which collects trading ideas, kills bad ones with hard
+stops in code and records every idea and test (`research/specs/funnel/requirements.md`).
 
 The goal is NOT to maximize historical returns.
 
@@ -55,6 +57,8 @@ Git + DVC + MLflow record what happened.
 | `tests/` | `unit`, `data`, `structural` (look-ahead/leakage), `integration` (engine reconciliation) | Git |
 | `notebooks/` | Exploration only. Final backtests live in `.py` files | Git |
 | `research/reports/audits/` | Backtest audit reports (`/audit-backtest`) | Git |
+| `research/funnel/` | Idea register: one card per idea (`ideas/<ID>.md`) and the append-only event log (`log.jsonl`) | Git |
+| `conf/funnel/profile.yaml` | User profile for the funnel's hard stops (markets, default costs, budgets) | Git |
 | `ROADMAP.md` | Numbered steps: done and remaining | Git |
 | `mlflow.db`, `mlruns/` | Experiment tracking (local, not committed) | MLflow |
 
@@ -158,6 +162,28 @@ Before declaring a task complete:
 uv run pytest
 uv run ruff check . && uv run ruff format --check .
 ```
+
+## Idea funnel (project 4)
+
+Spec: `research/specs/funnel/requirements.md`. CLI: `uv run python -m quant_lab.funnel`.
+
+- The register is append-only. Never edit or delete a line of
+  `research/funnel/log.jsonl`; correct a mistake with a new entry. Write to it
+  only through the CLI or `quant_lab.funnel.registry.append`, which validates
+  every entry.
+- Every card field carries a label (`SOURCE` with a verbatim quote and where,
+  `OWN-TEST` with the report file, `ASSUMPTION` with its reasoning,
+  `NOT-IN-SOURCE`, `MISSING`). Never invent a value: unknown is `MISSING`.
+- Hard stops are deterministic code (`quant_lab.funnel.kill`), never an LLM.
+- The Judge (an AI) only fills card fields and adds flags. It never changes a
+  status or stage, never records a test, and never scores profitability.
+- A human override of a hard stop needs an explicit reason in the log entry;
+  it never skips a required test, and every override is listed.
+- Every `quick`, `full` or `demo` test needs a spec written before it runs and
+  is logged, failures included. A new result must beat the t-hurdle that
+  `funnel status` prints (rises with the number of tests).
+- Funnel code stays light (no DVC, MLflow or Hydra) and must run on Windows
+  with uv. Paid data shows its cost before anything is bought.
 
 ## Working in steps
 
